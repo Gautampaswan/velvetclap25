@@ -36,8 +36,10 @@ Without Razorpay keys, checkout runs in **demo mode** (order saved, no payment g
 | POST | `/api/delivery/check` | Pincode delivery estimate |
 | POST | `/api/coupons/validate` | Promo codes (`VC25`) |
 | POST | `/api/newsletter` | Email signup |
+| GET | `/api/admin/orders` | Pack queue (admin password) |
+| PATCH | `/api/admin/orders/:orderRef` | `{ "status": "packed" \| "shipped" }` |
 
-Orders and newsletter data: `data/store.json`.
+Orders and newsletter data: `data/store.json`. **COD orders** save as `cod_confirmed` with customer address — view and mark packed in **`/admin.html` → Orders to pack**.
 
 ## Shop staff: photos & products (20+ SKUs)
 

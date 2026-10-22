@@ -23,9 +23,16 @@
     <div id="app-panel" class="hidden mt-8 space-y-8">
       <div class="flex flex-wrap gap-3 items-center">
         <span id="product-count" class="text-sm text-zinc-400"></span>
+        <span id="orders-badge" class="text-sm text-[#C6FF00] font-bold"></span>
         <button id="btn-export" class="text-xs border border-zinc-600 px-3 py-1.5 hover:border-[#C6FF00] uppercase font-bold">Export catalog JSON</button>
         <button id="btn-logout" class="text-xs text-zinc-500 hover:text-white ml-auto">Log out</button>
       </div>
+
+      <section class="border border-zinc-700 p-6 bg-[#121215] space-y-3">
+        <h2 class="font-bold text-white uppercase text-sm">Orders to pack (COD & paid)</h2>
+        <p class="text-xs text-zinc-500">When a customer chooses COD, the order appears here with address — mark <strong class="text-zinc-300">Packed</strong> then <strong class="text-zinc-300">Shipped</strong>.</p>
+        <ul id="order-list" class="space-y-3 text-sm max-h-96 overflow-y-auto"></ul>
+      </section>
 
       <form id="add-form" class="border border-zinc-700 p-6 bg-[#121215] space-y-4">
         <h2 class="font-bold text-white uppercase text-sm">Add product</h2>
@@ -132,10 +139,59 @@
         document.getElementById('login-error').classList.add('hidden');
         showApp(true);
         await loadProducts();
+        await loadOrders();
       } catch (e) {
         document.getElementById('login-error').textContent = e.message;
         document.getElementById('login-error').classList.remove('hidden');
       }
+    }
+
+    async function loadOrders() {
+      const data = await api('/api/admin/orders');
+      document.getElementById('orders-badge').textContent =
+        data.needsPacking > 0 ? `${data.needsPacking} order(s) need packing` : 'No pending packs';
+      const ul = document.getElementById('order-list');
+      if (!data.orders.length) {
+        ul.innerHTML = '<li class="text-zinc-500 text-xs">No orders yet.</li>';
+        return;
+      }
+      ul.innerHTML = data.orders.map((o) => {
+        const c = o.customer || {};
+        const items = (o.items || []).map((i) => `${i.title} ×${i.quantity} (${i.size})`).join('; ');
+        const canPack = ['cod_confirmed', 'paid', 'demo_confirmed'].includes(o.status);
+        const canShip = o.status === 'packed';
+        return `<li class="border border-zinc-800 p-3 bg-[#0B0B0D]">
+          <div class="flex justify-between gap-2 flex-wrap">
+            <span class="font-bold text-white">${o.orderRef}</span>
+            <span class="text-xs uppercase ${o.paymentMethod === 'cod' ? 'text-[#C6FF00]' : 'text-zinc-400'}">${o.paymentMethod || 'online'} · ${o.status}</span>
+          </div>
+          <div class="text-[#C6FF00] text-xs mt-1">₹${o.total} · ${new Date(o.createdAt).toLocaleString('en-IN')}</div>
+          <div class="text-xs text-zinc-400 mt-2">${items}</div>
+          ${c.name ? `<div class="text-xs text-zinc-300 mt-2"><strong>${c.name}</strong> · ${c.phone || ''}<br/>${c.address || ''} · PIN ${c.pincode || ''}</div>` : '<div class="text-xs text-amber-500 mt-2">No address (old order)</div>'}
+          <div class="flex gap-2 mt-3 flex-wrap">
+            ${canPack ? `<button type="button" class="btn-pack text-xs bg-[#C6FF00] text-black px-2 py-1 font-bold uppercase" data-ref="${o.orderRef}">Mark packed</button>` : ''}
+            ${canShip ? `<button type="button" class="btn-ship text-xs border border-zinc-500 px-2 py-1 font-bold uppercase hover:border-[#C6FF00]" data-ref="${o.orderRef}">Mark shipped</button>` : ''}
+          </div>
+        </li>`;
+      }).join('');
+      ul.querySelectorAll('.btn-pack').forEach((btn) => {
+        btn.addEventListener('click', async () => {
+          await api(`/api/admin/orders/${encodeURIComponent(btn.dataset.ref)}`, {
+            method: 'PATCH',
+            body: JSON.stringify({ status: 'packed' }),
+          });
+          await loadOrders();
+        });
+      });
+      ul.querySelectorAll('.btn-ship').forEach((btn) => {
+        btn.addEventListener('click', async () => {
+          await api(`/api/admin/orders/${encodeURIComponent(btn.dataset.ref)}`, {
+            method: 'PATCH',
+            body: JSON.stringify({ status: 'shipped' }),
+          });
+          await loadOrders();
+        });
+      });
     }
 
     async function loadProducts() {
@@ -219,7 +275,7 @@
     });
 
     if (token) {
-      api('/api/admin/products').then(() => { showApp(true); loadProducts(); }).catch(() => {});
+      api('/api/admin/products').then(() => { showApp(true); loadProducts(); loadOrders(); }).catch(() => {});
     }
   </script>
 </body>

@@ -646,6 +646,15 @@
         </div>
         <div id="coupon-alert" class="hidden text-[11px] font-space font-bold"></div>
 
+        <!-- Ship-to (for COD / delivery) -->
+        <div class="space-y-2 pt-2 border-t border-wireframe/60">
+          <p class="text-[10px] font-space font-bold text-zinc-400 uppercase tracking-wider">Ship to (required for COD)</p>
+          <input id="ship-name" type="text" placeholder="Full name" class="w-full bg-canvas border border-wireframe px-3 py-2 text-xs text-white focus:border-lime focus:outline-none" />
+          <input id="ship-phone" type="tel" placeholder="Mobile (10 digits)" maxlength="10" class="w-full bg-canvas border border-wireframe px-3 py-2 text-xs text-white focus:border-lime focus:outline-none" />
+          <input id="ship-pincode" type="text" placeholder="Pincode" maxlength="6" class="w-full bg-canvas border border-wireframe px-3 py-2 text-xs text-white focus:border-lime focus:outline-none" />
+          <textarea id="ship-address" rows="2" placeholder="Full address (house, street, city)" class="w-full bg-canvas border border-wireframe px-3 py-2 text-xs text-white focus:border-lime focus:outline-none resize-none"></textarea>
+        </div>
+
         <!-- Calculations -->
         <div class="space-y-1.5 text-xs font-space pt-2 border-t border-wireframe/60">
           <div class="flex justify-between text-zinc-400">
@@ -1588,7 +1597,7 @@
 
     function finalizeSuccessfulOrder(data) {
       alert(
-        `⚡ VELVETCLAP25 ORDER CONFIRMED\n\nOrder ID: ${data.orderRef}\nTotal: ₹${data.total}\nShipping: ${data.shipping}\n\n${data.message}`
+        `⚡ VELVETCLAP25 ORDER CONFIRMED\n\nOrder ID: ${data.orderRef}\n(Save this ID for tracking)\n\nTotal: ₹${data.total}\nShipping: ${data.shipping}\n\n${data.message}`
       );
       state.cart = [];
       state.discountCode = null;
@@ -1597,10 +1606,30 @@
       closeCartDrawer();
     }
 
+    function getCustomerDetails() {
+      return {
+        name: document.getElementById('ship-name').value.trim(),
+        phone: document.getElementById('ship-phone').value.trim(),
+        pincode: document.getElementById('ship-pincode').value.trim(),
+        address: document.getElementById('ship-address').value.trim(),
+      };
+    }
+
+    function validateCustomerDetails(_paymentMethod) {
+      const c = getCustomerDetails();
+      if (!c.name) throw new Error('Enter your full name for delivery.');
+      if (!/^\d{10}$/.test(c.phone)) throw new Error('Enter a valid 10-digit mobile number.');
+      if (!/^\d{6}$/.test(c.pincode)) throw new Error('Enter a valid 6-digit pincode.');
+      if (c.address.length < 10) throw new Error('Enter your full delivery address.');
+      return c;
+    }
+
     function orderPayload(paymentMethod) {
+      const customer = validateCustomerDetails(paymentMethod);
       return {
         paymentMethod,
         couponCode: state.discountCode,
+        customer,
         items: state.cart.map((item) => ({
           productId: item.product.id,
           size: item.size,

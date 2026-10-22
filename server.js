@@ -381,6 +381,42 @@ app.delete('/api/admin/products/:id', requireAdmin, (req, res) => {
   res.json({ ok: true, removed: req.params.id });
 });
 
+const FULFILLMENT_STATUSES = ['cod_confirmed', 'paid', 'demo_confirmed', 'packed', 'shipped', 'delivered', 'cancelled'];
+
+function validateCustomerForOrder(customer) {
+  const c = customer || {};
+  if (!String(c.name || '').trim()) return 'Customer name is required for delivery.';
+  if (!/^\d{10}$/.test(String(c.phone || '').trim())) return 'Valid 10-digit phone required.';
+  if (!/^\d{6}$/.test(String(c.pincode || '').trim())) return 'Valid 6-digit pincode required.';
+  if (String(c.address || '').trim().length < 10) return 'Full delivery address required.';
+  return null;
+}
+
+app.get('/api/admin/orders', requireAdmin, (_req, res) => {
+  const store = readStore();
+  const orders = [...(store.orders || [])].sort(
+    (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
+  );
+  const needsPacking = orders.filter((o) =>
+    ['cod_confirmed', 'paid', 'demo_confirmed'].includes(o.status)
+  ).length;
+  res.json({ orders, needsPacking, total: orders.length });
+});
+
+app.patch('/api/admin/orders/:orderRef', requireAdmin, (req, res) => {
+  const status = String(req.body?.status || '').trim();
+  if (!FULFILLMENT_STATUSES.includes(status)) {
+    return res.status(400).json({ error: 'Invalid status.' });
+  }
+  const store = readStore();
+  const order = findOrder(store, req.params.orderRef);
+  if (!order) return res.status(404).json({ error: 'Order not found' });
+  order.status = status;
+  order.updatedAt = new Date().toISOString();
+  writeStore(store);
+  res.json({ ok: true, orderRef: order.orderRef, status: order.status });
+});
+
 app.post('/api/delivery/check', (req, res) => {
   const pin = String(req.body.pincode || '').trim();
   if (!/^\d{6}$/.test(pin)) {
@@ -461,6 +497,11 @@ app.post('/api/orders', async (req, res) => {
     paymentMethod,
     couponCode,
   } = built;
+
+  const customerErr = validateCustomerForOrder(customer);
+  if (customerErr) {
+    return res.status(400).json({ error: customerErr });
+  }
 
   const store = readStore();
   const orderRecord = {
