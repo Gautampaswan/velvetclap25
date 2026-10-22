@@ -88,6 +88,21 @@ function nextProductId(list) {
   return `vc-${next}`;
 }
 
+function validateImageUrl(url) {
+  const img = String(url || '').trim();
+  if (!img) return 'image URL is required';
+  if (!img.startsWith('/') && !/^https?:\/\//i.test(img)) {
+    return 'image must be https URL or /products/... path';
+  }
+  if (/^https?:\/\/(www\.)?ibb\.co\//i.test(img) && !/^https?:\/\/i\.ibb\.co\//i.test(img)) {
+    return 'ImgBB: use the Direct link (https://i.ibb.co/.../file.jpg), not the page link (https://ibb.co/...)';
+  }
+  if (/drive\.google\.com|dropbox\.com|facebook\.com|instagram\.com/i.test(img)) {
+    return 'use a direct image URL (ends in .jpg/.png/.webp or i.ibb.co), not a share page';
+  }
+  return null;
+}
+
 function validateProductInput(body, { partial } = {}) {
   const errors = [];
   if (!partial || body.title !== undefined) {
@@ -103,18 +118,9 @@ function validateProductInput(body, { partial } = {}) {
       errors.push('at least one color with image is required');
     } else {
       for (const c of body.colors) {
-        const img = String(c.image || '').trim();
-        if (!img) errors.push('each color needs an image URL');
-        else if (!img.startsWith('/') && !/^https?:\/\//i.test(img)) {
-          errors.push('image must be https URL or /products/... path');
-        }
+        const imgErr = validateImageUrl(c.image);
+        if (imgErr) errors.push(imgErr);
       }
-    }
-  }
-  if (body.image !== undefined && body.colors === undefined) {
-    const img = String(body.image || '').trim();
-    if (!img.startsWith('/') && !/^https?:\/\//i.test(img)) {
-      errors.push('image must be https URL or /products/... path');
     }
   }
   return errors;

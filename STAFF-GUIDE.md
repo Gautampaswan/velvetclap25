@@ -2,7 +2,18 @@
 
 For shop staff adding **20+ products** with real photos. Developers: sync changes to GitHub after major catalog updates (see below).
 
-## 1. Upload photos to Cloudinary (recommended)
+## 1. Upload photos (free hosts)
+
+### Option A — ImgBB (easiest, free)
+
+1. Go to [imgbb.com](https://imgbb.com) → upload your photo.
+2. On the result page, open **Embed codes**.
+3. Copy **Direct link** — it must look like:  
+   `https://i.ibb.co/AbCdEf/salwar.jpg`  
+   **Not** the page link `https://ibb.co/wFYbLw3Q` (that shows **black/empty** on the shop).
+4. Paste the **Direct link** into admin **Image URL**.
+
+### Option B — Cloudinary
 
 1. Sign in at [cloudinary.com](https://cloudinary.com) (free tier is enough to start).
 2. **Media Library → Upload** → upload the garment photo.
