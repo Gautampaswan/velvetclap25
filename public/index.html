@@ -1,0 +1,1514 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>VELVETCLAP25 — The Under ₹999 Steal Vault | Raw Indian Streetwear</title>
+  
+  <!-- Fonts: Syne, Space Grotesk, Inter -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&family=Syne:wght@700;800&display=swap" rel="stylesheet">
+  
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  
+  <!-- Lucide Icons CDN -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            canvas: '#0B0B0D',
+            surface: '#121215',
+            'surface-high': '#18181D',
+            'surface-card': '#141417',
+            wireframe: '#26262B',
+            'wireframe-mid': '#3F3F46',
+            'wireframe-light': '#52525B',
+            lime: {
+              DEFAULT: '#C6FF00',
+              hover: '#B5E800',
+              dim: '#9AC900'
+            },
+            purple: {
+              accent: '#8B5CF6',
+              dim: '#6D28D9'
+            },
+            coral: {
+              urgent: '#FF5B4D',
+              deep: '#DC2626'
+            }
+          },
+          fontFamily: {
+            syne: ['Syne', 'sans-serif'],
+            space: ['"Space Grotesk"', 'sans-serif'],
+            inter: ['Inter', 'sans-serif']
+          },
+          boxShadow: {
+            'zine-lime': '4px 4px 0px 0px #C6FF00',
+            'zine-white': '4px 4px 0px 0px #FFFFFF',
+            'zine-black': '4px 4px 0px 0px #000000',
+            'zine-coral': '4px 4px 0px 0px #FF5B4D'
+          }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    /* Neo-Street Raw CSS Overrides */
+    * {
+      border-radius: 0px !important;
+      -webkit-font-smoothing: antialiased;
+    }
+    
+    body {
+      background-color: #0B0B0D;
+      color: #E5E1E4;
+      font-family: 'Inter', sans-serif;
+      overflow-x: hidden;
+      selection-background-color: #C6FF00;
+      selection-color: #0B0B0D;
+    }
+
+    ::selection {
+      background: #C6FF00;
+      color: #0B0B0D;
+    }
+
+    /* Custom Scrollbar */
+    ::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #0B0B0D;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #26262B;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: #C6FF00;
+    }
+
+    /* Marquee Animation */
+    @keyframes marquee {
+      0% { transform: translateX(0%); }
+      100% { transform: translateX(-50%); }
+    }
+    .animate-marquee {
+      display: inline-flex;
+      white-space: nowrap;
+      animation: marquee 24s linear infinite;
+    }
+    .animate-marquee:hover {
+      animation-play-state: paused;
+    }
+
+    /* Diagonal Slash for Out of Stock */
+    .out-of-stock-chip {
+      position: relative;
+      opacity: 0.4;
+      pointer-events: none;
+    }
+    .out-of-stock-chip::after {
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: 0;
+      width: 100%;
+      height: 1.5px;
+      background: #FF5B4D;
+      transform: rotate(-45deg);
+    }
+
+    .badge-pop {
+      transform: translate(-2px, -2px);
+      box-shadow: 3px 3px 0px 0px #000;
+    }
+
+    /* Backdrop blur for modals */
+    .modal-backdrop {
+      background: rgba(11, 11, 13, 0.88);
+      backdrop-filter: blur(10px);
+    }
+  </style>
+</head>
+<body class="bg-canvas text-gray-200">
+
+  <!-- ================= TOP ANNOUNCEMENT TICKER ================= -->
+  <div class="bg-lime text-black py-1.5 px-3 text-[11px] font-space font-bold uppercase tracking-wider overflow-hidden border-b border-black select-none z-50 relative">
+    <div class="animate-marquee items-center gap-8">
+      <span>⚡ SS25 DROP LIVE • FLAT ₹300 OFF ON FIRST APP ORDER: CODE <strong class="underline decoration-2">VC25</strong></span>
+      <span>•</span>
+      <span>FREE SHIPPING OVER ₹999</span>
+      <span>•</span>
+      <span>48H EXPRESS DELIVERY IN MUMBAI / DELHI-NCR / BLR</span>
+      <span>•</span>
+      <span>🔥 SECTION 09 HEAVYWEIGHT ARCHIVE CLEARANCE</span>
+      <span>•</span>
+      <span>⚡ SS25 DROP LIVE • FLAT ₹300 OFF ON FIRST APP ORDER: CODE <strong class="underline decoration-2">VC25</strong></span>
+      <span>•</span>
+      <span>FREE SHIPPING OVER ₹999</span>
+      <span>•</span>
+      <span>48H EXPRESS DELIVERY IN MUMBAI / DELHI-NCR / BLR</span>
+      <span>•</span>
+      <span>🔥 SECTION 09 HEAVYWEIGHT ARCHIVE CLEARANCE</span>
+    </div>
+  </div>
+
+  <!-- ================= PRIMARY HEADER NAVIGATION ================= -->
+  <header class="sticky top-0 z-40 bg-canvas/95 backdrop-blur-md border-b border-wireframe">
+    <div class="max-w-[1440px] mx-auto px-4 md:px-8 py-3.5 flex items-center justify-between gap-4">
+      
+      <!-- Brand Logo -->
+      <a href="#" class="flex items-center gap-2 group">
+        <div class="w-7 h-7 bg-lime text-black flex items-center justify-center font-black text-base shadow-zine-white group-hover:scale-105 transition-transform">
+          ⚡
+        </div>
+        <span class="font-syne font-black text-xl md:text-2xl tracking-tighter text-white uppercase">
+          VELVETCLAP<span class="text-lime">25</span>
+        </span>
+      </a>
+
+      <!-- Universal Search Bar -->
+      <div class="hidden lg:flex items-center flex-1 max-w-md mx-6 relative">
+        <input 
+          id="search-input"
+          type="text" 
+          placeholder="Search baggy fits, parachute pants, boxy tees..." 
+          class="w-full bg-surface border border-wireframe px-4 py-2 pl-9 text-xs font-inter text-white placeholder-zinc-500 focus:outline-none focus:border-lime transition-colors"
+        />
+        <i data-lucide="search" class="w-4 h-4 text-zinc-400 absolute left-3 pointer-events-none"></i>
+        <span class="absolute right-3 text-[10px] font-space text-zinc-500 border border-wireframe px-1.5 py-0.5 pointer-events-none">⌘K</span>
+      </div>
+
+      <!-- Action Cluster -->
+      <div class="flex items-center gap-2.5 sm:gap-4 font-space text-xs">
+        <!-- Currency -->
+        <div class="hidden sm:flex items-center gap-1.5 px-2.5 py-1.5 border border-wireframe bg-surface hover:border-zinc-400 transition cursor-pointer">
+          <span class="text-lime font-bold">₹</span>
+          <span class="text-white font-semibold">INR (₹)</span>
+        </div>
+
+        <!-- Wishlist -->
+        <button id="btn-open-wishlist" class="flex items-center gap-1.5 px-2.5 py-1.5 border border-wireframe bg-surface hover:border-lime transition relative group">
+          <i data-lucide="heart" class="w-4 h-4 text-zinc-300 group-hover:text-lime"></i>
+          <span id="header-wishlist-count" class="bg-lime text-black font-bold text-[10px] px-1.5 py-0.2 leading-none">0</span>
+        </button>
+
+        <!-- Cart Quick Access -->
+        <button id="btn-open-cart" class="flex items-center gap-2 px-3 py-1.5 bg-surface border border-wireframe hover:border-lime group transition relative">
+          <i data-lucide="shopping-bag" class="w-4 h-4 text-zinc-300 group-hover:text-lime"></i>
+          <span id="header-cart-total" class="font-bold text-white group-hover:text-lime transition">₹0</span>
+          <span id="header-cart-count" class="bg-lime text-black font-extrabold text-[11px] px-1.5 py-0.2 leading-none">0</span>
+        </button>
+
+        <!-- User Profile Avatar -->
+        <div class="w-8 h-8 border border-wireframe overflow-hidden cursor-pointer hover:border-lime transition">
+          <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=120&q=80" alt="Avatar" class="w-full h-full object-cover grayscale contrast-125" />
+        </div>
+      </div>
+    </div>
+
+    <!-- Category Sub-Navigation -->
+    <nav class="border-t border-wireframe bg-surface/80 overflow-x-auto no-scrollbar">
+      <div class="max-w-[1440px] mx-auto px-4 md:px-8 flex items-center gap-1 sm:gap-2 text-[11px] md:text-xs font-space font-bold tracking-wider uppercase py-1">
+        <a href="#vault-catalog" class="px-3 py-2 text-zinc-400 hover:text-white transition">DROPS</a>
+        <a href="#vault-catalog" class="px-3 py-2 text-zinc-400 hover:text-white transition">MEN</a>
+        <a href="#vault-catalog" class="px-3 py-2 text-zinc-400 hover:text-white transition">WOMEN</a>
+        <a href="#vault-catalog" class="px-3 py-2 text-zinc-400 hover:text-white transition">OVERSIZED TEES</a>
+        <a href="#vault-catalog" class="px-3 py-2 text-zinc-400 hover:text-white transition">CARGOS & DENIM</a>
+        <a href="#vault-catalog" class="px-3 py-2 text-zinc-400 hover:text-white transition">COLLABS</a>
+        <a href="#vault-catalog" class="ml-auto px-3.5 py-1.5 bg-lime text-black font-extrabold flex items-center gap-1.5 hover:bg-white transition">
+          UNDER ₹999 (SALE 🔥)
+        </a>
+      </div>
+    </nav>
+  </header>
+
+  <main class="max-w-[1440px] mx-auto px-4 md:px-8 pt-6 pb-20">
+
+    <!-- ================= HERO LOOKBOOK BANNER ================= -->
+    <section class="border border-wireframe bg-surface p-6 md:p-10 relative overflow-hidden mb-8">
+      <!-- Background Graphic Elements -->
+      <div class="absolute -right-12 -bottom-12 opacity-5 pointer-events-none select-none font-syne font-black text-[180px] leading-none text-white">
+        VAULT
+      </div>
+
+      <div class="flex flex-col lg:flex-row items-start lg:items-end justify-between gap-8 relative z-10">
+        <div class="max-w-3xl">
+          <!-- Live Tariff Status Badge -->
+          <div class="inline-flex items-center gap-2 border border-wireframe bg-canvas px-3 py-1 text-[11px] font-space font-bold tracking-wider text-zinc-300 uppercase mb-4">
+            <span class="w-2 h-2 rounded-full bg-coral-urgent animate-pulse"></span>
+            <span class="text-coral-urgent">LIVE TARIFF CLEARANCE</span>
+            <span class="text-zinc-600">//</span>
+            <span>SECTION 09 // HIGH-DENSITY RUN</span>
+          </div>
+
+          <!-- Brutalist Big Display Typography -->
+          <h1 class="font-syne font-extrabold text-4xl sm:text-6xl md:text-7xl lg:text-[76px] leading-[0.92] tracking-tighter text-white uppercase">
+            THE UNDER<br/>
+            <span class="text-lime drop-shadow-[0_2px_15px_rgba(198,255,0,0.25)]">₹999 STEAL</span><br/>
+            VAULT
+          </h1>
+
+          <p class="font-inter text-sm md:text-base text-zinc-400 mt-5 max-w-xl leading-relaxed">
+            No compromise on GSM. High-density prints, heavyweight cotton, and relaxed streetwear cuts at unbeatable Indian price points. Straight from factory floor to Delhi-NCR & Bombay streets.
+          </p>
+        </div>
+
+        <!-- Curated Metric Spec Box -->
+        <div class="w-full lg:w-80 bg-canvas border border-wireframe p-5 space-y-4">
+          <div class="flex justify-between items-baseline border-b border-wireframe pb-3">
+            <span class="text-zinc-400 font-space text-[11px] font-bold tracking-wider uppercase">CURATED ITEMS</span>
+            <span class="text-white font-syne font-bold text-2xl tracking-tight" id="hero-curated-count">64 STYLES</span>
+          </div>
+
+          <div class="flex justify-between items-baseline border-b border-wireframe pb-3">
+            <span class="text-zinc-400 font-space text-[11px] font-bold tracking-wider uppercase">MAX PRICE CAP</span>
+            <span class="text-lime font-space font-bold text-2xl tracking-tight">₹999 FLAT</span>
+          </div>
+
+          <!-- Scarcity Progress Bar -->
+          <div class="space-y-2">
+            <div class="w-full bg-surface h-1.5 overflow-hidden">
+              <div class="bg-lime h-full w-[84%] transition-all duration-700"></div>
+            </div>
+            <div class="flex items-center justify-between text-[11px] font-space font-bold">
+              <span class="text-coral-urgent flex items-center gap-1">
+                <i data-lucide="zap" class="w-3.5 h-3.5 fill-coral-urgent"></i>
+                84% OF VAULT RESERVED TODAY
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ================= CONTROLS: FILTERS, SIZES, FITS, SORT ================= -->
+    <section id="vault-catalog" class="space-y-4 mb-8">
+      
+      <!-- Top Category Tabs & Sort Dropdown -->
+      <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4 border-b border-wireframe pb-4">
+        
+        <!-- Category Filter Buttons -->
+        <div class="flex items-center gap-1.5 flex-wrap font-space text-xs font-bold uppercase" id="category-filters">
+          <button data-cat="all" class="cat-pill px-3.5 py-2 bg-lime text-black border border-lime hover:bg-white transition">
+            ALL (64)
+          </button>
+          <button data-cat="tees" class="cat-pill px-3.5 py-2 bg-surface text-zinc-300 border border-wireframe hover:border-white transition">
+            BOXY TEES (&lt;₹699)
+          </button>
+          <button data-cat="bottoms" class="cat-pill px-3.5 py-2 bg-surface text-zinc-300 border border-wireframe hover:border-white transition">
+            BOTTOMS (&lt;₹899)
+          </button>
+          <button data-cat="accessories" class="cat-pill px-3.5 py-2 bg-surface text-zinc-300 border border-wireframe hover:border-white transition">
+            ACCESSORIES (&lt;₹499)
+          </button>
+          <button data-cat="headwear" class="cat-pill px-3.5 py-2 bg-surface text-zinc-300 border border-wireframe hover:border-white transition">
+            CAPS & BEANIES (&lt;₹399)
+          </button>
+        </div>
+
+        <!-- Sort Select -->
+        <div class="flex items-center gap-2 self-start lg:self-auto">
+          <label for="sort-select" class="text-[11px] font-space text-zinc-400 font-bold uppercase tracking-wider">SORT BY:</label>
+          <div class="relative">
+            <select id="sort-select" class="bg-surface border border-wireframe text-white text-xs font-space font-bold uppercase px-3 py-2 pr-8 appearance-none focus:outline-none focus:border-lime cursor-pointer">
+              <option value="trending">TRENDING FIRST</option>
+              <option value="price-low">PRICE: LOW TO HIGH</option>
+              <option value="price-high">PRICE: HIGH TO LOW</option>
+              <option value="discount">HIGHEST DISCOUNT</option>
+              <option value="rating">TOP RATED</option>
+            </select>
+            <i data-lucide="chevron-down" class="w-4 h-4 text-zinc-400 absolute right-2.5 top-2.5 pointer-events-none"></i>
+          </div>
+        </div>
+      </div>
+
+      <!-- Secondary Sub-Filter Row: Sizing & Cut / Fit Selectors -->
+      <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 py-2 border-b border-wireframe/60">
+        <!-- Sizes -->
+        <div class="flex items-center gap-2">
+          <span class="text-[11px] font-space text-zinc-500 font-bold uppercase mr-1">SIZE:</span>
+          <div class="flex items-center gap-1 font-space text-xs font-bold" id="size-filters">
+            <button data-size="ALL" class="size-btn px-2.5 py-1.5 border border-wireframe bg-surface text-zinc-300 hover:border-zinc-400">ALL</button>
+            <button data-size="XS" class="size-btn px-2.5 py-1.5 border border-wireframe bg-surface text-zinc-300 hover:border-zinc-400">XS</button>
+            <button data-size="S" class="size-btn px-2.5 py-1.5 border border-wireframe bg-surface text-zinc-300 hover:border-zinc-400">S</button>
+            <button data-size="M" class="size-btn px-2.5 py-1.5 border border-wireframe bg-surface text-zinc-300 hover:border-zinc-400">M</button>
+            <button data-size="L" class="size-btn px-2.5 py-1.5 border border-lime bg-lime text-black font-extrabold">L</button>
+            <button data-size="XL" class="size-btn px-2.5 py-1.5 border border-wireframe bg-surface text-zinc-300 hover:border-zinc-400">XL</button>
+            <button data-size="XXL" class="size-btn px-2.5 py-1.5 border border-wireframe bg-surface text-zinc-300 hover:border-zinc-400">XXL</button>
+          </div>
+        </div>
+
+        <!-- Fit Selectors -->
+        <div class="flex items-center gap-2 overflow-x-auto no-scrollbar">
+          <span class="text-[11px] font-space text-zinc-500 font-bold uppercase mr-1">FIT:</span>
+          <div class="flex items-center gap-1 font-space text-xs font-semibold" id="fit-filters">
+            <button data-fit="ALL" class="fit-btn px-3 py-1 border border-lime bg-lime text-black font-bold">All Fits</button>
+            <button data-fit="Oversized" class="fit-btn px-3 py-1 border border-wireframe bg-surface text-zinc-300 hover:border-zinc-400">Oversized</button>
+            <button data-fit="Boxy Fit" class="fit-btn px-3 py-1 border border-wireframe bg-surface text-zinc-300 hover:border-zinc-400">Boxy Fit</button>
+            <button data-fit="Relaxed Fit" class="fit-btn px-3 py-1 border border-wireframe bg-surface text-zinc-300 hover:border-zinc-400">Relaxed Fit</button>
+            <button data-fit="Straight Cut" class="fit-btn px-3 py-1 border border-wireframe bg-surface text-zinc-300 hover:border-zinc-400">Straight Cut</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ================= PRODUCT CATALOG GRID ================= -->
+    <div id="product-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+      <!-- Injected via JavaScript with dynamic rendering -->
+    </div>
+
+    <!-- Empty State Container (if filters result in zero products) -->
+    <div id="no-products" class="hidden text-center py-20 border border-wireframe bg-surface p-8">
+      <i data-lucide="package-x" class="w-12 h-12 text-zinc-500 mx-auto mb-3"></i>
+      <h3 class="font-syne font-bold text-2xl text-white uppercase">No Vault Items Match That Fit</h3>
+      <p class="text-zinc-400 text-sm mt-1 max-w-sm mx-auto font-inter">Try resetting size filters or browse other categories in the archive.</p>
+      <button onclick="resetFilters()" class="mt-4 px-6 py-2.5 bg-lime text-black font-space font-bold uppercase text-xs hover:bg-white transition">
+        Reset All Filters
+      </button>
+    </div>
+
+    <!-- ================= VALUE PROPOSITION PANELS ================= -->
+    <section class="grid grid-cols-1 md:grid-cols-3 gap-4 my-14">
+      <div class="border border-wireframe bg-surface p-5 flex items-start gap-4 hover:border-lime transition group">
+        <div class="w-11 h-11 bg-lime text-black flex items-center justify-center font-bold text-lg flex-shrink-0 group-hover:rotate-6 transition-transform">
+          ⚡
+        </div>
+        <div>
+          <h4 class="font-space font-bold text-sm tracking-wide uppercase text-white">₹700 AVG. SAVINGS</h4>
+          <p class="text-xs text-zinc-400 mt-1 leading-relaxed">Real wholesale direct margins transferred to Indian streetwear retail without bloated middlemen.</p>
+        </div>
+      </div>
+
+      <div class="border border-wireframe bg-surface p-5 flex items-start gap-4 hover:border-purple-accent transition group">
+        <div class="w-11 h-11 bg-purple-accent text-white flex items-center justify-center font-bold text-lg flex-shrink-0 group-hover:rotate-6 transition-transform">
+          <i data-lucide="truck" class="w-5 h-5"></i>
+        </div>
+        <div>
+          <h4 class="font-space font-bold text-sm tracking-wide uppercase text-white">FREE OVER ₹999</h4>
+          <p class="text-xs text-zinc-400 mt-1 leading-relaxed">Add any 2 vault pieces to unlock zero shipping charge anywhere from Kashmir to Kanyakumari.</p>
+        </div>
+      </div>
+
+      <div class="border border-wireframe bg-surface p-5 flex items-start gap-4 hover:border-white transition group">
+        <div class="w-11 h-11 bg-zinc-800 text-lime flex items-center justify-center font-bold text-lg flex-shrink-0 group-hover:rotate-6 transition-transform">
+          <i data-lucide="refresh-cw" class="w-5 h-5"></i>
+        </div>
+        <div>
+          <h4 class="font-space font-bold text-sm tracking-wide uppercase text-white">NO-QUESTIONS RETURN</h4>
+          <p class="text-xs text-zinc-400 mt-1 leading-relaxed">Easy 7-day doorstep reverse pickup across 18,000+ Indian pincodes without interrogation.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ================= PINCODE DELIVERY CHECKER ================= -->
+    <section class="border border-wireframe bg-canvas p-6 md:p-8 mb-14 flex flex-col md:flex-row items-center justify-between gap-6">
+      <div class="space-y-1">
+        <span class="text-lime font-space text-[11px] font-bold uppercase tracking-widest">// EXPRESS ESTIMATOR</span>
+        <h3 class="font-syne font-bold text-xl md:text-2xl text-white uppercase">Check 48-Hour Drop Dispatch To Your Pin</h3>
+        <p class="text-xs text-zinc-400 font-inter">Live tie-up with Bluedart Air & Delhivery Priority for instant shipping.</p>
+      </div>
+
+      <div class="w-full md:w-auto flex flex-col sm:flex-row items-stretch gap-2">
+        <div class="relative">
+          <input 
+            id="pincode-input"
+            type="text" 
+            maxlength="6" 
+            placeholder="e.g. 400050 or 110016" 
+            class="bg-surface border border-wireframe text-white px-4 py-2.5 text-xs font-space font-bold uppercase tracking-wider focus:outline-none focus:border-lime w-full sm:w-64"
+          />
+        </div>
+        <button id="btn-check-pincode" class="bg-white text-black px-5 py-2.5 font-space font-bold uppercase text-xs hover:bg-lime hover:text-black transition">
+          CHECK COURIER
+        </button>
+      </div>
+    </section>
+    <div id="pincode-result" class="hidden -mt-10 mb-10 text-xs font-space font-bold p-3 border border-wireframe"></div>
+
+    <!-- ================= TRUST & STREET CREDENTIALS ================= -->
+    <section class="grid grid-cols-1 md:grid-cols-3 gap-6 py-8 border-y border-wireframe text-xs">
+      <div class="flex items-center gap-3.5">
+        <div class="w-10 h-10 border border-wireframe bg-surface flex items-center justify-center text-lime flex-shrink-0">
+          <i data-lucide="zap" class="w-5 h-5"></i>
+        </div>
+        <div>
+          <h5 class="font-space font-bold uppercase text-white">PAN-INDIA EXPRESS</h5>
+          <p class="text-zinc-400 mt-0.5">Free Express Courier on carts above ₹999. Dispatched in 24 hours.</p>
+        </div>
+      </div>
+
+      <div class="flex items-center gap-3.5">
+        <div class="w-10 h-10 border border-wireframe bg-surface flex items-center justify-center text-purple-accent flex-shrink-0">
+          <i data-lucide="qr-code" class="w-5 h-5"></i>
+        </div>
+        <div>
+          <h5 class="font-space font-bold uppercase text-white">INSTANT UPI / COD</h5>
+          <p class="text-zinc-400 mt-0.5">Pay via Google Pay, PhonePe, Paytm, or Cash on Delivery at your door.</p>
+        </div>
+      </div>
+
+      <div class="flex items-center gap-3.5">
+        <div class="w-10 h-10 border border-wireframe bg-surface flex items-center justify-center text-coral-urgent flex-shrink-0">
+          <i data-lucide="shield-check" class="w-5 h-5"></i>
+        </div>
+        <div>
+          <h5 class="font-space font-bold uppercase text-white">240+ GSM GUARANTEED</h5>
+          <p class="text-zinc-400 mt-0.5">Zero paper-thin fabrics. Heavy gauge combed yarn built for repeated wash.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ================= DROP ALERT NEWSLETTER ================= -->
+    <section class="my-16 bg-surface border border-wireframe p-6 md:p-12 flex flex-col lg:flex-row lg:items-center justify-between gap-8">
+      <div class="max-w-xl">
+        <h2 class="font-syne font-extrabold text-3xl md:text-4xl text-white uppercase tracking-tight">
+          GET 15% OFF DROP ALERTS
+        </h2>
+        <p class="text-zinc-400 font-inter text-xs md:text-sm mt-2">
+          Be the first to access raw archive drops, secret pop-up locations, and member-exclusive flash sales across India.
+        </p>
+      </div>
+
+      <form id="newsletter-form" class="w-full lg:w-auto flex flex-col sm:flex-row items-stretch gap-0 border border-wireframe max-w-md">
+        <input 
+          id="newsletter-email"
+          type="email" 
+          required 
+          placeholder="ENTER YOUR EMAIL ID..." 
+          class="bg-canvas text-white px-4 py-3 text-xs font-inter placeholder-zinc-500 focus:outline-none flex-grow min-w-[240px]"
+        />
+        <button type="submit" class="bg-lime text-black font-space font-extrabold text-xs uppercase px-6 py-3 hover:bg-white transition flex items-center justify-center gap-2">
+          SUBSCRIBE <span>→</span>
+        </button>
+      </form>
+    </section>
+
+  </main>
+
+  <!-- ================= EDITORIAL FOOTER ================= -->
+  <footer class="border-t border-wireframe bg-surface pt-14 pb-8 relative overflow-hidden">
+    <div class="max-w-[1440px] mx-auto px-4 md:px-8">
+      
+      <!-- 4 Columns Link Architecture -->
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-8 mb-12">
+        
+        <div>
+          <h6 class="font-space font-bold text-xs uppercase tracking-wider text-white mb-4">// SHOP CATEGORIES</h6>
+          <ul class="space-y-2 text-xs font-inter text-zinc-400">
+            <li><a href="#" class="hover:text-lime transition">Latest SS25 Drops</a></li>
+            <li><a href="#" class="hover:text-lime transition">Boxy & Heavyweight Tees</a></li>
+            <li><a href="#" class="hover:text-lime transition">Parachute & Cargo Pants</a></li>
+            <li><a href="#" class="hover:text-lime transition">Raw Distressed Denim</a></li>
+            <li><a href="#" class="hover:text-lime transition font-bold text-zinc-300">Steal Deals (Under ₹999)</a></li>
+          </ul>
+        </div>
+
+        <div>
+          <h6 class="font-space font-bold text-xs uppercase tracking-wider text-white mb-4">// CUSTOMER CARE</h6>
+          <ul class="space-y-2 text-xs font-inter text-zinc-400">
+            <li><a href="#" class="hover:text-lime transition">Track Order Status</a></li>
+            <li><a href="#" class="hover:text-lime transition">Easy 7-Day Hassle-Free Returns</a></li>
+            <li><a href="#" class="hover:text-lime transition">Cash On Delivery (COD) Info</a></li>
+            <li><a href="#" class="hover:text-lime transition">Shipping & Express Timeline</a></li>
+            <li><a href="#" class="hover:text-lime transition flex items-center gap-1.5 text-lime"><i data-lucide="message-circle" class="w-3.5 h-3.5"></i> WhatsApp Support Desk</a></li>
+          </ul>
+        </div>
+
+        <div>
+          <h6 class="font-space font-bold text-xs uppercase tracking-wider text-white mb-4">// CULTURE & COMMUNITY</h6>
+          <ul class="space-y-2 text-xs font-inter text-zinc-400">
+            <li><a href="#" class="hover:text-lime transition">Join Discord Server</a></li>
+            <li><a href="#" class="hover:text-lime transition">Underground Spotify Playlists</a></li>
+            <li><a href="#" class="hover:text-lime transition">Campus Ambassador Program</a></li>
+            <li><a href="#" class="hover:text-lime transition">Creator Affiliate Circle</a></li>
+            <li><a href="#" class="hover:text-lime transition">Editorial Lookbooks</a></li>
+          </ul>
+        </div>
+
+        <div>
+          <h6 class="font-space font-bold text-xs uppercase tracking-wider text-white mb-4">// FLAGSHIP HUBS</h6>
+          <ul class="space-y-2.5 text-xs font-inter text-zinc-400">
+            <li class="flex items-start gap-1.5">
+              <span class="text-lime font-bold">📍</span>
+              <span>Bandra West, Mumbai</span>
+            </li>
+            <li class="flex items-start gap-1.5">
+              <span class="text-lime font-bold">📍</span>
+              <span>Hauz Khas Village, Delhi</span>
+            </li>
+            <li class="flex items-start gap-1.5">
+              <span class="text-lime font-bold">📍</span>
+              <span>12th Main Indiranagar, BLR</span>
+            </li>
+            <li class="flex items-start gap-1.5">
+              <span class="text-lime font-bold">📍</span>
+              <span>Koregaon Park, Pune</span>
+            </li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- Payment Gateways & Copyright Bar -->
+      <div class="pt-8 border-t border-wireframe flex flex-col md:flex-row items-center justify-between gap-4 text-xs font-space">
+        <div class="flex items-center gap-2 flex-wrap">
+          <span class="px-2 py-1 bg-canvas border border-wireframe text-[10px] text-zinc-300 font-bold">UPI</span>
+          <span class="px-2 py-1 bg-canvas border border-wireframe text-[10px] text-zinc-300 font-bold">RUPAY</span>
+          <span class="px-2 py-1 bg-canvas border border-wireframe text-[10px] text-zinc-300 font-bold">VISA</span>
+          <span class="px-2 py-1 bg-canvas border border-wireframe text-[10px] text-zinc-300 font-bold">MASTERCARD</span>
+          <span class="px-2 py-1 bg-lime text-black border border-lime text-[10px] font-black">CASH ON DELIVERY</span>
+        </div>
+
+        <div class="text-zinc-500 text-[11px]">
+          © 2025 VELVETCLAP25 INDIA PRIVATE LIMITED. ALL RIGHTS RESERVED.
+        </div>
+      </div>
+
+      <!-- Giant Editorial Subculture Watermark -->
+      <div class="select-none pointer-events-none mt-10 -mb-6 text-center overflow-hidden">
+        <span class="font-syne font-black text-4xl sm:text-7xl md:text-9xl text-white/[0.03] tracking-tighter uppercase whitespace-nowrap block">
+          VELVETCLAP25 STREETWEAR
+        </span>
+      </div>
+
+    </div>
+  </footer>
+
+  <!-- ================= CART SLIDE-IN DRAWER ================= -->
+  <div id="cart-drawer-overlay" class="fixed inset-0 modal-backdrop z-50 transition-opacity opacity-0 pointer-events-none duration-300">
+    <div id="cart-drawer" class="fixed top-0 right-0 h-full w-full max-w-md bg-canvas border-l border-wireframe z-50 flex flex-col transform translate-x-full transition-transform duration-300 ease-out shadow-2xl">
+      
+      <!-- Drawer Header -->
+      <div class="p-4 border-b border-wireframe flex items-center justify-between bg-surface">
+        <div class="flex items-center gap-2">
+          <span class="font-syne font-black text-lg text-white uppercase">BAG VAULT</span>
+          <span id="drawer-cart-badge" class="bg-lime text-black font-space font-extrabold text-xs px-2 py-0.5">0 ITEMS</span>
+        </div>
+        <button id="btn-close-cart" class="p-1 hover:text-lime transition text-zinc-400">
+          <i data-lucide="x" class="w-6 h-6"></i>
+        </button>
+      </div>
+
+      <!-- Free Shipping Meter -->
+      <div class="bg-surface-high p-3 border-b border-wireframe">
+        <div class="flex justify-between text-xs font-space font-bold mb-1">
+          <span id="shipping-progress-text" class="text-lime">⚡ YOU'VE UNLOCKED FREE SHIPPING!</span>
+          <span id="shipping-remaining" class="text-zinc-400">₹0 TO GO</span>
+        </div>
+        <div class="w-full bg-canvas h-1.5 overflow-hidden">
+          <div id="shipping-progress-bar" class="bg-lime h-full w-full transition-all duration-500"></div>
+        </div>
+      </div>
+
+      <!-- Cart Items Scroll Area -->
+      <div id="cart-items-container" class="flex-1 overflow-y-auto p-4 space-y-4">
+        <!-- Rendered via JS -->
+      </div>
+
+      <!-- Coupon & Summary Bottom Area -->
+      <div class="border-t border-wireframe p-4 bg-surface space-y-3">
+        <!-- Coupon Form -->
+        <div class="flex gap-2">
+          <input 
+            id="coupon-code-input"
+            type="text" 
+            placeholder="PROMO CODE (TRY: VC25)" 
+            class="bg-canvas border border-wireframe px-3 py-2 text-xs font-space font-bold uppercase text-white flex-1 focus:outline-none focus:border-lime"
+          />
+          <button id="btn-apply-coupon" class="bg-white text-black font-space font-bold text-xs uppercase px-4 py-2 hover:bg-lime transition">
+            APPLY
+          </button>
+        </div>
+        <div id="coupon-alert" class="hidden text-[11px] font-space font-bold"></div>
+
+        <!-- Calculations -->
+        <div class="space-y-1.5 text-xs font-space pt-2 border-t border-wireframe/60">
+          <div class="flex justify-between text-zinc-400">
+            <span>SUBTOTAL</span>
+            <span id="cart-subtotal-display" class="text-white font-bold">₹0</span>
+          </div>
+          <div class="flex justify-between text-zinc-400" id="discount-row" style="display: none;">
+            <span class="text-lime">APP PROMO (VC25)</span>
+            <span id="cart-discount-display" class="text-lime font-bold">-₹300</span>
+          </div>
+          <div class="flex justify-between text-zinc-400">
+            <span>SHIPPING (PAN-INDIA)</span>
+            <span id="cart-shipping-display" class="text-lime font-bold">FREE</span>
+          </div>
+          <div class="flex justify-between text-base font-bold text-white pt-2 border-t border-wireframe">
+            <span class="font-syne">TOTAL AMOUNT</span>
+            <span id="cart-grand-total" class="font-space text-lime text-lg">₹0</span>
+          </div>
+        </div>
+
+        <!-- Action Button -->
+        <button id="btn-checkout" class="w-full py-3.5 bg-lime text-black font-space font-black text-sm uppercase tracking-wider hover:bg-white hover:shadow-zine-white transition flex items-center justify-center gap-2">
+          <span>PROCEED TO SECURE CHECKOUT</span>
+          <i data-lucide="arrow-right" class="w-4 h-4"></i>
+        </button>
+        <p class="text-[10px] text-zinc-500 text-center font-space">
+          🔒 256-BIT ENCRYPTED UPI, CARDS & CASH ON DELIVERY SUPPORTED
+        </p>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ================= WISHLIST MODAL ================= -->
+  <div id="wishlist-modal-overlay" class="fixed inset-0 modal-backdrop z-50 flex items-center justify-center p-4 transition-opacity opacity-0 pointer-events-none duration-200">
+    <div class="bg-canvas border border-wireframe w-full max-w-2xl max-h-[85vh] flex flex-col shadow-2xl">
+      <div class="p-4 border-b border-wireframe flex items-center justify-between bg-surface">
+        <div class="flex items-center gap-2">
+          <i data-lucide="heart" class="w-5 h-5 text-lime fill-lime"></i>
+          <h3 class="font-syne font-bold text-lg text-white uppercase">SAVED ARCHIVE PIECES</h3>
+        </div>
+        <button id="btn-close-wishlist" class="text-zinc-400 hover:text-white">
+          <i data-lucide="x" class="w-6 h-6"></i>
+        </button>
+      </div>
+      <div id="wishlist-items-container" class="p-4 overflow-y-auto space-y-3 flex-1">
+        <!-- Rendered via JS -->
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= PRODUCT QUICK VIEW MODAL ================= -->
+  <div id="quickview-overlay" class="fixed inset-0 modal-backdrop z-50 flex items-center justify-center p-4 transition-opacity opacity-0 pointer-events-none duration-200">
+    <div id="quickview-content" class="bg-surface border border-wireframe w-full max-w-3xl max-h-[92vh] overflow-y-auto shadow-2xl relative">
+      <!-- Injected via JavaScript -->
+    </div>
+  </div>
+
+  <!-- ================= LIVE TOAST NOTIFICATION ================= -->
+  <div id="toast" class="fixed bottom-5 left-5 z-50 bg-black border border-lime p-3 text-xs font-space font-bold text-white shadow-zine-lime flex items-center gap-3 transform -translate-y-12 opacity-0 pointer-events-none transition-all duration-300">
+    <div class="w-2.5 h-2.5 bg-lime rounded-full animate-ping"></div>
+    <span id="toast-message">Notification message</span>
+  </div>
+
+  <!-- ================= APPLICATION LOGIC SCRIPT ================= -->
+  <script>
+    // --- 1. Product catalog (loaded from API) ---
+    const API = '';
+    let PRODUCTS = [];
+
+    let state = {
+      category: 'all',
+      size: 'L',
+      fit: 'ALL',
+      sortBy: 'trending',
+      searchQuery: '',
+      wishlist: [],
+      cart: [],
+      discountCode: null,
+      discountAmount: 0
+    };
+
+    async function apiFetch(path, options) {
+      const res = await fetch(`${API}${path}`, {
+        headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
+        ...options,
+      });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) throw new Error(data.message || data.error || 'Request failed');
+      return data;
+    }
+
+    async function loadProductsFromServer() {
+      const params = new URLSearchParams({
+        category: state.category,
+        size: state.size,
+        fit: state.fit,
+        sort: state.sortBy,
+        q: state.searchQuery,
+      });
+      const data = await apiFetch(`/api/products?${params}`);
+      PRODUCTS = data.products || [];
+    }
+
+    function loadPersistedSession() {
+      try {
+        const raw = localStorage.getItem('vc25_session');
+        if (!raw) return;
+        const saved = JSON.parse(raw);
+        if (Array.isArray(saved.wishlist)) state.wishlist = saved.wishlist;
+        if (Array.isArray(saved.cart)) state.cart = saved.cart;
+        if (saved.discountCode) state.discountCode = saved.discountCode;
+      } catch (_) { /* ignore corrupt storage */ }
+    }
+
+    function persistSession() {
+      localStorage.setItem(
+        'vc25_session',
+        JSON.stringify({
+          wishlist: state.wishlist,
+          cart: state.cart.map((item) => ({
+            productId: item.product.id,
+            size: item.size,
+            colorIndex: item.colorIndex,
+            quantity: item.quantity,
+          })),
+          discountCode: state.discountCode,
+        })
+      );
+    }
+
+    function hydrateCartProducts() {
+      state.cart = state.cart
+        .map((item) => {
+          const product =
+            item.product ||
+            PRODUCTS.find((p) => p.id === item.productId);
+          if (!product) return null;
+          return {
+            product,
+            size: item.size,
+            colorIndex: item.colorIndex ?? 0,
+            quantity: item.quantity,
+          };
+        })
+        .filter(Boolean);
+    }
+
+    // --- 2. DOM Cache ---
+    const productGridEl = document.getElementById('product-grid');
+    const noProductsEl = document.getElementById('no-products');
+    const cartDrawerOverlay = document.getElementById('cart-drawer-overlay');
+    const cartDrawer = document.getElementById('cart-drawer');
+    const cartItemsContainer = document.getElementById('cart-items-container');
+    const wishlistModalOverlay = document.getElementById('wishlist-modal-overlay');
+    const wishlistItemsContainer = document.getElementById('wishlist-items-container');
+    const quickviewOverlay = document.getElementById('quickview-overlay');
+    const quickviewContent = document.getElementById('quickview-content');
+    const toastEl = document.getElementById('toast');
+    const toastMsg = document.getElementById('toast-message');
+
+    // Header Counters
+    const headerCartTotal = document.getElementById('header-cart-total');
+    const headerCartCount = document.getElementById('header-cart-count');
+    const headerWishlistCount = document.getElementById('header-wishlist-count');
+    const heroCuratedCount = document.getElementById('hero-curated-count');
+
+    // --- 4. Render Products Engine ---
+    function getFilteredProducts() {
+      return PRODUCTS;
+    }
+
+    async function refreshCatalog() {
+      await loadProductsFromServer();
+      hydrateCartProducts();
+      renderProducts();
+      updateCartState();
+    }
+
+    function renderProducts() {
+      const filtered = getFilteredProducts();
+      heroCuratedCount.textContent = `${filtered.length} STYLES`;
+
+      if (filtered.length === 0) {
+        productGridEl.innerHTML = '';
+        noProductsEl.classList.remove('hidden');
+        return;
+      }
+      noProductsEl.classList.add('hidden');
+
+      productGridEl.innerHTML = filtered.map(product => {
+        const isWishlisted = state.wishlist.includes(product.id);
+        const activeColor = product.colors[0];
+
+        // Tag styling based on tagType
+        let tagBadgeClass = 'bg-lime text-black';
+        if (product.tagType === 'purple') tagBadgeClass = 'bg-purple-accent text-white';
+        if (product.tagType === 'urgent') tagBadgeClass = 'bg-coral-urgent text-black';
+
+        return `
+          <div class="product-card group bg-surface border border-wireframe hover:border-lime transition-all duration-200 relative flex flex-col" data-id="${product.id}">
+            
+            <!-- Top Badges Row -->
+            <div class="absolute top-2.5 left-2.5 z-20 flex flex-col gap-1.5 items-start pointer-events-none">
+              <span class="bg-coral-urgent text-black text-[11px] font-space font-extrabold px-2 py-0.5 tracking-tight uppercase">
+                ${product.discount}
+              </span>
+              <span class="${tagBadgeClass} text-[10px] font-space font-bold px-2 py-0.5 tracking-wider uppercase">
+                ${product.tag}
+              </span>
+            </div>
+
+            <!-- Wishlist Heart Button -->
+            <button 
+              onclick="toggleWishlist('${product.id}')" 
+              class="absolute top-2.5 right-2.5 z-20 w-8 h-8 bg-canvas/80 border border-wireframe flex items-center justify-center text-white hover:text-lime hover:border-lime transition"
+              title="Save to Vault"
+            >
+              <i data-lucide="heart" class="w-4 h-4 ${isWishlisted ? 'fill-lime text-lime' : ''}"></i>
+            </button>
+
+            <!-- 4:5 Aspect Ratio Editorial Image Pod -->
+            <div class="relative aspect-[4/5] bg-black overflow-hidden cursor-pointer" onclick="openQuickView('${product.id}')">
+              <img 
+                id="img-${product.id}"
+                src="${activeColor.image}" 
+                alt="${product.title}" 
+                class="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-500"
+                loading="lazy"
+              />
+              
+              <!-- Quick Size Overlay (Hover on Desktop) -->
+              <div class="absolute inset-x-0 bottom-0 bg-canvas/95 border-t border-wireframe p-3 translate-y-full group-hover:translate-y-0 transition-transform duration-200 flex flex-col gap-2 z-10">
+                <div class="flex items-center justify-between text-[10px] font-space text-zinc-400 font-bold uppercase">
+                  <span>QUICK ADD SIZE:</span>
+                  <span class="text-coral-urgent">⚡ ${product.stockLeft} LEFT</span>
+                </div>
+                <div class="flex items-center gap-1.5">
+                  ${product.sizes.map(sz => `
+                    <button 
+                      onclick="event.stopPropagation(); quickAddToCart('${product.id}', '${sz}')" 
+                      class="flex-1 py-1.5 bg-surface border border-wireframe hover:bg-lime hover:text-black hover:border-lime text-xs font-space font-bold transition text-white"
+                    >
+                      ${sz}
+                    </button>
+                  `).join('')}
+                </div>
+              </div>
+            </div>
+
+            <!-- Product Specs & Detail Stack -->
+            <div class="p-4 flex-1 flex flex-col justify-between space-y-3 bg-surface">
+              
+              <!-- Colors Swatches & Rating Row -->
+              <div class="flex items-center justify-between text-xs font-space">
+                <!-- Color Dots -->
+                <div class="flex items-center gap-2">
+                  <div class="flex items-center -space-x-1">
+                    ${product.colors.map((c, idx) => `
+                      <button 
+                        onclick="switchCardColor('${product.id}', ${idx})" 
+                        title="${c.name}"
+                        class="w-4 h-4 rounded-full border border-wireframe hover:scale-125 transition-transform relative z-10"
+                        style="background-color: ${c.hex};"
+                      ></button>
+                    `).join('')}
+                  </div>
+                  <span class="text-[11px] text-zinc-400 font-medium">${product.colors.length} Colors</span>
+                </div>
+
+                <!-- Star Rating -->
+                <div class="flex items-center gap-1 text-[11px] text-zinc-300 font-bold">
+                  <i data-lucide="star" class="w-3.5 h-3.5 fill-lime text-lime"></i>
+                  <span>${product.rating}</span>
+                  <span class="text-zinc-500">(${product.reviewsCount})</span>
+                </div>
+              </div>
+
+              <!-- Product Title & Cut Subtitle -->
+              <div>
+                <h3 
+                  onclick="openQuickView('${product.id}')"
+                  class="font-space font-bold text-sm md:text-base text-white tracking-tight uppercase group-hover:text-lime transition cursor-pointer"
+                >
+                  ${product.title}
+                </h3>
+                <p class="font-inter text-xs text-zinc-400 mt-0.5 line-clamp-1">
+                  ${product.subtitle}
+                </p>
+              </div>
+
+              <!-- Price & "COP NOW" CTA Button -->
+              <div class="flex items-center justify-between pt-2 border-t border-wireframe/70">
+                <div class="flex items-baseline gap-2">
+                  <span class="font-space font-bold text-lg md:text-xl text-white">₹${product.price}</span>
+                  <span class="font-space text-xs text-zinc-500 line-through">₹${product.originalPrice}</span>
+                </div>
+
+                <!-- Instant Action Button (Sharp 0px, Electric Lime) -->
+                <button 
+                  onclick="quickAddToCart('${product.id}', '${product.sizes[0]}')" 
+                  class="px-4 py-2 bg-lime text-black font-space font-bold text-xs uppercase tracking-wider hover:bg-white hover:shadow-zine-white transition flex items-center gap-1.5"
+                >
+                  <i data-lucide="shopping-bag" class="w-3.5 h-3.5"></i>
+                  <span>COP NOW</span>
+                </button>
+              </div>
+
+            </div>
+
+          </div>
+        `;
+      }).join('');
+
+      lucide.createIcons();
+    }
+
+    // --- 5. Color Swatcher on Grid Card ---
+    function switchCardColor(productId, colorIndex) {
+      const product = PRODUCTS.find(p => p.id === productId);
+      if (!product) return;
+      const imgEl = document.getElementById(`img-${productId}`);
+      if (imgEl && product.colors[colorIndex]) {
+        imgEl.src = product.colors[colorIndex].image;
+      }
+    }
+
+    // --- 6. Quick Add to Cart & Drawer Management ---
+    function quickAddToCart(productId, size = 'L', colorIndex = 0) {
+      const product = PRODUCTS.find(p => p.id === productId);
+      if (!product) return;
+
+      const existingIndex = state.cart.findIndex(item => 
+        item.product.id === productId && item.size === size && item.colorIndex === colorIndex
+      );
+
+      if (existingIndex > -1) {
+        state.cart[existingIndex].quantity += 1;
+      } else {
+        state.cart.push({
+          product,
+          size,
+          colorIndex,
+          quantity: 1
+        });
+      }
+
+      updateCartState();
+      persistSession();
+      openCartDrawer();
+      triggerToast(`Added ${product.title} (${size}) to bag!`);
+    }
+
+    function updateCartState() {
+      // Subtotal calculation
+      const subtotal = state.cart.reduce((sum, item) => sum + (item.product.price * item.quantity), 0);
+      const totalItems = state.cart.reduce((sum, item) => sum + item.quantity, 0);
+
+      // Free shipping threshold (₹999)
+      const freeShippingGoal = 999;
+      const progressPercent = Math.min(100, Math.round((subtotal / freeShippingGoal) * 100));
+      const remainingForShipping = Math.max(0, freeShippingGoal - subtotal);
+
+      // Coupon logic
+      let finalDiscount = 0;
+      if (state.discountCode === 'VC25') {
+        finalDiscount = 300;
+      }
+      state.discountAmount = finalDiscount;
+
+      const grandTotal = Math.max(0, subtotal - finalDiscount);
+
+      // Update Header Elements
+      headerCartTotal.textContent = `₹${subtotal}`;
+      headerCartCount.textContent = totalItems;
+      document.getElementById('drawer-cart-badge').textContent = `${totalItems} ITEMS`;
+
+      // Update Drawer Free Shipping Bar
+      const shippingProgressBar = document.getElementById('shipping-progress-bar');
+      const shippingProgressText = document.getElementById('shipping-progress-text');
+      const shippingRemaining = document.getElementById('shipping-remaining');
+
+      shippingProgressBar.style.width = `${progressPercent}%`;
+      if (subtotal >= freeShippingGoal) {
+        shippingProgressText.innerHTML = `⚡ YOU'VE UNLOCKED FREE PAN-INDIA SHIPPING!`;
+        shippingRemaining.textContent = `₹0 TO GO`;
+      } else {
+        shippingProgressText.innerHTML = `ADD <strong class="text-white">₹${remainingForShipping}</strong> MORE FOR FREE COURIER`;
+        shippingRemaining.textContent = `${progressPercent}%`;
+      }
+
+      // Calculations View
+      document.getElementById('cart-subtotal-display').textContent = `₹${subtotal}`;
+      document.getElementById('cart-grand-total').textContent = `₹${grandTotal}`;
+      
+      const discountRow = document.getElementById('discount-row');
+      if (state.discountAmount > 0) {
+        discountRow.style.display = 'flex';
+        document.getElementById('cart-discount-display').textContent = `-₹${state.discountAmount}`;
+      } else {
+        discountRow.style.display = 'none';
+      }
+
+      // Render Cart Items
+      if (state.cart.length === 0) {
+        cartItemsContainer.innerHTML = `
+          <div class="text-center py-12 text-zinc-500 font-space space-y-3">
+            <i data-lucide="shopping-bag" class="w-12 h-12 mx-auto stroke-zinc-600"></i>
+            <p class="uppercase text-sm font-bold">YOUR VAULT BAG IS EMPTY</p>
+            <p class="text-xs font-inter text-zinc-400">Discover limited pieces under ₹999 before stock runs out.</p>
+          </div>
+        `;
+      } else {
+        cartItemsContainer.innerHTML = state.cart.map((item, idx) => `
+          <div class="flex gap-3 bg-surface p-3 border border-wireframe">
+            <img src="${item.product.colors[item.colorIndex].image}" class="w-16 h-20 object-cover flex-shrink-0" alt="${item.product.title}" />
+            <div class="flex-1 flex flex-col justify-between">
+              <div>
+                <div class="flex justify-between items-start gap-2">
+                  <h4 class="font-space font-bold text-xs text-white uppercase leading-tight">${item.product.title}</h4>
+                  <button onclick="removeCartItem(${idx})" class="text-zinc-500 hover:text-coral-urgent transition">
+                    <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
+                  </button>
+                </div>
+                <div class="text-[11px] font-space text-zinc-400 mt-1 flex items-center gap-2">
+                  <span>SIZE: <strong class="text-white">${item.size}</strong></span>
+                  <span>•</span>
+                  <span>${item.product.colors[item.colorIndex].name}</span>
+                </div>
+              </div>
+
+              <div class="flex items-center justify-between pt-2">
+                <div class="flex items-center border border-wireframe bg-canvas text-xs font-space font-bold">
+                  <button onclick="adjustQuantity(${idx}, -1)" class="px-2 py-0.5 text-zinc-400 hover:text-white">-</button>
+                  <span class="px-2 py-0.5 text-white">${item.quantity}</span>
+                  <button onclick="adjustQuantity(${idx}, 1)" class="px-2 py-0.5 text-zinc-400 hover:text-white">+</button>
+                </div>
+                <span class="font-space font-bold text-sm text-lime">₹${item.product.price * item.quantity}</span>
+              </div>
+            </div>
+          </div>
+        `).join('');
+      }
+
+      lucide.createIcons();
+      persistSession();
+    }
+
+    function adjustQuantity(index, delta) {
+      state.cart[index].quantity += delta;
+      if (state.cart[index].quantity <= 0) {
+        state.cart.splice(index, 1);
+      }
+      updateCartState();
+    }
+
+    function removeCartItem(index) {
+      state.cart.splice(index, 1);
+      updateCartState();
+      triggerToast('Item removed from bag');
+    }
+
+    function openCartDrawer() {
+      cartDrawerOverlay.classList.remove('opacity-0', 'pointer-events-none');
+      cartDrawer.classList.remove('translate-x-full');
+    }
+
+    function closeCartDrawer() {
+      cartDrawerOverlay.classList.add('opacity-0', 'pointer-events-none');
+      cartDrawer.classList.add('translate-x-full');
+    }
+
+    // --- 7. Wishlist Functionality ---
+    function toggleWishlist(productId) {
+      const idx = state.wishlist.indexOf(productId);
+      if (idx > -1) {
+        state.wishlist.splice(idx, 1);
+        triggerToast('Removed from saved vault');
+      } else {
+        state.wishlist.push(productId);
+        triggerToast('Saved to your archive vault ❤️');
+      }
+      headerWishlistCount.textContent = state.wishlist.length;
+      persistSession();
+      renderProducts();
+    }
+
+    function openWishlistModal() {
+      wishlistModalOverlay.classList.remove('opacity-0', 'pointer-events-none');
+      
+      const savedProducts = PRODUCTS.filter(p => state.wishlist.includes(p.id));
+      if (savedProducts.length === 0) {
+        wishlistItemsContainer.innerHTML = `
+          <div class="text-center py-12 text-zinc-500 font-space space-y-2">
+            <i data-lucide="heart" class="w-10 h-10 mx-auto stroke-zinc-600"></i>
+            <p class="uppercase text-xs font-bold">NO VAULT SAVES YET</p>
+          </div>
+        `;
+      } else {
+        wishlistItemsContainer.innerHTML = savedProducts.map(product => `
+          <div class="flex items-center justify-between p-3 border border-wireframe bg-surface">
+            <div class="flex items-center gap-3">
+              <img src="${product.colors[0].image}" class="w-12 h-14 object-cover" />
+              <div>
+                <h4 class="font-space font-bold text-xs text-white uppercase">${product.title}</h4>
+                <div class="font-space text-xs text-lime font-bold mt-0.5">₹${product.price} <span class="text-zinc-500 line-through text-[11px]">₹${product.originalPrice}</span></div>
+              </div>
+            </div>
+            <div class="flex items-center gap-2">
+              <button onclick="quickAddToCart('${product.id}', '${product.sizes[0]}'); closeWishlistModal();" class="px-3 py-1.5 bg-lime text-black font-space font-bold text-xs uppercase hover:bg-white transition">
+                MOVE TO BAG
+              </button>
+              <button onclick="toggleWishlist('${product.id}'); openWishlistModal();" class="p-1.5 text-zinc-400 hover:text-coral-urgent transition">
+                <i data-lucide="trash-2" class="w-4 h-4"></i>
+              </button>
+            </div>
+          </div>
+        `).join('');
+      }
+      lucide.createIcons();
+    }
+
+    function closeWishlistModal() {
+      wishlistModalOverlay.classList.add('opacity-0', 'pointer-events-none');
+    }
+
+    // --- 8. Quick View Editorial Modal ---
+    function openQuickView(productId) {
+      const product = PRODUCTS.find(p => p.id === productId);
+      if (!product) return;
+
+      quickviewContent.innerHTML = `
+        <button onclick="closeQuickView()" class="absolute top-4 right-4 z-30 p-2 bg-canvas/80 text-white hover:text-lime transition border border-wireframe">
+          <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+
+        <div class="grid grid-cols-1 md:grid-cols-2">
+          <!-- Left: Big Editorial Image -->
+          <div class="aspect-[4/5] bg-black relative">
+            <img id="qv-main-image" src="${product.colors[0].image}" class="w-full h-full object-cover" />
+            <div class="absolute bottom-3 left-3 bg-canvas/90 border border-wireframe px-2 py-1 text-[11px] font-space font-bold text-white">
+              RAW RUN ARCHIVE // SS25
+            </div>
+          </div>
+
+          <!-- Right: Technical Specification Pod -->
+          <div class="p-6 md:p-8 flex flex-col justify-between space-y-5 bg-surface">
+            <div>
+              <div class="flex items-center gap-2 text-[11px] font-space font-bold uppercase mb-2">
+                <span class="bg-coral-urgent text-black px-2 py-0.5">${product.discount}</span>
+                <span class="bg-purple-accent text-white px-2 py-0.5">${product.fit}</span>
+                <span class="text-lime">★ ${product.rating} (${product.reviewsCount} verified reviews)</span>
+              </div>
+
+              <h2 class="font-syne font-extrabold text-2xl text-white uppercase leading-tight">${product.title}</h2>
+              <p class="font-inter text-xs text-zinc-400 mt-2 leading-relaxed">${product.details}</p>
+
+              <!-- Price Array -->
+              <div class="flex items-baseline gap-3 my-4">
+                <span class="font-space font-bold text-2xl text-white">₹${product.price}</span>
+                <span class="font-space text-sm text-zinc-500 line-through">₹${product.originalPrice}</span>
+                <span class="font-space text-xs text-lime font-bold">SAVING ₹${product.originalPrice - product.price} INSTANTLY</span>
+              </div>
+
+              <!-- Color Chooser -->
+              <div class="space-y-2 mb-4">
+                <label class="text-[11px] font-space text-zinc-400 font-bold uppercase">SELECT SHADE:</label>
+                <div class="flex items-center gap-2">
+                  ${product.colors.map((c, i) => `
+                    <button 
+                      onclick="document.getElementById('qv-main-image').src='${c.image}';" 
+                      class="px-2.5 py-1 border border-wireframe bg-canvas text-xs font-space font-bold text-white hover:border-lime flex items-center gap-1.5"
+                    >
+                      <span class="w-2.5 h-2.5 rounded-full" style="background-color: ${c.hex}"></span>
+                      <span>${c.name}</span>
+                    </button>
+                  `).join('')}
+                </div>
+              </div>
+
+              <!-- Sizing Selector Chips -->
+              <div class="space-y-2">
+                <div class="flex justify-between items-center text-[11px] font-space font-bold">
+                  <span class="text-zinc-400 uppercase">SELECT SIZE:</span>
+                  <span class="text-coral-urgent uppercase">⚡ ONLY ${product.stockLeft} LEFT IN STOCK</span>
+                </div>
+                <div class="flex items-center gap-2" id="qv-sizes">
+                  ${product.sizes.map((s, idx) => `
+                    <button 
+                      onclick="document.querySelectorAll('.qv-size-chip').forEach(b => b.classList.remove('bg-lime', 'text-black', 'border-lime')); this.classList.add('bg-lime', 'text-black', 'border-lime');"
+                      class="qv-size-chip w-10 h-10 border border-wireframe bg-canvas text-white font-space font-bold text-xs uppercase flex items-center justify-center hover:border-lime transition ${idx === 0 ? 'bg-lime text-black border-lime' : ''}"
+                    >
+                      ${s}
+                    </button>
+                  `).join('')}
+                </div>
+              </div>
+            </div>
+
+            <!-- CTA -->
+            <div class="pt-4 border-t border-wireframe space-y-2">
+              <button 
+                onclick="quickAddToCart('${product.id}', 'L'); closeQuickView();" 
+                class="w-full py-3.5 bg-lime text-black font-space font-black text-sm uppercase tracking-wider hover:bg-white hover:shadow-zine-white transition flex items-center justify-center gap-2"
+              >
+                <i data-lucide="shopping-bag" class="w-4 h-4"></i>
+                <span>ADD TO BAG VAULT — ₹${product.price}</span>
+              </button>
+              <div class="flex items-center justify-between text-[11px] font-space text-zinc-500">
+                <span>✓ 100% Bio-Washed Combed Cotton</span>
+                <span>✓ Ships within 24 Hours</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      `;
+
+      quickviewOverlay.classList.remove('opacity-0', 'pointer-events-none');
+      lucide.createIcons();
+    }
+
+    function closeQuickView() {
+      quickviewOverlay.classList.add('opacity-0', 'pointer-events-none');
+    }
+
+    // --- 9. Toast Notification Handler ---
+    let toastTimeout;
+    function triggerToast(message) {
+      clearTimeout(toastTimeout);
+      toastMsg.textContent = message;
+      toastEl.classList.remove('opacity-0', 'pointer-events-none', '-translate-y-12');
+      toastEl.classList.add('translate-y-0');
+
+      toastTimeout = setTimeout(() => {
+        toastEl.classList.add('opacity-0', 'pointer-events-none', '-translate-y-12');
+        toastEl.classList.remove('translate-y-0');
+      }, 3500);
+    }
+
+    // --- 10. Filter & Search Handlers ---
+    function setupFilterListeners() {
+      // Category buttons
+      document.querySelectorAll('.cat-pill').forEach(btn => {
+        btn.addEventListener('click', () => {
+          document.querySelectorAll('.cat-pill').forEach(b => {
+            b.classList.remove('bg-lime', 'text-black', 'border-lime');
+            b.classList.add('bg-surface', 'text-zinc-300', 'border-wireframe');
+          });
+          btn.classList.remove('bg-surface', 'text-zinc-300', 'border-wireframe');
+          btn.classList.add('bg-lime', 'text-black', 'border-lime');
+          state.category = btn.getAttribute('data-cat');
+          refreshCatalog();
+        });
+      });
+
+      // Size buttons
+      document.querySelectorAll('.size-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          document.querySelectorAll('.size-btn').forEach(b => {
+            b.classList.remove('bg-lime', 'text-black', 'border-lime', 'font-extrabold');
+            b.classList.add('bg-surface', 'text-zinc-300', 'border-wireframe');
+          });
+          btn.classList.remove('bg-surface', 'text-zinc-300', 'border-wireframe');
+          btn.classList.add('bg-lime', 'text-black', 'border-lime', 'font-extrabold');
+          state.size = btn.getAttribute('data-size');
+          refreshCatalog();
+        });
+      });
+
+      // Fit buttons
+      document.querySelectorAll('.fit-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          document.querySelectorAll('.fit-btn').forEach(b => {
+            b.classList.remove('bg-lime', 'text-black', 'border-lime', 'font-bold');
+            b.classList.add('bg-surface', 'text-zinc-300', 'border-wireframe');
+          });
+          btn.classList.remove('bg-surface', 'text-zinc-300', 'border-wireframe');
+          btn.classList.add('bg-lime', 'text-black', 'border-lime', 'font-bold');
+          state.fit = btn.getAttribute('data-fit');
+          refreshCatalog();
+        });
+      });
+
+      // Sort Select
+      document.getElementById('sort-select').addEventListener('change', (e) => {
+        state.sortBy = e.target.value;
+        refreshCatalog();
+      });
+
+      // Search Inputs
+      const searchInput = document.getElementById('search-input');
+      let searchDebounce;
+      searchInput.addEventListener('input', (e) => {
+        state.searchQuery = e.target.value;
+        clearTimeout(searchDebounce);
+        searchDebounce = setTimeout(() => refreshCatalog(), 280);
+      });
+
+      // Keyboard shortcut ⌘K / Ctrl+K
+      window.addEventListener('keydown', (e) => {
+        if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
+          e.preventDefault();
+          searchInput.focus();
+        }
+      });
+    }
+
+    function resetFilters() {
+      state.category = 'all';
+      state.size = 'ALL';
+      state.fit = 'ALL';
+      state.searchQuery = '';
+      document.getElementById('search-input').value = '';
+      
+      // Reset UI states
+      document.querySelectorAll('.cat-pill').forEach((b, i) => {
+        if (i === 0) {
+          b.classList.add('bg-lime', 'text-black', 'border-lime');
+          b.classList.remove('bg-surface', 'text-zinc-300', 'border-wireframe');
+        } else {
+          b.classList.remove('bg-lime', 'text-black', 'border-lime');
+          b.classList.add('bg-surface', 'text-zinc-300', 'border-wireframe');
+        }
+      });
+
+      refreshCatalog();
+      triggerToast('All filter parameters cleared');
+    }
+
+    // --- 11. Courier Pincode Checker (API) ---
+    document.getElementById('btn-check-pincode').addEventListener('click', async () => {
+      const pin = document.getElementById('pincode-input').value.trim();
+      const resEl = document.getElementById('pincode-result');
+
+      try {
+        const data = await apiFetch('/api/delivery/check', {
+          method: 'POST',
+          body: JSON.stringify({ pincode: pin }),
+        });
+        resEl.classList.remove('hidden', 'border-coral-urgent', 'text-coral-urgent', 'bg-coral-urgent/10');
+        resEl.classList.add('border-lime', 'text-lime', 'bg-lime/10');
+        resEl.innerHTML = data.expressAvailable ? `⚡ ${data.message}` : `📦 ${data.message}`;
+      } catch (err) {
+        resEl.classList.remove('hidden', 'border-lime', 'text-lime', 'bg-lime/10');
+        resEl.classList.add('border-coral-urgent', 'text-coral-urgent', 'bg-coral-urgent/10');
+        resEl.innerHTML = `⚠️ ${err.message}`;
+      }
+    });
+
+    // --- 12. Coupon Application (API) ---
+    document.getElementById('btn-apply-coupon').addEventListener('click', async () => {
+      const code = document.getElementById('coupon-code-input').value.trim().toUpperCase();
+      const alertEl = document.getElementById('coupon-alert');
+      alertEl.classList.remove('hidden');
+
+      try {
+        const data = await apiFetch('/api/coupons/validate', {
+          method: 'POST',
+          body: JSON.stringify({ code }),
+        });
+        state.discountCode = data.code;
+        state.discountAmount = data.discount;
+        alertEl.className = 'text-[11px] font-space font-bold text-lime';
+        alertEl.textContent = `✓ ${data.message}`;
+        updateCartState();
+        triggerToast('₹300 Promo discount applied!');
+      } catch (err) {
+        state.discountCode = null;
+        state.discountAmount = 0;
+        alertEl.className = 'text-[11px] font-space font-bold text-coral-urgent';
+        alertEl.textContent = `✕ ${err.message}`;
+        updateCartState();
+      }
+    });
+
+    // --- 13. Drop Alert Newsletter (API) ---
+    document.getElementById('newsletter-form').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const email = document.getElementById('newsletter-email').value.trim();
+      if (!email) return;
+      try {
+        const data = await apiFetch('/api/newsletter', {
+          method: 'POST',
+          body: JSON.stringify({ email }),
+        });
+        triggerToast(`🔥 ${data.message}`);
+        document.getElementById('newsletter-email').value = '';
+      } catch (err) {
+        triggerToast(err.message);
+      }
+    });
+
+    // --- 14. Checkout (API order) ---
+    document.getElementById('btn-checkout').addEventListener('click', async () => {
+      if (state.cart.length === 0) {
+        triggerToast('Your bag is empty! Add items first.');
+        return;
+      }
+      triggerToast('Creating secure checkout session...');
+      try {
+        const data = await apiFetch('/api/orders', {
+          method: 'POST',
+          body: JSON.stringify({
+            couponCode: state.discountCode,
+            items: state.cart.map((item) => ({
+              productId: item.product.id,
+              size: item.size,
+              colorIndex: item.colorIndex,
+              quantity: item.quantity,
+            })),
+          }),
+        });
+        alert(
+          `⚡ VELVETCLAP25 ORDER CONFIRMED\n\nOrder ID: ${data.orderRef}\nTotal: ₹${data.total}\nShipping: ${data.shipping}\n\n${data.message}`
+        );
+        state.cart = [];
+        state.discountCode = null;
+        state.discountAmount = 0;
+        updateCartState();
+        closeCartDrawer();
+      } catch (err) {
+        triggerToast(err.message);
+      }
+    });
+
+    // --- 15. Real-Time Social Proof Simulator ---
+    const socialNotifications = [
+      'Dev from Pune just copped Cyberpunk Glitch Boxy Tee!',
+      'Kabir from Bandra West grabbed Heavy 280 GSM Mesh Shorts.',
+      'Siddharth from Delhi-NCR applied code VC25 for ₹300 OFF!',
+      'Tanvi from Indiranagar added Minimalist Foam-Print Tee to Bag.',
+      'Only 3 pieces remaining in Section 09 Steal Vault!'
+    ];
+
+    setInterval(() => {
+      const randomMsg = socialNotifications[Math.floor(Math.random() * socialNotifications.length)];
+      // Only pop if cart and quickview aren't open
+      if (cartDrawerOverlay.classList.contains('pointer-events-none') && quickviewOverlay.classList.contains('pointer-events-none')) {
+        triggerToast(`⚡ ${randomMsg}`);
+      }
+    }, 18000);
+
+    // --- 16. Event Bindings ---
+    document.getElementById('btn-open-cart').addEventListener('click', openCartDrawer);
+    document.getElementById('btn-close-cart').addEventListener('click', closeCartDrawer);
+    cartDrawerOverlay.addEventListener('click', (e) => {
+      if (e.target === cartDrawerOverlay) closeCartDrawer();
+    });
+
+    document.getElementById('btn-open-wishlist').addEventListener('click', openWishlistModal);
+    document.getElementById('btn-close-wishlist').addEventListener('click', closeWishlistModal);
+    wishlistModalOverlay.addEventListener('click', (e) => {
+      if (e.target === wishlistModalOverlay) closeWishlistModal();
+    });
+
+    quickviewOverlay.addEventListener('click', (e) => {
+      if (e.target === quickviewOverlay) closeQuickView();
+    });
+
+    // Escape Key to close modals
+    window.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') {
+        closeCartDrawer();
+        closeWishlistModal();
+        closeQuickView();
+      }
+    });
+
+    // --- Initialize App ---
+    document.addEventListener('DOMContentLoaded', async () => {
+      loadPersistedSession();
+      setupFilterListeners();
+      try {
+        await refreshCatalog();
+        headerWishlistCount.textContent = state.wishlist.length;
+      } catch (err) {
+        productGridEl.innerHTML = `<p class="text-coral-urgent font-space text-sm col-span-full">Failed to load vault catalog. Is the server running?</p>`;
+        triggerToast(err.message);
+      }
+    });
+  </script>
+</body>
+</html>

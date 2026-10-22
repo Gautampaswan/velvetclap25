@@ -1,0 +1,131 @@
+[
+  {
+    "id": "vc-101",
+    "title": "CYBERPUNK GLITCH BOXY TEE",
+    "subtitle": "Heavy 240 GSM French Terry Cotton // Boxy Drop-Shoulder",
+    "category": "tees",
+    "fit": "Boxy Fit",
+    "tag": "⚡ 240 GSM HEAVY",
+    "tagType": "lime",
+    "discount": "58% OFF",
+    "price": 499,
+    "originalPrice": 1199,
+    "rating": 4.9,
+    "reviewsCount": 342,
+    "colors": [
+      { "name": "Onyx Black", "hex": "#161616", "image": "https://images.unsplash.com/photo-1576566588028-4147f3842f27?auto=format&fit=crop&w=800&q=80" },
+      { "name": "Acid Olive", "hex": "#556B2F", "image": "https://images.unsplash.com/photo-1521572267360-ee0c2909d518?auto=format&fit=crop&w=800&q=80" },
+      { "name": "Bleach Grey", "hex": "#808080", "image": "https://images.unsplash.com/photo-1618354691373-d851c5c3a990?auto=format&fit=crop&w=800&q=80" }
+    ],
+    "sizes": ["XS", "S", "M", "L", "XL"],
+    "stockLeft": 7,
+    "details": "Crafted with premium 100% combed French Terry cotton. Features high-density silicon chest typography, distressed sleeve hem, and authentic drop-shoulder drape engineered for Indian summers."
+  },
+  {
+    "id": "vc-102",
+    "title": "MINIMALIST FOAM-PRINT OVERSIZED TEE",
+    "subtitle": "Tactile Raised Typography // Bio-Washed Combed Yarn",
+    "category": "tees",
+    "fit": "Oversized",
+    "tag": "✨ 3D FOAM PUFF",
+    "tagType": "purple",
+    "discount": "57% OFF",
+    "price": 549,
+    "originalPrice": 1299,
+    "rating": 4.8,
+    "reviewsCount": 518,
+    "colors": [
+      { "name": "Raw Bone White", "hex": "#F0EBE0", "image": "https://images.unsplash.com/photo-1503342217505-b0a15ec3261c?auto=format&fit=crop&w=800&q=80" },
+      { "name": "Deep Asphalt", "hex": "#262626", "image": "https://images.unsplash.com/photo-1583743814966-8936f5b7be1a?auto=format&fit=crop&w=800&q=80" }
+    ],
+    "sizes": ["S", "M", "L", "XL", "XXL"],
+    "stockLeft": 12,
+    "details": "Features tactile rubberized micro-embossed prints on both chest and spine. Double-needle stitch on neckline and sleeves to prevent sagging after repeated laundry runs."
+  },
+  {
+    "id": "vc-103",
+    "title": "RELAXED CHILL TWILL CARGO SHORTS",
+    "subtitle": "Ripstop Twill Blend // Adjustable Drawstring Waist",
+    "category": "bottoms",
+    "fit": "Relaxed Fit",
+    "tag": "6 UTILITY POCKETS",
+    "tagType": "urgent",
+    "discount": "50% OFF",
+    "price": 799,
+    "originalPrice": 1599,
+    "rating": 4.7,
+    "reviewsCount": 129,
+    "colors": [
+      { "name": "Tactical Olive", "hex": "#4B5320", "image": "https://images.unsplash.com/photo-1591195853828-11db59a44f6b?auto=format&fit=crop&w=800&q=80" },
+      { "name": "Stealth Black", "hex": "#111111", "image": "https://images.unsplash.com/photo-1517445312882-bc9910d016b7?auto=format&fit=crop&w=800&q=80" },
+      { "name": "Desert Sand", "hex": "#C2B280", "image": "https://images.unsplash.com/photo-1562157873-818bc0726f68?auto=format&fit=crop&w=800&q=80" }
+    ],
+    "sizes": ["S", "M", "L", "XL"],
+    "stockLeft": 4,
+    "details": "Constructed from tear-resistant cotton ripstop. Features 2 bellow cargo compartments with reinforced bar-tack stitching and custom matte metal hardware."
+  },
+  {
+    "id": "vc-104",
+    "title": "METALLIC CHROME GRAPHIC ACID TEE",
+    "subtitle": "Mineral Acid Wash // Mirror Foil Screenprint",
+    "category": "tees",
+    "fit": "Oversized",
+    "tag": "✨ FOIL METALLIC",
+    "tagType": "purple",
+    "discount": "57% OFF",
+    "price": 599,
+    "originalPrice": 1399,
+    "rating": 4.9,
+    "reviewsCount": 211,
+    "colors": [
+      { "name": "Charcoal Wash", "hex": "#2E2E32", "image": "https://images.unsplash.com/photo-1529139574466-a303027c1d8b?auto=format&fit=crop&w=800&q=80" },
+      { "name": "Rusty Red", "hex": "#58181F", "image": "https://images.unsplash.com/photo-1503342394128-c104d54dba01?auto=format&fit=crop&w=800&q=80" }
+    ],
+    "sizes": ["XS", "S", "M", "L", "XL", "XXL"],
+    "stockLeft": 9,
+    "details": "Hand-dipped mineral acid treatment means each piece has unique tonal marbling. Silver chrome foil is heat-cured at 180°C to guarantee zero flaking."
+  },
+  {
+    "id": "vc-105",
+    "title": "HEAVY 280 GSM MESH BASKETBALL SHORTS",
+    "subtitle": "Heavy Knitted Mesh // Contrast Striped Hem Trim",
+    "category": "bottoms",
+    "fit": "Relaxed Fit",
+    "tag": "🏀 DOUBLE-LAYER MESH",
+    "tagType": "urgent",
+    "discount": "53% OFF",
+    "price": 699,
+    "originalPrice": 1499,
+    "rating": 4.8,
+    "reviewsCount": 89,
+    "colors": [
+      { "name": "Court Black/Red", "hex": "#1C1917", "image": "https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?auto=format&fit=crop&w=800&q=80" },
+      { "name": "Varsity Blue", "hex": "#1E3A8A", "image": "https://images.unsplash.com/photo-1542291026-7eec264c27ff?auto=format&fit=crop&w=800&q=80" },
+      { "name": "Grape Purple", "hex": "#4C1D95", "image": "https://images.unsplash.com/photo-1539185441755-769473a23570?auto=format&fit=crop&w=800&q=80" }
+    ],
+    "sizes": ["M", "L", "XL"],
+    "stockLeft": 3,
+    "details": "Heavy 280 GSM poly-mesh outer shell with an ultra-soft breathable anti-chafing inner jersey lining. Deep front pockets designed to securely hold smartphones."
+  },
+  {
+    "id": "vc-106",
+    "title": "STREET UTILITY CROSSBODY RIG BAG",
+    "subtitle": "Water-Resistant 600D Fabric // Quick-Release Cobra Buckle",
+    "category": "accessories",
+    "fit": "Straight Cut",
+    "tag": "🔒 CORDURA NYLON",
+    "tagType": "lime",
+    "discount": "55% OFF",
+    "price": 449,
+    "originalPrice": 999,
+    "rating": 4.9,
+    "reviewsCount": 640,
+    "colors": [
+      { "name": "Tactical Black", "hex": "#18181B", "image": "https://images.unsplash.com/photo-1553062407-98eeb64c6a62?auto=format&fit=crop&w=800&q=80" },
+      { "name": "Storm Grey", "hex": "#4B5563", "image": "https://images.unsplash.com/photo-1622560480605-d83c853bc5c3?auto=format&fit=crop&w=800&q=80" }
+    ],
+    "sizes": ["ONE SIZE"],
+    "stockLeft": 16,
+    "details": "Designed for daily commute across suburban trains and metros. Features waterproof zipper taped seams, carabiner clip attachments, and hidden rear passport pocket."
+  }
+]
