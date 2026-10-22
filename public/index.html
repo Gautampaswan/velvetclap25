@@ -742,8 +742,8 @@
   </div>
 
   <!-- ================= VAULT PROFILE (auto-created at checkout) ================= -->
-  <div id="vault-modal-overlay" class="overlay-closed fixed inset-0 modal-backdrop z-[60] flex items-center justify-center p-4 transition-opacity duration-200">
-    <div class="bg-surface border border-wireframe w-full max-w-md p-6 shadow-2xl max-h-[90vh] overflow-y-auto">
+  <div id="vault-modal-overlay" class="overlay-closed fixed inset-0 modal-backdrop z-[70] flex items-center justify-center p-4 transition-opacity duration-200">
+    <div id="vault-modal-panel" class="relative z-10 bg-surface border border-wireframe w-full max-w-md p-6 shadow-2xl max-h-[90vh] overflow-y-auto pointer-events-auto">
       <div class="flex justify-between items-start gap-4 mb-3">
         <h3 class="font-syne font-bold text-lg text-white uppercase">Vault profile</h3>
         <button type="button" id="btn-close-vault" class="text-zinc-400 hover:text-lime"><i data-lucide="x" class="w-5 h-5"></i></button>
@@ -762,10 +762,12 @@
         <ul id="vault-orders-list" class="space-y-2 text-xs font-space"></ul>
       </div>
 
+      <p id="vault-loaded-hint" class="hidden text-[11px] text-lime font-space mb-3">Your vault is open on this device — scroll for track order, or tap Refresh to reload from the server.</p>
       <div id="vault-load-panel" class="space-y-2 mb-4">
-        <label class="text-[10px] font-space font-bold text-zinc-400 uppercase">Load profile by mobile</label>
+        <label id="vault-load-label" class="text-[10px] font-space font-bold text-zinc-400 uppercase">Load profile by mobile</label>
+        <p class="text-[10px] text-zinc-500 font-space">Use this if you ordered on another phone/browser — enter the same 10-digit mobile from checkout.</p>
         <input id="vault-phone-input" type="tel" maxlength="10" placeholder="10-digit mobile used at checkout" class="w-full bg-canvas border border-wireframe px-3 py-2 text-xs text-white focus:border-lime focus:outline-none" />
-        <button type="button" id="btn-vault-load" class="w-full py-2 bg-lime text-black font-space font-bold text-xs uppercase hover:bg-white">Open my vault</button>
+        <button type="button" id="btn-vault-load" class="w-full py-2.5 bg-lime text-black font-space font-bold text-xs uppercase hover:bg-white cursor-pointer relative z-20">Open my vault</button>
         <p id="vault-load-error" class="text-[11px] text-coral-urgent hidden"></p>
       </div>
 
@@ -945,8 +947,27 @@
         : '';
     }
 
+    let vaultLoadedPhone = null;
+
+    function updateVaultLoadPanelUI() {
+      const btn = document.getElementById('btn-vault-load');
+      const label = document.getElementById('vault-load-label');
+      const hint = document.getElementById('vault-loaded-hint');
+      const active = document.getElementById('vault-profile-active');
+      const isOpen = active && !active.classList.contains('hidden');
+      if (hint) hint.classList.toggle('hidden', !isOpen);
+      if (isOpen && vaultLoadedPhone) {
+        if (label) label.textContent = 'Refresh or switch mobile';
+        if (btn) btn.textContent = 'Refresh my orders';
+      } else {
+        if (label) label.textContent = 'Load profile by mobile';
+        if (btn) btn.textContent = 'Open my vault';
+      }
+    }
+
     async function loadVaultByPhone(phone) {
       const errEl = document.getElementById('vault-load-error');
+      const btn = document.getElementById('btn-vault-load');
       errEl.classList.add('hidden');
       const normalized = String(phone || '').replace(/\D/g, '').slice(-10);
       if (!/^\d{10}$/.test(normalized)) {
@@ -954,12 +975,27 @@
         errEl.classList.remove('hidden');
         return;
       }
-      const data = await apiFetch(`/api/profile?phone=${encodeURIComponent(normalized)}`);
-      saveCustomerProfile(data.profile);
-      showVaultProfileCard(data.profile);
-      renderVaultOrders(data.orders);
-      document.getElementById('vault-track-phone').value = normalized;
-      triggerToast(`Vault loaded · ${data.profile.profileId}`);
+      const prevLabel = btn?.textContent;
+      if (btn) {
+        btn.disabled = true;
+        btn.textContent = 'Loading…';
+      }
+      try {
+        const data = await apiFetch(`/api/profile?phone=${encodeURIComponent(normalized)}`);
+        vaultLoadedPhone = normalized;
+        saveCustomerProfile(data.profile);
+        showVaultProfileCard(data.profile);
+        renderVaultOrders(data.orders);
+        document.getElementById('vault-track-phone').value = normalized;
+        updateVaultLoadPanelUI();
+        triggerToast(`Vault loaded · ${data.profile.profileId}`);
+      } finally {
+        if (btn) {
+          btn.disabled = false;
+          updateVaultLoadPanelUI();
+          if (btn.textContent === 'Loading…') btn.textContent = prevLabel || 'Open my vault';
+        }
+      }
     }
 
     function openVaultModal() {
@@ -982,10 +1018,15 @@
         document.getElementById('vault-track-ref').value = last.orderRef;
       }
       if (saved?.profileId) {
+        vaultLoadedPhone = String(saved.phone || '').replace(/\D/g, '').slice(-10);
         showVaultProfileCard(saved);
+        updateVaultLoadPanelUI();
         loadVaultByPhone(saved.phone).catch(() => {
           showVaultProfileCard(saved);
+          updateVaultLoadPanelUI();
         });
+      } else {
+        updateVaultLoadPanelUI();
       }
       lucide.createIcons();
     }
@@ -1722,13 +1763,24 @@
       document.getElementById('vault-modal-overlay')?.addEventListener('click', (e) => {
         if (e.target.id === 'vault-modal-overlay') closeVaultModal();
       });
-      document.getElementById('btn-vault-load')?.addEventListener('click', async () => {
+      document.getElementById('vault-modal-panel')?.addEventListener('click', (e) => {
+        e.stopPropagation();
+      });
+      document.getElementById('btn-vault-load')?.addEventListener('click', async (e) => {
+        e.preventDefault();
+        e.stopPropagation();
         try {
           await loadVaultByPhone(document.getElementById('vault-phone-input').value.trim());
         } catch (err) {
           const errEl = document.getElementById('vault-load-error');
           errEl.textContent = err.message || 'Could not load profile.';
           errEl.classList.remove('hidden');
+        }
+      });
+      document.getElementById('vault-phone-input')?.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') {
+          e.preventDefault();
+          document.getElementById('btn-vault-load')?.click();
         }
       });
       document.getElementById('btn-vault-track')?.addEventListener('click', async () => {
