@@ -667,6 +667,7 @@
             </summary>
             <div class="space-y-2 p-3 pt-0 border-t border-wireframe/60">
               <input id="ship-name" type="text" placeholder="Full name" class="w-full bg-surface border border-wireframe px-3 py-2 text-xs text-white focus:border-lime focus:outline-none" />
+              <input id="ship-email" type="email" placeholder="Email (optional — order &amp; shipping updates)" class="w-full bg-surface border border-wireframe px-3 py-2 text-xs text-white focus:border-lime focus:outline-none" />
               <div class="grid grid-cols-2 gap-2">
                 <input id="ship-phone" type="tel" placeholder="Mobile" maxlength="10" class="w-full bg-surface border border-wireframe px-3 py-2 text-xs text-white focus:border-lime focus:outline-none" />
                 <input id="ship-pincode" type="text" placeholder="Pincode" maxlength="6" class="w-full bg-surface border border-wireframe px-3 py-2 text-xs text-white focus:border-lime focus:outline-none" />
@@ -791,7 +792,7 @@
     };
 
     const INFO_COPY = {
-      track: { title: 'Track order', body: 'Use your Order ID + mobile on GET /api/track?orderRef=VC25-…&phone=10digits (track page coming soon). You also get SMS when the shop marks your order shipped (if MSG91 is enabled).' },
+      track: { title: 'Track order', body: 'After checkout, save your Order ID (starts with VC25-). Your Vault profile ID (VCU-…) is shown in the confirmation popup and saved on this device for faster checkout next time. Status updates: SMS if the shop enabled MSG91, or email if you entered one at checkout. A simple track form is coming soon — until then staff can look up your order in admin.' },
       returns: { title: '7-day returns', body: 'Easy doorstep reverse pickup across 18,000+ pincodes. Items must be unworn with tags. Refund to UPI/bank within 5–7 business days after QC.' },
       cod: { title: 'Cash on delivery', body: 'Choose COD at checkout. Pay the delivery partner in cash or UPI on delivery. COD fee may apply on orders under ₹999.' },
       shipping: { title: 'Shipping timeline', body: 'Express 48h in Mumbai, Delhi-NCR, and Bangalore pincodes when ordered before 4 PM. Rest of India: 3–5 business days. Free shipping on carts ₹999+.' },
@@ -846,6 +847,7 @@
         if (p.phone) document.getElementById('ship-phone').value = p.phone;
         if (p.pincode) document.getElementById('ship-pincode').value = p.pincode;
         if (p.address) document.getElementById('ship-address').value = p.address;
+        if (p.email) document.getElementById('ship-email').value = p.email;
       } catch (_) { /* ignore */ }
     }
 
@@ -1669,7 +1671,12 @@
     }
 
     function finalizeSuccessfulOrder(data) {
-      if (data.profile) saveCustomerProfile(data.profile);
+      const toSave = data.profile
+        ? { ...data.profile, profileId: data.profileId || data.profile.profileId }
+        : data.profileId
+          ? { profileId: data.profileId, ...getCustomerDetails() }
+          : null;
+      if (toSave?.phone) saveCustomerProfile(toSave);
       const profileLine = data.profileId
         ? `\nVault profile: ${data.profileId} (saved on this device — no login needed)\n`
         : '';
@@ -1677,9 +1684,18 @@
         ? '\nSMS: demo mode on server (shop owner can enable MSG91).'
         : data.sms?.ok
           ? '\nSMS confirmation sent to your mobile.'
-          : '';
+          : data.sms === null
+            ? '\nSMS: disabled on server (email alerts may be enabled).'
+            : '';
+      const emailLine = data.email?.customer?.ok && !data.email.customer.skipped
+        ? '\nEmail confirmation sent to your inbox.'
+        : data.email?.shop?.simulated
+          ? '\nShop email: demo mode (set Gmail SMTP on server for free alerts).'
+          : data.email?.shop?.ok
+            ? '\nShop notified by email.'
+            : '';
       alert(
-        `⚡ VELVETCLAP25 ORDER CONFIRMED\n\nOrder ID: ${data.orderRef}\n(Save this ID for tracking)\n${profileLine}\nTotal: ₹${data.total}\nShipping: ${data.shipping}${smsLine}\n\n${data.message}`
+        `⚡ VELVETCLAP25 ORDER CONFIRMED\n\nOrder ID: ${data.orderRef}\n(Save this ID for tracking)\n${profileLine}\nTotal: ₹${data.total}\nShipping: ${data.shipping}${smsLine}${emailLine}\n\n${data.message}`
       );
       state.cart = [];
       state.discountCode = null;
@@ -1694,6 +1710,7 @@
         phone: document.getElementById('ship-phone').value.trim(),
         pincode: document.getElementById('ship-pincode').value.trim(),
         address: document.getElementById('ship-address').value.trim(),
+        email: document.getElementById('ship-email').value.trim(),
       };
     }
 
@@ -1703,6 +1720,9 @@
       if (!/^\d{10}$/.test(c.phone)) throw new Error('Enter a valid 10-digit mobile number.');
       if (!/^\d{6}$/.test(c.pincode)) throw new Error('Enter a valid 6-digit pincode.');
       if (c.address.length < 10) throw new Error('Enter your full delivery address.');
+      if (c.email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(c.email)) {
+        throw new Error('Enter a valid email or leave it blank.');
+      }
       return c;
     }
 
@@ -1745,6 +1765,10 @@
                 }),
               });
               data.message = verified.message;
+              if (verified.sms != null) data.sms = verified.sms;
+              if (verified.email) data.email = verified.email;
+              if (verified.profileId) data.profileId = verified.profileId;
+              if (verified.profile) data.profile = verified.profile;
               resolve(data);
             } catch (err) {
               reject(err);

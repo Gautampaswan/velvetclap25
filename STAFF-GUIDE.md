@@ -94,7 +94,16 @@ Until you move to a database, do an **export + push** weekly or after big drops.
 }
 ```
 
-## 6. Who to contact
+## 6. Order alerts (email vs SMS)
+
+| Channel | Cost | Setup |
+|---------|------|--------|
+| **Email to shop** | Free (Gmail) | Render env: `GMAIL_USER`, `GMAIL_APP_PASSWORD`, `SHOP_ORDERS_EMAIL` |
+| **SMS to customer** | MSG91 per SMS | `MSG91_AUTH_KEY` — or set `ORDER_SMS=false` for email-only |
+
+Every new checkout emails the shop inbox with order ID, items, and delivery address. If the customer entered email at checkout, they also get confirm + shipped emails when you mark shipped in admin.
+
+## 7. Who to contact
 
 - **New password / Render env:** tech lead  
 - **Razorpay live payments:** tech lead + Razorpay KYC  

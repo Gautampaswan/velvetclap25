@@ -4,6 +4,14 @@ const crypto = require('crypto');
 const path = require('path');
 const fs = require('fs');
 const { sendSms } = require('./lib/sms');
+const {
+  emailShopNewOrder,
+  emailCustomerOrderConfirm,
+  emailCustomerShipped,
+} = require('./lib/email');
+
+const orderSmsEnabled = () => process.env.ORDER_SMS !== 'false';
+const orderEmailShopEnabled = () => process.env.ORDER_EMAIL_SHOP !== 'false';
 
 const PORT = process.env.PORT || 3000;
 const app = express();
@@ -153,6 +161,7 @@ function upsertCustomerProfile(store, customer, orderRef) {
       name: customer.name,
       address: customer.address,
       pincode: customer.pincode,
+      email: customer.email || '',
       orderRefs: [],
       createdAt: new Date().toISOString(),
     };
@@ -161,10 +170,23 @@ function upsertCustomerProfile(store, customer, orderRef) {
     profile.name = customer.name;
     profile.address = customer.address;
     profile.pincode = customer.pincode;
+    if (customer.email) profile.email = customer.email;
     profile.updatedAt = new Date().toISOString();
   }
   if (!profile.orderRefs.includes(orderRef)) profile.orderRefs.push(orderRef);
   return profile;
+}
+
+function customerProfilePayload(profile) {
+  if (!profile) return null;
+  return {
+    profileId: profile.profileId,
+    name: profile.name,
+    phone: profile.phone,
+    pincode: profile.pincode,
+    address: profile.address,
+    email: profile.email || '',
+  };
 }
 
 function writeStore(store) {
@@ -421,6 +443,8 @@ function validateCustomerForOrder(customer) {
   if (!/^\d{10}$/.test(String(c.phone || '').trim())) return 'Valid 10-digit phone required.';
   if (!/^\d{6}$/.test(String(c.pincode || '').trim())) return 'Valid 6-digit pincode required.';
   if (String(c.address || '').trim().length < 10) return 'Full delivery address required.';
+  const email = String(c.email || '').trim();
+  if (email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return 'Invalid email address.';
   return null;
 }
 
@@ -447,6 +471,7 @@ app.patch('/api/admin/orders/:orderRef', requireAdmin, async (req, res) => {
   order.updatedAt = new Date().toISOString();
 
   let smsResult = null;
+  let emailResult = null;
   if (status === 'shipped') {
     order.courier = String(req.body?.courier || 'Bluedart/Delhivery').trim();
     order.trackingNumber = String(req.body?.trackingNumber || '').trim();
@@ -454,12 +479,16 @@ app.patch('/api/admin/orders/:orderRef', requireAdmin, async (req, res) => {
     order.shippedAt = new Date().toISOString();
 
     const phone = order.customer?.phone;
-    if (phone && req.body?.sendSms !== false) {
+    if (phone && req.body?.sendSms !== false && orderSmsEnabled()) {
       const awb = order.trackingNumber ? ` AWB: ${order.trackingNumber}.` : '';
       const track = order.trackingUrl ? ` Track: ${order.trackingUrl}` : '';
       const smsText = `VELVETCLAP25: Order ${order.orderRef} SHIPPED via ${order.courier}.${awb}${track} — thank you!`;
       smsResult = await sendSms(phone, smsText);
       order.lastSms = { type: 'shipped', at: new Date().toISOString(), result: smsResult };
+    }
+    if (req.body?.sendEmail !== false) {
+      emailResult = await emailCustomerShipped(order);
+      order.lastEmail = { type: 'shipped', at: new Date().toISOString(), result: emailResult };
     }
   }
 
@@ -469,6 +498,7 @@ app.patch('/api/admin/orders/:orderRef', requireAdmin, async (req, res) => {
     orderRef: order.orderRef,
     status: order.status,
     sms: smsResult,
+    email: emailResult,
   });
 });
 
@@ -595,11 +625,19 @@ app.post('/api/orders', async (req, res) => {
     return res.status(400).json({ error: customerErr });
   }
 
+  const deliveryCustomer = {
+    name: String(customer.name || '').trim(),
+    phone: String(customer.phone || '').trim(),
+    pincode: String(customer.pincode || '').trim(),
+    address: String(customer.address || '').trim(),
+    email: String(customer.email || '').trim(),
+  };
+
   const store = readStore();
   const orderRecord = {
     orderRef,
     items: lineItems,
-    customer,
+    customer: deliveryCustomer,
     subtotal,
     discount,
     shippingFee,
@@ -611,7 +649,7 @@ app.post('/api/orders', async (req, res) => {
     razorpayPaymentId: null,
     createdAt: new Date().toISOString(),
   };
-  const profile = upsertCustomerProfile(store, customer, orderRef);
+  const profile = upsertCustomerProfile(store, deliveryCustomer, orderRef);
   orderRecord.customerProfileId = profile.profileId;
   store.orders.push(orderRecord);
   writeStore(store);
@@ -619,10 +657,23 @@ app.post('/api/orders', async (req, res) => {
   const shippingLabel = shippingFee === 0 ? 'FREE' : `₹${shippingFee}`;
 
   async function finalizeOrderResponse(paymentMode, message, extra = {}) {
-    const phone = customer.phone;
-    const smsText = `VELVETCLAP25: Order ${orderRef} confirmed. Total Rs${total}. ${paymentMethod === 'cod' ? 'COD on delivery.' : 'Thank you!'} Vault ID ${profile.profileId}`;
-    const smsOrder = await sendSms(phone, smsText);
-    orderRecord.smsOrderConfirm = smsOrder;
+    const phone = deliveryCustomer.phone;
+    let smsOrder = null;
+    if (orderSmsEnabled()) {
+      const smsText = `VELVETCLAP25: Order ${orderRef} confirmed. Total Rs${total}. ${paymentMethod === 'cod' ? 'COD on delivery.' : 'Thank you!'} Vault ID ${profile.profileId}`;
+      smsOrder = await sendSms(phone, smsText);
+      orderRecord.smsOrderConfirm = smsOrder;
+    }
+    let emailShop = null;
+    let emailCustomer = null;
+    if (orderEmailShopEnabled()) {
+      emailShop = await emailShopNewOrder(orderRecord);
+      orderRecord.emailShopAlert = emailShop;
+    }
+    if (deliveryCustomer.email) {
+      emailCustomer = await emailCustomerOrderConfirm(orderRecord);
+      orderRecord.emailCustomerConfirm = emailCustomer;
+    }
     writeStore(store);
     return res.status(201).json({
       orderRef,
@@ -632,8 +683,9 @@ app.post('/api/orders', async (req, res) => {
       total,
       paymentMode,
       profileId: profile.profileId,
-      profile: { name: profile.name, phone: profile.phone },
+      profile: customerProfilePayload(profile),
       sms: smsOrder,
+      email: { shop: emailShop, customer: emailCustomer },
       message,
       ...extra,
     });
@@ -642,7 +694,7 @@ app.post('/api/orders', async (req, res) => {
   if (paymentMethod === 'cod') {
     return finalizeOrderResponse(
       'cod',
-      'COD order placed. Pay when your vault drop arrives. SMS sent if MSG91 is configured.'
+      'COD order placed. Pay when your vault drop arrives. Shop gets an email alert if Gmail SMTP is configured; SMS if MSG91 is set.'
     );
   }
 
@@ -673,6 +725,8 @@ app.post('/api/orders', async (req, res) => {
       shipping: shippingLabel,
       total,
       paymentMode: 'razorpay',
+      profileId: profile.profileId,
+      profile: customerProfilePayload(profile),
       razorpay: {
         keyId: RAZORPAY_KEY_ID,
         orderId: rzpOrder.id,
@@ -691,7 +745,7 @@ app.post('/api/orders', async (req, res) => {
   }
 });
 
-app.post('/api/orders/verify', (req, res) => {
+app.post('/api/orders/verify', async (req, res) => {
   if (!razorpayEnabled) {
     return res.status(400).json({ error: 'Razorpay is not configured on this server.' });
   }
@@ -726,12 +780,39 @@ app.post('/api/orders/verify', (req, res) => {
   order.razorpayOrderId = orderId;
   order.razorpayPaymentId = paymentId;
   order.paidAt = new Date().toISOString();
+
+  let smsOrder = null;
+  let emailShop = null;
+  let emailCustomer = null;
+  const phone = order.customer?.phone;
+  if (orderSmsEnabled() && phone && !order.smsOrderConfirm) {
+    const smsText = `VELVETCLAP25: Order ${orderRef} confirmed. Total Rs${order.total}. Thank you! Vault ID ${order.customerProfileId || ''}`;
+    smsOrder = await sendSms(phone, smsText);
+    order.smsOrderConfirm = smsOrder;
+  }
+  if (orderEmailShopEnabled() && !order.emailShopAlert) {
+    emailShop = await emailShopNewOrder(order);
+    order.emailShopAlert = emailShop;
+  }
+  if (order.customer?.email && !order.emailCustomerConfirm) {
+    emailCustomer = await emailCustomerOrderConfirm(order);
+    order.emailCustomerConfirm = emailCustomer;
+  }
+
   writeStore(store);
+
+  const storeProfile = order.customer?.phone
+    ? store.customers[order.customer.phone]
+    : null;
 
   res.json({
     ok: true,
     orderRef,
     status: 'paid',
+    profileId: order.customerProfileId || storeProfile?.profileId,
+    profile: customerProfilePayload(storeProfile),
+    sms: smsOrder,
+    email: { shop: emailShop, customer: emailCustomer },
     message: 'Payment verified. Your vault order is confirmed!',
   });
 });

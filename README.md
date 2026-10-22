@@ -42,9 +42,20 @@ Without Razorpay keys, checkout runs in **demo mode** (order saved, no payment g
 Orders, **customer profiles** (by mobile), and newsletter: `data/store.json`.
 
 - **Guest checkout** — no login; name + phone + address creates/updates a **Vault profile** (`VCU-…`).
-- **Admin** — `/admin.html` → pack → enter courier + AWB → **Mark shipped + send SMS**.
-- **SMS** — set `MSG91_AUTH_KEY` on Render (demo logs SMS if unset).
+- **Admin** — `/admin.html` → pack → enter courier + AWB → **Mark shipped + notify customer**.
+- **Email (free)** — Gmail SMTP sends **new-order alerts** to your shop inbox (`GMAIL_USER` + `GMAIL_APP_PASSWORD` + optional `SHOP_ORDERS_EMAIL`). Customers who enter email get confirm + shipped mail. No third-party SMS cost.
+- **SMS (optional)** — set `MSG91_AUTH_KEY` on Render, or set `ORDER_SMS=false` for email-only.
 - **Track API** — `GET /api/track?orderRef=…&phone=10digits`
+
+### Gmail SMTP on Render (recommended for zero SMS cost)
+
+1. Google Account → **Security** → enable **2-Step Verification**.
+2. **App passwords** → create one for “Mail” → copy the 16-character password.
+3. On Render **Environment**, set:
+   - `GMAIL_USER` — your Gmail address
+   - `GMAIL_APP_PASSWORD` — the app password (not your login password)
+   - `SHOP_ORDERS_EMAIL` — same Gmail or another inbox for alerts
+4. Optional: `ORDER_SMS=false` to skip MSG91 entirely.
 
 ## Shop staff: photos & products (20+ SKUs)
 
