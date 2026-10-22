@@ -6,6 +6,7 @@ const fs = require('fs');
 const { sendSms } = require('./lib/sms');
 const {
   emailShopNewOrder,
+  emailShopOrderShipped,
   emailCustomerOrderConfirm,
   emailCustomerShipped,
 } = require('./lib/email');
@@ -487,7 +488,11 @@ app.patch('/api/admin/orders/:orderRef', requireAdmin, async (req, res) => {
       order.lastSms = { type: 'shipped', at: new Date().toISOString(), result: smsResult };
     }
     if (req.body?.sendEmail !== false) {
-      emailResult = await emailCustomerShipped(order);
+      const emailShop = orderEmailShopEnabled()
+        ? await emailShopOrderShipped(order)
+        : null;
+      const emailCustomer = await emailCustomerShipped(order);
+      emailResult = { shop: emailShop, customer: emailCustomer };
       order.lastEmail = { type: 'shipped', at: new Date().toISOString(), result: emailResult };
     }
   }
