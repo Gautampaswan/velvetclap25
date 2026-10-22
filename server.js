@@ -25,9 +25,100 @@ app.use(cors());
 app.use(express.json());
 app.use(express.static(path.join(__dirname, 'public')));
 
-const products = JSON.parse(
-  fs.readFileSync(path.join(__dirname, 'data', 'products.json'), 'utf8')
-);
+const productsPath = path.join(__dirname, 'data', 'products.json');
+const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || '';
+const CLOUDINARY_CATALOG_TRANSFORM =
+  process.env.CLOUDINARY_CATALOG_TRANSFORM || 'w_800,h_1000,c_fill,f_auto,q_auto';
+const cloudinaryAutoTransform = process.env.CLOUDINARY_AUTO_TRANSFORM !== 'false';
+
+function loadProductsRaw() {
+  return JSON.parse(fs.readFileSync(productsPath, 'utf8'));
+}
+
+function saveProductsRaw(list) {
+  fs.writeFileSync(productsPath, JSON.stringify(list, null, 2), 'utf8');
+}
+
+let products = loadProductsRaw();
+
+function optimizeCatalogImage(url) {
+  if (!url || typeof url !== 'string') return url;
+  if (url.startsWith('/')) return url;
+  if (!cloudinaryAutoTransform) return url;
+  if (!url.includes('res.cloudinary.com') || !url.includes('/upload/')) return url;
+  if (url.includes(CLOUDINARY_CATALOG_TRANSFORM)) return url;
+  return url.replace('/upload/', `/upload/${CLOUDINARY_CATALOG_TRANSFORM}/`);
+}
+
+function withOptimizedImages(product) {
+  return {
+    ...product,
+    colors: (product.colors || []).map((c) => ({
+      ...c,
+      image: optimizeCatalogImage(c.image),
+    })),
+  };
+}
+
+function reloadProducts() {
+  products = loadProductsRaw();
+  return products;
+}
+
+function requireAdmin(req, res, next) {
+  if (!ADMIN_PASSWORD) {
+    return res.status(503).json({
+      error: 'Admin not configured. Set ADMIN_PASSWORD on the server (Render → Environment).',
+    });
+  }
+  const auth = req.headers.authorization || '';
+  const token = auth.startsWith('Bearer ') ? auth.slice(7) : '';
+  if (token !== ADMIN_PASSWORD) {
+    return res.status(401).json({ error: 'Invalid admin password.' });
+  }
+  next();
+}
+
+function nextProductId(list) {
+  const nums = list
+    .map((p) => p.id)
+    .filter((id) => /^vc-\d+$/.test(id))
+    .map((id) => parseInt(id.replace('vc-', ''), 10));
+  const next = nums.length ? Math.max(...nums) + 1 : 101;
+  return `vc-${next}`;
+}
+
+function validateProductInput(body, { partial } = {}) {
+  const errors = [];
+  if (!partial || body.title !== undefined) {
+    if (!String(body.title || '').trim()) errors.push('title is required');
+  }
+  if (!partial || body.price !== undefined) {
+    if (!Number.isFinite(Number(body.price)) || Number(body.price) < 1) {
+      errors.push('price must be a positive number');
+    }
+  }
+  if (body.colors !== undefined) {
+    if (!Array.isArray(body.colors) || body.colors.length === 0) {
+      errors.push('at least one color with image is required');
+    } else {
+      for (const c of body.colors) {
+        const img = String(c.image || '').trim();
+        if (!img) errors.push('each color needs an image URL');
+        else if (!img.startsWith('/') && !/^https?:\/\//i.test(img)) {
+          errors.push('image must be https URL or /products/... path');
+        }
+      }
+    }
+  }
+  if (body.image !== undefined && body.colors === undefined) {
+    const img = String(body.image || '').trim();
+    if (!img.startsWith('/') && !/^https?:\/\//i.test(img)) {
+      errors.push('image must be https URL or /products/... path');
+    }
+  }
+  return errors;
+}
 
 const storePath = path.join(__dirname, 'data', 'store.json');
 
@@ -86,7 +177,7 @@ function filterProducts(query) {
     );
   } else if (sortBy === 'rating') list.sort((a, b) => b.rating - a.rating);
 
-  return list;
+  return list.map(withOptimizedImages);
 }
 
 function buildOrderPayload(body) {
@@ -167,13 +258,89 @@ app.get('/api/payments/config', (_req, res) => {
 });
 
 app.get('/api/products', (req, res) => {
+  reloadProducts();
   res.json({ products: filterProducts(req.query), total: products.length });
 });
 
 app.get('/api/products/:id', (req, res) => {
+  reloadProducts();
   const product = products.find((p) => p.id === req.params.id);
   if (!product) return res.status(404).json({ error: 'Product not found' });
-  res.json(product);
+  res.json(withOptimizedImages(product));
+});
+
+app.get('/STAFF-GUIDE.md', (_req, res) => {
+  res.sendFile(path.join(__dirname, 'STAFF-GUIDE.md'));
+});
+
+app.get('/api/admin/status', (_req, res) => {
+  res.json({ adminEnabled: Boolean(ADMIN_PASSWORD) });
+});
+
+app.get('/api/admin/products', requireAdmin, (_req, res) => {
+  reloadProducts();
+  res.json({
+    products: products.map(withOptimizedImages),
+    count: products.length,
+  });
+});
+
+app.get('/api/admin/products/export', requireAdmin, (_req, res) => {
+  reloadProducts();
+  res.setHeader('Content-Type', 'application/json');
+  res.setHeader('Content-Disposition', 'attachment; filename="products.json"');
+  res.send(JSON.stringify(products, null, 2));
+});
+
+app.post('/api/admin/products', requireAdmin, (req, res) => {
+  reloadProducts();
+  const body = req.body || {};
+  const errors = validateProductInput(body);
+  if (errors.length) return res.status(400).json({ error: errors.join('; ') });
+
+  const price = Number(body.price);
+  const originalPrice = Number(body.originalPrice) || Math.round(price * 2);
+  const product = {
+    id: body.id && String(body.id).trim() ? String(body.id).trim() : nextProductId(products),
+    title: String(body.title).trim().toUpperCase(),
+    subtitle: String(body.subtitle || '').trim(),
+    category: body.category || 'tees',
+    fit: body.fit || 'Oversized',
+    tag: body.tag || 'NEW DROP',
+    tagType: body.tagType || 'lime',
+    discount: body.discount || `${Math.max(0, Math.round((1 - price / originalPrice) * 100))}% OFF`,
+    price,
+    originalPrice,
+    rating: Number(body.rating) || 4.8,
+    reviewsCount: Number(body.reviewsCount) || 0,
+    colors: body.colors.map((c) => ({
+      name: c.name || 'Default',
+      hex: c.hex || '#262626',
+      image: String(c.image).trim(),
+    })),
+    sizes: Array.isArray(body.sizes) && body.sizes.length ? body.sizes : ['S', 'M', 'L', 'XL'],
+    stockLeft: Number(body.stockLeft) ?? 10,
+    details: String(body.details || '').trim(),
+  };
+
+  if (products.some((p) => p.id === product.id)) {
+    return res.status(409).json({ error: `Product id ${product.id} already exists` });
+  }
+
+  products.push(product);
+  saveProductsRaw(products);
+  res.status(201).json({ ok: true, product: withOptimizedImages(product) });
+});
+
+app.delete('/api/admin/products/:id', requireAdmin, (req, res) => {
+  reloadProducts();
+  const before = products.length;
+  products = products.filter((p) => p.id !== req.params.id);
+  if (products.length === before) {
+    return res.status(404).json({ error: 'Product not found' });
+  }
+  saveProductsRaw(products);
+  res.json({ ok: true, removed: req.params.id });
 });
 
 app.post('/api/delivery/check', (req, res) => {
@@ -239,6 +406,7 @@ app.post('/api/newsletter', (req, res) => {
 });
 
 app.post('/api/orders', async (req, res) => {
+  reloadProducts();
   const built = buildOrderPayload(req.body);
   if (built.error) {
     return res.status(built.status).json({ error: built.error });
@@ -387,6 +555,7 @@ app.post('/api/orders/verify', (req, res) => {
 
 app.get('*', (req, res, next) => {
   if (req.path.startsWith('/api')) return next();
+  if (req.path.endsWith('.html') || req.path.startsWith('/products/')) return next();
   res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
 
@@ -396,5 +565,10 @@ app.listen(PORT, () => {
     razorpayEnabled
       ? 'Razorpay: enabled (live/test per your dashboard keys)'
       : 'Razorpay: disabled — set RAZORPAY_KEY_ID + RAZORPAY_KEY_SECRET in .env'
+  );
+  console.log(
+    ADMIN_PASSWORD
+      ? 'Staff admin: /admin.html (ADMIN_PASSWORD set)'
+      : 'Staff admin: disabled — set ADMIN_PASSWORD in .env or Render'
   );
 });

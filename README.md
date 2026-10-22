@@ -39,6 +39,19 @@ Without Razorpay keys, checkout runs in **demo mode** (order saved, no payment g
 
 Orders and newsletter data: `data/store.json`.
 
+## Shop staff: photos & products (20+ SKUs)
+
+**→ [STAFF-GUIDE.md](./STAFF-GUIDE.md)** — Cloudinary upload checklist, image sizes, export/sync workflow.
+
+| Task | Where |
+|------|--------|
+| Upload photos | [Cloudinary](https://cloudinary.com) Media Library |
+| Add / remove products | **`/admin.html`** on your live URL (password: `ADMIN_PASSWORD`) |
+| Local images (fallback) | `public/products/your-file.jpg` → URL `/products/your-file.jpg` |
+| Backup catalog | Admin → **Export catalog JSON** → commit to GitHub |
+
+Set `ADMIN_PASSWORD` in `.env` locally and on **Render → Environment** before sharing admin with staff.
+
 ## Deploy on Render (free) — client demo
 
 [![Deploy to Render](https://render.com/images/deploy-to-render-button.svg)](https://render.com/deploy?repo=https://github.com/Gautampaswan/velvetclap25)
