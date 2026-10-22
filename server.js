@@ -10,6 +10,7 @@ const {
   emailCustomerOrderConfirm,
   emailCustomerShipped,
   isEmailConfigured,
+  customerEmailNeedsResend,
 } = require('./lib/email');
 
 const orderSmsEnabled = () => process.env.ORDER_SMS !== 'false';
@@ -450,6 +451,39 @@ function validateCustomerForOrder(customer) {
   return null;
 }
 
+app.post('/api/admin/orders/:orderRef/resend-customer-email', requireAdmin, async (req, res) => {
+  const store = readStore();
+  const order = findOrder(store, req.params.orderRef);
+  if (!order) return res.status(404).json({ error: 'Order not found' });
+  if (!order.customer?.email?.trim()) {
+    return res.status(400).json({ error: 'No customer email on this order.' });
+  }
+  if (!isEmailConfigured()) {
+    return res.status(400).json({
+      error: 'Gmail SMTP not configured on server (GMAIL_USER + GMAIL_APP_PASSWORD).',
+    });
+  }
+
+  const mode = String(req.body?.mode || 'both').toLowerCase();
+  const result = { confirm: null, shipped: null };
+
+  if (mode === 'confirm' || mode === 'both') {
+    result.confirm = await emailCustomerOrderConfirm(order);
+    order.emailCustomerConfirm = result.confirm;
+  }
+  if ((mode === 'shipped' || mode === 'both') && order.status === 'shipped') {
+    result.shipped = await emailCustomerShipped(order);
+    order.lastEmail = {
+      type: 'shipped_resend',
+      at: new Date().toISOString(),
+      result: { customer: result.shipped },
+    };
+  }
+
+  writeStore(store);
+  res.json({ ok: true, orderRef: order.orderRef, result });
+});
+
 app.get('/api/admin/notifications/status', requireAdmin, (_req, res) => {
   const smsConfigured = Boolean(process.env.MSG91_AUTH_KEY?.trim());
   res.json({
@@ -692,7 +726,10 @@ app.post('/api/orders', async (req, res) => {
       emailShop = await emailShopNewOrder(orderRecord);
       orderRecord.emailShopAlert = emailShop;
     }
-    if (deliveryCustomer.email) {
+    if (
+      deliveryCustomer.email &&
+      customerEmailNeedsResend(orderRecord.emailCustomerConfirm)
+    ) {
       emailCustomer = await emailCustomerOrderConfirm(orderRecord);
       orderRecord.emailCustomerConfirm = emailCustomer;
     }
@@ -816,7 +853,10 @@ app.post('/api/orders/verify', async (req, res) => {
     emailShop = await emailShopNewOrder(order);
     order.emailShopAlert = emailShop;
   }
-  if (order.customer?.email && !order.emailCustomerConfirm) {
+  if (
+    order.customer?.email &&
+    customerEmailNeedsResend(order.emailCustomerConfirm)
+  ) {
     emailCustomer = await emailCustomerOrderConfirm(order);
     order.emailCustomerConfirm = emailCustomer;
   }
