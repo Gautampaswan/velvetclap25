@@ -708,7 +708,7 @@
         <button id="btn-checkout-cod" type="button" class="w-full py-2.5 border border-wireframe bg-canvas text-white font-space font-bold text-xs uppercase tracking-wider hover:border-lime hover:text-lime transition">
           CASH ON DELIVERY (COD)
         </button>
-        <p class="text-[10px] text-zinc-500 text-center font-space">
+        <p id="cart-checkout-hint" class="text-[10px] text-zinc-500 text-center font-space">
           🔒 256-BIT ENCRYPTED UPI, CARDS & CASH ON DELIVERY SUPPORTED
         </p>
       </div>
@@ -870,6 +870,32 @@
           discountCode: state.discountCode,
         })
       );
+    }
+
+    function rememberLastOrder(orderRef, status) {
+      if (!orderRef) return;
+      localStorage.setItem(
+        'vc25_last_order',
+        JSON.stringify({ orderRef, status: status || 'confirmed', at: Date.now() })
+      );
+    }
+
+    function clearBagAfterOrder() {
+      state.cart = [];
+      state.discountCode = null;
+      state.discountAmount = 0;
+      updateCartState();
+    }
+
+    function setCheckoutBusy(busy) {
+      const btnPay = document.getElementById('btn-checkout');
+      const btnCod = document.getElementById('btn-checkout-cod');
+      [btnPay, btnCod].forEach((btn) => {
+        if (!btn) return;
+        btn.disabled = busy;
+        btn.classList.toggle('opacity-50', busy);
+        btn.classList.toggle('pointer-events-none', busy);
+      });
     }
 
     function hydrateCartProducts() {
@@ -1186,6 +1212,14 @@
 
       lucide.createIcons();
       persistSession();
+
+      const hasItems = state.cart.length > 0;
+      const btnPay = document.getElementById('btn-checkout');
+      const btnCod = document.getElementById('btn-checkout-cod');
+      const checkoutHint = document.getElementById('cart-checkout-hint');
+      if (btnPay) btnPay.style.display = hasItems ? '' : 'none';
+      if (btnCod) btnCod.style.display = hasItems ? '' : 'none';
+      if (checkoutHint) checkoutHint.style.display = hasItems ? '' : 'none';
     }
 
     function adjustQuantity(index, delta) {
@@ -1671,6 +1705,10 @@
     }
 
     function finalizeSuccessfulOrder(data) {
+      rememberLastOrder(data.orderRef, data.paymentMode || 'confirmed');
+      clearBagAfterOrder();
+      closeCartDrawer();
+
       const toSave = data.profile
         ? { ...data.profile, profileId: data.profileId || data.profile.profileId }
         : data.profileId
@@ -1697,11 +1735,6 @@
       alert(
         `⚡ VELVETCLAP25 ORDER CONFIRMED\n\nOrder ID: ${data.orderRef}\n(Save this ID for tracking)\n${profileLine}\nTotal: ₹${data.total}\nShipping: ${data.shipping}${smsLine}${emailLine}\n\n${data.message}`
       );
-      state.cart = [];
-      state.discountCode = null;
-      state.discountAmount = 0;
-      updateCartState();
-      closeCartDrawer();
     }
 
     function getCustomerDetails() {
@@ -1786,27 +1819,46 @@
       });
     }
 
+    let checkoutInFlight = false;
+
     async function placeOrder(paymentMethod) {
+      if (checkoutInFlight) return;
       if (state.cart.length === 0) {
         triggerToast('Your bag is empty! Add items first.');
         return;
       }
-      triggerToast(
-        paymentMethod === 'cod'
-          ? 'Placing COD order...'
-          : 'Creating secure checkout session...'
-      );
-      const data = await apiFetch('/api/orders', {
-        method: 'POST',
-        body: JSON.stringify(orderPayload(paymentMethod)),
-      });
+      checkoutInFlight = true;
+      setCheckoutBusy(true);
+      try {
+        triggerToast(
+          paymentMethod === 'cod'
+            ? 'Placing COD order...'
+            : 'Creating secure checkout session...'
+        );
+        const data = await apiFetch('/api/orders', {
+          method: 'POST',
+          body: JSON.stringify(orderPayload(paymentMethod)),
+        });
 
-      if (data.paymentMode === 'razorpay') {
-        const paid = await openRazorpayCheckout(data);
-        finalizeSuccessfulOrder(paid);
-        return;
+        if (data.paymentMode === 'razorpay') {
+          try {
+            const paid = await openRazorpayCheckout(data);
+            finalizeSuccessfulOrder(paid);
+          } catch (payErr) {
+            rememberLastOrder(data.orderRef, 'pending_payment');
+            clearBagAfterOrder();
+            closeCartDrawer();
+            triggerToast(
+              `${payErr.message || 'Payment cancelled.'} Order ${data.orderRef} is saved as unpaid — contact the shop or use COD on your next order.`
+            );
+          }
+          return;
+        }
+        finalizeSuccessfulOrder(data);
+      } finally {
+        checkoutInFlight = false;
+        setCheckoutBusy(false);
       }
-      finalizeSuccessfulOrder(data);
     }
 
     function openDeliverySection() {
