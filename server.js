@@ -437,10 +437,15 @@ app.post('/api/delivery/check', (req, res) => {
   });
 });
 
-app.post('/api/coupons/validate', (req, res) => {
-  const code = String(req.body.code || '')
+function normalizeCouponCode(raw) {
+  return String(raw || '')
     .trim()
-    .toUpperCase();
+    .toUpperCase()
+    .replace(/[^A-Z0-9]/g, '');
+}
+
+app.post('/api/coupons/validate', (req, res) => {
+  const code = normalizeCouponCode(req.body.code);
   const coupon = COUPONS[code];
   if (!coupon) {
     return res.status(400).json({

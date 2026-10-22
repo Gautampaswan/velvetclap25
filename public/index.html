@@ -652,7 +652,8 @@
           <input id="ship-name" type="text" placeholder="Full name" class="w-full bg-canvas border border-wireframe px-3 py-2 text-xs text-white focus:border-lime focus:outline-none" />
           <input id="ship-phone" type="tel" placeholder="Mobile (10 digits)" maxlength="10" class="w-full bg-canvas border border-wireframe px-3 py-2 text-xs text-white focus:border-lime focus:outline-none" />
           <input id="ship-pincode" type="text" placeholder="Pincode" maxlength="6" class="w-full bg-canvas border border-wireframe px-3 py-2 text-xs text-white focus:border-lime focus:outline-none" />
-          <textarea id="ship-address" rows="2" placeholder="Full address (house, street, city)" class="w-full bg-canvas border border-wireframe px-3 py-2 text-xs text-white focus:border-lime focus:outline-none resize-none"></textarea>
+          <textarea id="ship-address" rows="2" placeholder="Full address (house no., street, area, city) — min 10 characters" class="w-full bg-canvas border border-wireframe px-3 py-2 text-xs text-white focus:border-lime focus:outline-none resize-none"></textarea>
+          <p id="ship-address-hint" class="text-[10px] text-zinc-500 font-space hidden"></p>
         </div>
 
         <!-- Calculations -->
@@ -1061,18 +1062,14 @@
       const progressPercent = Math.min(100, Math.round((subtotal / freeShippingGoal) * 100));
       const remainingForShipping = Math.max(0, freeShippingGoal - subtotal);
 
-      // Coupon logic
-      let finalDiscount = 0;
-      if (state.discountCode === 'VC25') {
-        finalDiscount = 300;
-      }
-      state.discountAmount = finalDiscount;
+      // Coupon logic (amount set when user applies a valid code)
+      const finalDiscount = state.discountCode ? (state.discountAmount || 0) : 0;
 
       const shippingFee = subtotal >= freeShippingGoal ? 0 : (subtotal > 0 ? 99 : 0);
       const grandTotal = Math.max(0, subtotal - finalDiscount + shippingFee);
 
       // Update Header Elements
-      headerCartTotal.textContent = `₹${subtotal}`;
+      headerCartTotal.textContent = `₹${grandTotal}`;
       headerCartCount.textContent = totalItems;
       document.getElementById('drawer-cart-badge').textContent = `${totalItems} ITEMS`;
 
@@ -1097,9 +1094,9 @@
       document.getElementById('cart-grand-total').textContent = `₹${grandTotal}`;
       
       const discountRow = document.getElementById('discount-row');
-      if (state.discountAmount > 0) {
+      if (finalDiscount > 0) {
         discountRow.style.display = 'flex';
-        document.getElementById('cart-discount-display').textContent = `-₹${state.discountAmount}`;
+        document.getElementById('cart-discount-display').textContent = `-₹${finalDiscount}`;
       } else {
         discountRow.style.display = 'none';
       }
@@ -1528,11 +1525,22 @@
       }
     });
 
-    // --- 12. Coupon Application (API) ---
-    document.getElementById('btn-apply-coupon').addEventListener('click', async () => {
-      const code = document.getElementById('coupon-code-input').value.trim().toUpperCase();
+    function normalizeCouponInput(raw) {
+      return String(raw || '').trim().toUpperCase().replace(/[^A-Z0-9]/g, '');
+    }
+
+    async function applyCouponCode() {
+      const input = document.getElementById('coupon-code-input');
+      const code = normalizeCouponInput(input.value);
+      input.value = code;
       const alertEl = document.getElementById('coupon-alert');
       alertEl.classList.remove('hidden');
+
+      if (!code) {
+        alertEl.className = 'text-[11px] font-space font-bold text-coral-urgent';
+        alertEl.textContent = '✕ Enter promo code VC25 (letters and numbers only).';
+        return;
+      }
 
       try {
         const data = await apiFetch('/api/coupons/validate', {
@@ -1544,13 +1552,36 @@
         alertEl.className = 'text-[11px] font-space font-bold text-lime';
         alertEl.textContent = `✓ ${data.message}`;
         updateCartState();
-        triggerToast('₹300 Promo discount applied!');
+        triggerToast(`₹${data.discount} promo applied!`);
       } catch (err) {
         state.discountCode = null;
         state.discountAmount = 0;
         alertEl.className = 'text-[11px] font-space font-bold text-coral-urgent';
         alertEl.textContent = `✕ ${err.message}`;
         updateCartState();
+      }
+    }
+
+    // --- 12. Coupon Application (API) ---
+    document.getElementById('btn-apply-coupon').addEventListener('click', applyCouponCode);
+    document.getElementById('coupon-code-input').addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        applyCouponCode();
+      }
+    });
+    document.getElementById('coupon-code-input').addEventListener('input', () => {
+      document.getElementById('coupon-alert').classList.add('hidden');
+    });
+    document.getElementById('ship-address').addEventListener('input', (e) => {
+      const hint = document.getElementById('ship-address-hint');
+      const len = e.target.value.trim().length;
+      if (len > 0 && len < 10) {
+        hint.textContent = `${len}/10 characters — add house no., street, or city`;
+        hint.classList.remove('hidden');
+        hint.className = 'text-[10px] text-coral-urgent font-space';
+      } else {
+        hint.classList.add('hidden');
       }
     });
 
