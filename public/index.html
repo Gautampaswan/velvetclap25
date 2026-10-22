@@ -741,6 +741,44 @@
     </div>
   </div>
 
+  <!-- ================= VAULT PROFILE (auto-created at checkout) ================= -->
+  <div id="vault-modal-overlay" class="overlay-closed fixed inset-0 modal-backdrop z-[60] flex items-center justify-center p-4 transition-opacity duration-200">
+    <div class="bg-surface border border-wireframe w-full max-w-md p-6 shadow-2xl max-h-[90vh] overflow-y-auto">
+      <div class="flex justify-between items-start gap-4 mb-3">
+        <h3 class="font-syne font-bold text-lg text-white uppercase">Vault profile</h3>
+        <button type="button" id="btn-close-vault" class="text-zinc-400 hover:text-lime"><i data-lucide="x" class="w-5 h-5"></i></button>
+      </div>
+      <p class="text-[11px] text-zinc-500 font-space mb-4">No password — we create your profile from <strong class="text-zinc-300">name + mobile</strong> when you place an order.</p>
+
+      <div id="vault-profile-active" class="hidden mb-4 p-3 border border-lime/40 bg-canvas space-y-1">
+        <p class="text-[10px] font-space font-bold text-lime uppercase">Your vault ID</p>
+        <p id="vault-display-id" class="font-space font-bold text-white text-sm"></p>
+        <p id="vault-display-name" class="text-xs text-zinc-300 mt-2"></p>
+        <p id="vault-display-phone" class="text-xs text-zinc-400"></p>
+      </div>
+
+      <div id="vault-orders-wrap" class="hidden mb-4">
+        <p class="text-[10px] font-space font-bold text-zinc-400 uppercase mb-2">Your orders</p>
+        <ul id="vault-orders-list" class="space-y-2 text-xs font-space"></ul>
+      </div>
+
+      <div id="vault-load-panel" class="space-y-2 mb-4">
+        <label class="text-[10px] font-space font-bold text-zinc-400 uppercase">Load profile by mobile</label>
+        <input id="vault-phone-input" type="tel" maxlength="10" placeholder="10-digit mobile used at checkout" class="w-full bg-canvas border border-wireframe px-3 py-2 text-xs text-white focus:border-lime focus:outline-none" />
+        <button type="button" id="btn-vault-load" class="w-full py-2 bg-lime text-black font-space font-bold text-xs uppercase hover:bg-white">Open my vault</button>
+        <p id="vault-load-error" class="text-[11px] text-coral-urgent hidden"></p>
+      </div>
+
+      <div class="border-t border-wireframe pt-4 space-y-2">
+        <p class="text-[10px] font-space font-bold text-zinc-400 uppercase">Track one order</p>
+        <input id="vault-track-ref" type="text" placeholder="Order ID (VC25-…)" class="w-full bg-canvas border border-wireframe px-3 py-2 text-xs text-white focus:border-lime focus:outline-none" />
+        <input id="vault-track-phone" type="tel" maxlength="10" placeholder="Mobile on order" class="w-full bg-canvas border border-wireframe px-3 py-2 text-xs text-white focus:border-lime focus:outline-none" />
+        <button type="button" id="btn-vault-track" class="w-full py-2 border border-wireframe text-white font-space font-bold text-xs uppercase hover:border-lime">Check status</button>
+        <div id="vault-track-result" class="text-xs text-zinc-300 font-space hidden mt-2 p-2 border border-wireframe bg-canvas"></div>
+      </div>
+    </div>
+  </div>
+
   <!-- ================= INFO MODAL (footer / help links) ================= -->
   <div id="info-modal-overlay" class="overlay-closed fixed inset-0 modal-backdrop z-[60] flex items-center justify-center p-4 transition-opacity duration-200">
     <div class="bg-surface border border-wireframe w-full max-w-md p-6 shadow-2xl">
@@ -792,7 +830,7 @@
     };
 
     const INFO_COPY = {
-      track: { title: 'Track order', body: 'After checkout, save your Order ID (starts with VC25-). Your Vault profile ID (VCU-…) is shown in the confirmation popup and saved on this device for faster checkout next time. Status updates: SMS if the shop enabled MSG91, or email if you entered one at checkout. A simple track form is coming soon — until then staff can look up your order in admin.' },
+      track: { title: 'Track order', body: 'Use Vault profile (header avatar) or Track Order in the footer — enter your mobile to see your VCU profile and orders.' },
       returns: { title: '7-day returns', body: 'Easy doorstep reverse pickup across 18,000+ pincodes. Items must be unworn with tags. Refund to UPI/bank within 5–7 business days after QC.' },
       cod: { title: 'Cash on delivery', body: 'Choose COD at checkout. Pay the delivery partner in cash or UPI on delivery. COD fee may apply on orders under ₹999.' },
       shipping: { title: 'Shipping timeline', body: 'Express 48h in Mumbai, Delhi-NCR, and Bangalore pincodes when ordered before 4 PM. Rest of India: 3–5 business days. Free shipping on carts ₹999+.' },
@@ -853,7 +891,119 @@
 
     function saveCustomerProfile(profile) {
       if (!profile?.phone) return;
-      localStorage.setItem('vc25_profile', JSON.stringify(profile));
+      const merged = {
+        ...getSavedVaultProfile(),
+        ...profile,
+        phone: String(profile.phone).replace(/\D/g, '').slice(-10),
+      };
+      localStorage.setItem('vc25_profile', JSON.stringify(merged));
+      syncProfileAvatar();
+    }
+
+    function getSavedVaultProfile() {
+      try {
+        const raw = localStorage.getItem('vc25_profile');
+        return raw ? JSON.parse(raw) : null;
+      } catch (_) {
+        return null;
+      }
+    }
+
+    function formatOrderStatus(status) {
+      return String(status || '').replace(/_/g, ' ').toUpperCase();
+    }
+
+    function renderVaultOrders(orders) {
+      const wrap = document.getElementById('vault-orders-wrap');
+      const ul = document.getElementById('vault-orders-list');
+      if (!wrap || !ul) return;
+      if (!orders?.length) {
+        wrap.classList.add('hidden');
+        return;
+      }
+      wrap.classList.remove('hidden');
+      ul.innerHTML = orders
+        .map(
+          (o) => `<li class="border border-wireframe p-2 bg-surface">
+          <span class="text-white font-bold">${o.orderRef}</span>
+          <span class="text-lime ml-1">${formatOrderStatus(o.status)}</span>
+          <div class="text-zinc-500 mt-1">₹${o.total} · ${new Date(o.createdAt).toLocaleDateString('en-IN')}</div>
+          ${o.trackingNumber ? `<div class="text-zinc-400 mt-1">${o.courier || 'Courier'} AWB ${o.trackingNumber}</div>` : ''}
+        </li>`
+        )
+        .join('');
+    }
+
+    function showVaultProfileCard(profile) {
+      const card = document.getElementById('vault-profile-active');
+      if (!profile?.profileId || !card) return;
+      card.classList.remove('hidden');
+      document.getElementById('vault-display-id').textContent = profile.profileId;
+      document.getElementById('vault-display-name').textContent = profile.name || '—';
+      document.getElementById('vault-display-phone').textContent = profile.phone
+        ? `Mobile · ${profile.phone}`
+        : '';
+    }
+
+    async function loadVaultByPhone(phone) {
+      const errEl = document.getElementById('vault-load-error');
+      errEl.classList.add('hidden');
+      const normalized = String(phone || '').replace(/\D/g, '').slice(-10);
+      if (!/^\d{10}$/.test(normalized)) {
+        errEl.textContent = 'Enter the 10-digit mobile from checkout.';
+        errEl.classList.remove('hidden');
+        return;
+      }
+      const data = await apiFetch(`/api/profile?phone=${encodeURIComponent(normalized)}`);
+      saveCustomerProfile(data.profile);
+      showVaultProfileCard(data.profile);
+      renderVaultOrders(data.orders);
+      document.getElementById('vault-track-phone').value = normalized;
+      triggerToast(`Vault loaded · ${data.profile.profileId}`);
+    }
+
+    function openVaultModal() {
+      const el = document.getElementById('vault-modal-overlay');
+      el.classList.remove('overlay-closed');
+      el.classList.add('overlay-open');
+      const saved = getSavedVaultProfile();
+      if (saved?.phone) {
+        document.getElementById('vault-phone-input').value = saved.phone;
+        document.getElementById('vault-track-phone').value = saved.phone;
+      }
+      const last = (() => {
+        try {
+          return JSON.parse(localStorage.getItem('vc25_last_order') || 'null');
+        } catch (_) {
+          return null;
+        }
+      })();
+      if (last?.orderRef) {
+        document.getElementById('vault-track-ref').value = last.orderRef;
+      }
+      if (saved?.profileId) {
+        showVaultProfileCard(saved);
+        loadVaultByPhone(saved.phone).catch(() => {
+          showVaultProfileCard(saved);
+        });
+      }
+      lucide.createIcons();
+    }
+
+    function closeVaultModal() {
+      const el = document.getElementById('vault-modal-overlay');
+      el.classList.add('overlay-closed');
+      el.classList.remove('overlay-open');
+    }
+
+    function syncProfileAvatar() {
+      const p = getSavedVaultProfile();
+      const btn = document.getElementById('btn-profile');
+      if (!btn) return;
+      if (p?.profileId) {
+        const tag = p.profileId.replace('VCU-', '').slice(-4);
+        btn.innerHTML = `<span class="flex items-center justify-center w-full h-full bg-lime text-black text-[9px] font-space font-black leading-none" title="Vault ${p.profileId}">${tag}</span>`;
+      }
     }
 
     function persistSession() {
@@ -1563,8 +1713,43 @@
       document.querySelectorAll('.info-link[data-info]').forEach((link) => {
         link.addEventListener('click', (e) => {
           e.preventDefault();
-          openInfoModal(link.getAttribute('data-info'));
+          const key = link.getAttribute('data-info');
+          if (key === 'track') openVaultModal();
+          else openInfoModal(key);
         });
+      });
+      document.getElementById('btn-close-vault')?.addEventListener('click', closeVaultModal);
+      document.getElementById('vault-modal-overlay')?.addEventListener('click', (e) => {
+        if (e.target.id === 'vault-modal-overlay') closeVaultModal();
+      });
+      document.getElementById('btn-vault-load')?.addEventListener('click', async () => {
+        try {
+          await loadVaultByPhone(document.getElementById('vault-phone-input').value.trim());
+        } catch (err) {
+          const errEl = document.getElementById('vault-load-error');
+          errEl.textContent = err.message || 'Could not load profile.';
+          errEl.classList.remove('hidden');
+        }
+      });
+      document.getElementById('btn-vault-track')?.addEventListener('click', async () => {
+        const resultEl = document.getElementById('vault-track-result');
+        resultEl.classList.add('hidden');
+        try {
+          const orderRef = document.getElementById('vault-track-ref').value.trim();
+          const phone = document.getElementById('vault-track-phone').value.trim();
+          const data = await apiFetch(
+            `/api/track?orderRef=${encodeURIComponent(orderRef)}&phone=${encodeURIComponent(phone)}`
+          );
+          resultEl.innerHTML = `<strong class="text-white">${data.orderRef}</strong> · ${formatOrderStatus(data.status)}<br/>Total ₹${data.total}${
+            data.customerProfileId ? `<br/>Vault ID ${data.customerProfileId}` : ''
+          }${data.trackingNumber ? `<br/>${data.courier || 'Courier'} AWB ${data.trackingNumber}` : ''}${
+            data.trackingUrl ? `<br/><a href="${data.trackingUrl}" class="text-lime underline" target="_blank" rel="noopener">Tracking link</a>` : ''
+          }`;
+          resultEl.classList.remove('hidden');
+        } catch (err) {
+          resultEl.textContent = err.message || 'Track failed.';
+          resultEl.classList.remove('hidden');
+        }
       });
       document.getElementById('btn-close-info').addEventListener('click', closeInfoModal);
       document.getElementById('btn-close-info-2').addEventListener('click', closeInfoModal);
@@ -1579,7 +1764,7 @@
         triggerToast('Checkout in INR (₹) — pan-India pricing');
       });
       document.getElementById('btn-profile')?.addEventListener('click', () => {
-        openInfoModal('track');
+        openVaultModal();
       });
     }
 
@@ -1735,6 +1920,10 @@
       alert(
         `⚡ VELVETCLAP25 ORDER CONFIRMED\n\nOrder ID: ${data.orderRef}\n(Save this ID for tracking)\n${profileLine}\nTotal: ₹${data.total}\nShipping: ${data.shipping}${smsLine}${emailLine}\n\n${data.message}`
       );
+      if (data.profileId) {
+        syncProfileAvatar();
+        triggerToast(`Vault profile ${data.profileId} saved — tap your avatar to view orders.`);
+      }
     }
 
     function getCustomerDetails() {
@@ -1931,11 +2120,12 @@
         closeWishlistModal();
         closeQuickView();
         closeInfoModal();
+        closeVaultModal();
       }
     });
 
     function ensureOverlaysClosed() {
-      [cartDrawerOverlay, wishlistModalOverlay, quickviewOverlay, document.getElementById('info-modal-overlay')].forEach((el) => {
+      [cartDrawerOverlay, wishlistModalOverlay, quickviewOverlay, document.getElementById('info-modal-overlay'), document.getElementById('vault-modal-overlay')].forEach((el) => {
         if (!el) return;
         el.classList.add('overlay-closed');
         el.classList.remove('overlay-open');
@@ -1948,6 +2138,7 @@
       ensureOverlaysClosed();
       loadPersistedSession();
       loadCustomerProfilePrefill();
+      syncProfileAvatar();
       setupFilterListeners();
       setupNavAndFooterLinks();
       try {

@@ -587,6 +587,39 @@ app.get('/api/track', (req, res) => {
     trackingUrl: order.trackingUrl || null,
     shippedAt: order.shippedAt || null,
     createdAt: order.createdAt,
+    customerProfileId: order.customerProfileId || null,
+  });
+});
+
+app.get('/api/profile', (req, res) => {
+  const phone = String(req.query.phone || '').replace(/\D/g, '').slice(-10);
+  if (!/^\d{10}$/.test(phone)) {
+    return res.status(400).json({ error: 'Valid 10-digit mobile required.' });
+  }
+  const store = readStore();
+  const profile = store.customers?.[phone];
+  if (!profile) {
+    return res.status(404).json({
+      error: 'No vault profile yet. Place an order with this mobile — your profile is created automatically at checkout.',
+    });
+  }
+  const orders = (profile.orderRefs || [])
+    .map((ref) => findOrder(store, ref))
+    .filter(Boolean)
+    .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
+    .map((o) => ({
+      orderRef: o.orderRef,
+      status: o.status,
+      total: o.total,
+      paymentMethod: o.paymentMethod,
+      createdAt: o.createdAt,
+      courier: o.courier || null,
+      trackingNumber: o.trackingNumber || null,
+      trackingUrl: o.trackingUrl || null,
+    }));
+  res.json({
+    profile: customerProfilePayload(profile),
+    orders,
   });
 });
 
