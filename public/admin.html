@@ -31,6 +31,7 @@
       <section class="border border-zinc-700 p-6 bg-[#121215] space-y-3">
         <h2 class="font-bold text-white uppercase text-sm">Orders to pack (COD & paid)</h2>
         <p class="text-xs text-zinc-500">When a customer chooses COD, the order appears here with address — mark <strong class="text-zinc-300">Packed</strong> then <strong class="text-zinc-300">Shipped</strong>.</p>
+        <p id="notify-status" class="text-xs border border-zinc-700 bg-[#0B0B0D] px-3 py-2 hidden"></p>
         <ul id="order-list" class="space-y-3 text-sm max-h-96 overflow-y-auto"></ul>
       </section>
 
@@ -146,7 +147,69 @@
       }
     }
 
+    function formatShippedEmailAlert(email) {
+      if (!email) {
+        return ' Email: server did not return email status — redeploy latest commit on Render.';
+      }
+      const parts = [];
+      const shop = email.shop ?? (email.customer ? null : email);
+      const customer = email.customer ?? null;
+      if (shop) {
+        if (shop.simulated) {
+          parts.push(
+            ' Shop + customer emails were NOT sent (demo mode). On Render → Environment add GMAIL_USER and GMAIL_APP_PASSWORD (Google App Password, not your login password). Optional: SHOP_ORDERS_EMAIL for which inbox gets alerts.'
+          );
+        } else if (shop.ok) {
+          parts.push(' Shop inbox emailed.');
+        } else if (shop.error) {
+          parts.push(` Shop email failed: ${shop.error}`);
+        }
+      }
+      if (customer) {
+        if (customer.skipped) {
+          parts.push(' Customer email: none at checkout.');
+        } else if (customer.simulated && !shop?.simulated) {
+          parts.push(' Customer email simulated — set Gmail SMTP on Render.');
+        } else if (customer.ok) {
+          parts.push(` Customer emailed (${customer.messageId ? 'sent' : 'ok'}).`);
+        } else if (customer.error) {
+          parts.push(` Customer email failed: ${customer.error}`);
+        }
+      }
+      if (!parts.length && email.simulated) {
+        return ' Email NOT sent (demo). Add GMAIL_USER + GMAIL_APP_PASSWORD on Render.';
+      }
+      if (!parts.length && email.skipped) {
+        return ' Customer had no email at checkout.';
+      }
+      if (!parts.length && email.ok) {
+        return ' Email sent.';
+      }
+      return parts.join('');
+    }
+
+    async function loadNotifyStatus() {
+      const el = document.getElementById('notify-status');
+      try {
+        const s = await api('/api/admin/notifications/status');
+        el.classList.remove('hidden');
+        if (s.emailConfigured) {
+          el.className =
+            'text-xs border border-lime-900/60 bg-lime-950/30 text-lime-300 px-3 py-2';
+          el.textContent = `Email live → shop alerts go to ${s.shopOrdersEmail || 'GMAIL_USER'}. Customer email on each order is used for confirm/shipped mail.`;
+        } else {
+          el.className =
+            'text-xs border border-amber-900/60 bg-amber-950/30 text-amber-200 px-3 py-2';
+          el.textContent =
+            'Email is OFF (demo only). Render → Environment: GMAIL_USER + GMAIL_APP_PASSWORD (create App Password in Google Account → Security). SMS also demo until MSG91_AUTH_KEY is set.';
+        }
+      } catch (_) {
+        el.classList.add('hidden');
+      }
+    }
+
     async function loadOrders() {
+      await loadNotifyStatus();
       const data = await api('/api/admin/orders');
       document.getElementById('orders-badge').textContent =
         data.needsPacking > 0 ? `${data.needsPacking} order(s) need packing` : 'No pending packs';
@@ -237,21 +300,8 @@
               : result.sms === null
                 ? ' SMS disabled (ORDER_SMS=false).'
                 : '';
-          const shopMail = result.email?.shop;
-          const custMail = result.email?.customer;
-          const emailNote = shopMail?.simulated
-            ? ' Shop email simulated — add GMAIL_USER + GMAIL_APP_PASSWORD on Render.'
-            : shopMail?.ok
-              ? ' Shop inbox emailed.'
-              : '';
-          const custEmailNote = custMail?.skipped
-            ? ' Customer had no email at checkout.'
-            : custMail?.simulated
-              ? ''
-              : custMail?.ok
-                ? ' Customer shipped email sent.'
-                : '';
-          alert(`Order marked shipped.${smsNote}${emailNote}${custEmailNote}`);
+          const emailNote = formatShippedEmailAlert(result.email);
+          alert(`Order marked shipped.${smsNote}${emailNote}`);
           await loadOrders();
         });
       });

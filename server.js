@@ -9,6 +9,7 @@ const {
   emailShopOrderShipped,
   emailCustomerOrderConfirm,
   emailCustomerShipped,
+  isEmailConfigured,
 } = require('./lib/email');
 
 const orderSmsEnabled = () => process.env.ORDER_SMS !== 'false';
@@ -448,6 +449,22 @@ function validateCustomerForOrder(customer) {
   if (email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return 'Invalid email address.';
   return null;
 }
+
+app.get('/api/admin/notifications/status', requireAdmin, (_req, res) => {
+  const smsConfigured = Boolean(process.env.MSG91_AUTH_KEY?.trim());
+  res.json({
+    emailConfigured: isEmailConfigured(),
+    smsConfigured,
+    shopOrdersEmail:
+      process.env.SHOP_ORDERS_EMAIL?.trim() ||
+      process.env.GMAIL_USER?.trim() ||
+      process.env.SMTP_USER?.trim() ||
+      null,
+    hint: isEmailConfigured()
+      ? 'Real emails will send to shop inbox and customer email on orders.'
+      : 'Add GMAIL_USER + GMAIL_APP_PASSWORD on Render (Google App Password). Until then emails are demo-only in server logs.',
+  });
+});
 
 app.get('/api/admin/orders', requireAdmin, (_req, res) => {
   const store = readStore();
