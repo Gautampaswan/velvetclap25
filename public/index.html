@@ -641,7 +641,7 @@
           </div>
           <div class="flex justify-between text-zinc-400">
             <span>SHIPPING (PAN-INDIA)</span>
-            <span id="cart-shipping-display" class="text-lime font-bold">FREE</span>
+            <span id="cart-shipping-display" class="text-lime font-bold">—</span>
           </div>
           <div class="flex justify-between text-base font-bold text-white pt-2 border-t border-wireframe">
             <span class="font-syne">TOTAL AMOUNT</span>
@@ -651,8 +651,11 @@
 
         <!-- Action Button -->
         <button id="btn-checkout" class="w-full py-3.5 bg-lime text-black font-space font-black text-sm uppercase tracking-wider hover:bg-white hover:shadow-zine-white transition flex items-center justify-center gap-2">
-          <span>PROCEED TO SECURE CHECKOUT</span>
+          <span id="btn-checkout-label">PROCEED TO SECURE CHECKOUT</span>
           <i data-lucide="arrow-right" class="w-4 h-4"></i>
+        </button>
+        <button id="btn-checkout-cod" type="button" class="w-full py-2.5 border border-wireframe bg-canvas text-white font-space font-bold text-xs uppercase tracking-wider hover:border-lime hover:text-lime transition">
+          CASH ON DELIVERY (COD)
         </button>
         <p class="text-[10px] text-zinc-500 text-center font-space">
           🔒 256-BIT ENCRYPTED UPI, CARDS & CASH ON DELIVERY SUPPORTED
@@ -999,7 +1002,8 @@
       }
       state.discountAmount = finalDiscount;
 
-      const grandTotal = Math.max(0, subtotal - finalDiscount);
+      const shippingFee = subtotal >= freeShippingGoal ? 0 : (subtotal > 0 ? 99 : 0);
+      const grandTotal = Math.max(0, subtotal - finalDiscount + shippingFee);
 
       // Update Header Elements
       headerCartTotal.textContent = `₹${subtotal}`;
@@ -1022,6 +1026,8 @@
 
       // Calculations View
       document.getElementById('cart-subtotal-display').textContent = `₹${subtotal}`;
+      document.getElementById('cart-shipping-display').textContent =
+        subtotal === 0 ? '—' : shippingFee === 0 ? 'FREE' : `₹${shippingFee}`;
       document.getElementById('cart-grand-total').textContent = `₹${grandTotal}`;
       
       const discountRow = document.getElementById('discount-row');
@@ -1421,34 +1427,129 @@
       }
     });
 
-    // --- 14. Checkout (API order) ---
-    document.getElementById('btn-checkout').addEventListener('click', async () => {
+    // --- 14. Checkout (Razorpay + COD) ---
+    let paymentConfig = { razorpayEnabled: false, keyId: null };
+
+    async function loadPaymentConfig() {
+      try {
+        paymentConfig = await apiFetch('/api/payments/config');
+        const label = document.getElementById('btn-checkout-label');
+        if (label && paymentConfig.razorpayEnabled) {
+          label.textContent = 'PAY WITH UPI / CARD (RAZORPAY)';
+        }
+      } catch (_) { /* keep defaults */ }
+    }
+
+    function loadRazorpayScript() {
+      return new Promise((resolve, reject) => {
+        if (window.Razorpay) return resolve();
+        const script = document.createElement('script');
+        script.src = 'https://checkout.razorpay.com/v1/checkout.js';
+        script.onload = () => resolve();
+        script.onerror = () => reject(new Error('Could not load Razorpay checkout.'));
+        document.body.appendChild(script);
+      });
+    }
+
+    function finalizeSuccessfulOrder(data) {
+      alert(
+        `⚡ VELVETCLAP25 ORDER CONFIRMED\n\nOrder ID: ${data.orderRef}\nTotal: ₹${data.total}\nShipping: ${data.shipping}\n\n${data.message}`
+      );
+      state.cart = [];
+      state.discountCode = null;
+      state.discountAmount = 0;
+      updateCartState();
+      closeCartDrawer();
+    }
+
+    function orderPayload(paymentMethod) {
+      return {
+        paymentMethod,
+        couponCode: state.discountCode,
+        items: state.cart.map((item) => ({
+          productId: item.product.id,
+          size: item.size,
+          colorIndex: item.colorIndex,
+          quantity: item.quantity,
+        })),
+      };
+    }
+
+    async function openRazorpayCheckout(data) {
+      await loadRazorpayScript();
+      const rzp = data.razorpay;
+      return new Promise((resolve, reject) => {
+        const options = {
+          key: rzp.keyId,
+          amount: rzp.amount,
+          currency: rzp.currency,
+          name: 'VELVETCLAP25',
+          description: `Vault order ${data.orderRef}`,
+          order_id: rzp.orderId,
+          theme: { color: '#C6FF00' },
+          handler: async (response) => {
+            try {
+              const verified = await apiFetch('/api/orders/verify', {
+                method: 'POST',
+                body: JSON.stringify({
+                  orderRef: data.orderRef,
+                  razorpay_order_id: response.razorpay_order_id,
+                  razorpay_payment_id: response.razorpay_payment_id,
+                  razorpay_signature: response.razorpay_signature,
+                }),
+              });
+              data.message = verified.message;
+              resolve(data);
+            } catch (err) {
+              reject(err);
+            }
+          },
+          modal: {
+            ondismiss: () => reject(new Error('Payment cancelled.')),
+          },
+        };
+        const checkout = new window.Razorpay(options);
+        checkout.on('payment.failed', (resp) => {
+          reject(new Error(resp.error?.description || 'Payment failed.'));
+        });
+        checkout.open();
+      });
+    }
+
+    async function placeOrder(paymentMethod) {
       if (state.cart.length === 0) {
         triggerToast('Your bag is empty! Add items first.');
         return;
       }
-      triggerToast('Creating secure checkout session...');
+      triggerToast(
+        paymentMethod === 'cod'
+          ? 'Placing COD order...'
+          : 'Creating secure checkout session...'
+      );
+      const data = await apiFetch('/api/orders', {
+        method: 'POST',
+        body: JSON.stringify(orderPayload(paymentMethod)),
+      });
+
+      if (data.paymentMode === 'razorpay') {
+        const paid = await openRazorpayCheckout(data);
+        finalizeSuccessfulOrder(paid);
+        return;
+      }
+      finalizeSuccessfulOrder(data);
+    }
+
+    document.getElementById('btn-checkout').addEventListener('click', async () => {
       try {
-        const data = await apiFetch('/api/orders', {
-          method: 'POST',
-          body: JSON.stringify({
-            couponCode: state.discountCode,
-            items: state.cart.map((item) => ({
-              productId: item.product.id,
-              size: item.size,
-              colorIndex: item.colorIndex,
-              quantity: item.quantity,
-            })),
-          }),
-        });
-        alert(
-          `⚡ VELVETCLAP25 ORDER CONFIRMED\n\nOrder ID: ${data.orderRef}\nTotal: ₹${data.total}\nShipping: ${data.shipping}\n\n${data.message}`
-        );
-        state.cart = [];
-        state.discountCode = null;
-        state.discountAmount = 0;
-        updateCartState();
-        closeCartDrawer();
+        await placeOrder('online');
+      } catch (err) {
+        triggerToast(err.message);
+      }
+    });
+
+    document.getElementById('btn-checkout-cod').addEventListener('click', async () => {
+      try {
+        await placeOrder('cod');
       } catch (err) {
         triggerToast(err.message);
       }
@@ -1502,6 +1603,7 @@
       loadPersistedSession();
       setupFilterListeners();
       try {
+        await loadPaymentConfig();
         await refreshCatalog();
         headerWishlistCount.textContent = state.wishlist.length;
       } catch (err) {
