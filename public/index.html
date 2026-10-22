@@ -136,6 +136,23 @@
       background: rgba(11, 11, 13, 0.88);
       backdrop-filter: blur(10px);
     }
+
+    .overlay-closed {
+      opacity: 0;
+      pointer-events: none !important;
+      visibility: hidden;
+    }
+    .overlay-open {
+      opacity: 1;
+      pointer-events: auto;
+      visibility: visible;
+    }
+    #toast {
+      pointer-events: none !important;
+    }
+    .nav-tab-active {
+      color: #C6FF00 !important;
+    }
   </style>
 </head>
 <body class="bg-canvas text-gray-200">
@@ -166,7 +183,7 @@
     <div class="max-w-[1440px] mx-auto px-4 md:px-8 py-3.5 flex items-center justify-between gap-4">
       
       <!-- Brand Logo -->
-      <a href="#" class="flex items-center gap-2 group">
+      <a href="/" id="brand-home" class="flex items-center gap-2 group">
         <div class="w-7 h-7 bg-lime text-black flex items-center justify-center font-black text-base shadow-zine-white group-hover:scale-105 transition-transform">
           ⚡
         </div>
@@ -190,7 +207,7 @@
       <!-- Action Cluster -->
       <div class="flex items-center gap-2.5 sm:gap-4 font-space text-xs">
         <!-- Currency -->
-        <div class="hidden sm:flex items-center gap-1.5 px-2.5 py-1.5 border border-wireframe bg-surface hover:border-zinc-400 transition cursor-pointer">
+        <div id="btn-currency" role="button" tabindex="0" class="hidden sm:flex items-center gap-1.5 px-2.5 py-1.5 border border-wireframe bg-surface hover:border-zinc-400 transition cursor-pointer">
           <span class="text-lime font-bold">₹</span>
           <span class="text-white font-semibold">INR (₹)</span>
         </div>
@@ -209,7 +226,7 @@
         </button>
 
         <!-- User Profile Avatar -->
-        <div class="w-8 h-8 border border-wireframe overflow-hidden cursor-pointer hover:border-lime transition">
+        <div id="btn-profile" role="button" tabindex="0" class="w-8 h-8 border border-wireframe overflow-hidden cursor-pointer hover:border-lime transition">
           <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=120&q=80" alt="Avatar" class="w-full h-full object-cover grayscale contrast-125" />
         </div>
       </div>
@@ -218,15 +235,15 @@
     <!-- Category Sub-Navigation -->
     <nav class="border-t border-wireframe bg-surface/80 overflow-x-auto no-scrollbar">
       <div class="max-w-[1440px] mx-auto px-4 md:px-8 flex items-center gap-1 sm:gap-2 text-[11px] md:text-xs font-space font-bold tracking-wider uppercase py-1">
-        <a href="#vault-catalog" class="px-3 py-2 text-zinc-400 hover:text-white transition">DROPS</a>
-        <a href="#vault-catalog" class="px-3 py-2 text-zinc-400 hover:text-white transition">MEN</a>
-        <a href="#vault-catalog" class="px-3 py-2 text-zinc-400 hover:text-white transition">WOMEN</a>
-        <a href="#vault-catalog" class="px-3 py-2 text-zinc-400 hover:text-white transition">OVERSIZED TEES</a>
-        <a href="#vault-catalog" class="px-3 py-2 text-zinc-400 hover:text-white transition">CARGOS & DENIM</a>
-        <a href="#vault-catalog" class="px-3 py-2 text-zinc-400 hover:text-white transition">COLLABS</a>
-        <a href="#vault-catalog" class="ml-auto px-3.5 py-1.5 bg-lime text-black font-extrabold flex items-center gap-1.5 hover:bg-white transition">
+        <button type="button" data-nav="drops" class="nav-tab px-3 py-2 text-zinc-400 hover:text-white transition nav-tab-active">DROPS</button>
+        <button type="button" data-nav="men" class="nav-tab px-3 py-2 text-zinc-400 hover:text-white transition">MEN</button>
+        <button type="button" data-nav="women" class="nav-tab px-3 py-2 text-zinc-400 hover:text-white transition">WOMEN</button>
+        <button type="button" data-nav="oversized" class="nav-tab px-3 py-2 text-zinc-400 hover:text-white transition">OVERSIZED TEES</button>
+        <button type="button" data-nav="cargos" class="nav-tab px-3 py-2 text-zinc-400 hover:text-white transition">CARGOS & DENIM</button>
+        <button type="button" data-nav="collabs" class="nav-tab px-3 py-2 text-zinc-400 hover:text-white transition">COLLABS</button>
+        <button type="button" data-nav="sale" class="nav-tab ml-auto px-3.5 py-1.5 bg-lime text-black font-extrabold flex items-center gap-1.5 hover:bg-white transition">
           UNDER ₹999 (SALE 🔥)
-        </a>
+        </button>
       </div>
     </nav>
   </header>
@@ -337,11 +354,11 @@
         <div class="flex items-center gap-2">
           <span class="text-[11px] font-space text-zinc-500 font-bold uppercase mr-1">SIZE:</span>
           <div class="flex items-center gap-1 font-space text-xs font-bold" id="size-filters">
-            <button data-size="ALL" class="size-btn px-2.5 py-1.5 border border-wireframe bg-surface text-zinc-300 hover:border-zinc-400">ALL</button>
+            <button data-size="ALL" class="size-btn px-2.5 py-1.5 border border-lime bg-lime text-black font-extrabold">ALL</button>
             <button data-size="XS" class="size-btn px-2.5 py-1.5 border border-wireframe bg-surface text-zinc-300 hover:border-zinc-400">XS</button>
             <button data-size="S" class="size-btn px-2.5 py-1.5 border border-wireframe bg-surface text-zinc-300 hover:border-zinc-400">S</button>
             <button data-size="M" class="size-btn px-2.5 py-1.5 border border-wireframe bg-surface text-zinc-300 hover:border-zinc-400">M</button>
-            <button data-size="L" class="size-btn px-2.5 py-1.5 border border-lime bg-lime text-black font-extrabold">L</button>
+            <button data-size="L" class="size-btn px-2.5 py-1.5 border border-wireframe bg-surface text-zinc-300 hover:border-zinc-400">L</button>
             <button data-size="XL" class="size-btn px-2.5 py-1.5 border border-wireframe bg-surface text-zinc-300 hover:border-zinc-400">XL</button>
             <button data-size="XXL" class="size-btn px-2.5 py-1.5 border border-wireframe bg-surface text-zinc-300 hover:border-zinc-400">XXL</button>
           </div>
@@ -504,33 +521,33 @@
         <div>
           <h6 class="font-space font-bold text-xs uppercase tracking-wider text-white mb-4">// SHOP CATEGORIES</h6>
           <ul class="space-y-2 text-xs font-inter text-zinc-400">
-            <li><a href="#" class="hover:text-lime transition">Latest SS25 Drops</a></li>
-            <li><a href="#" class="hover:text-lime transition">Boxy & Heavyweight Tees</a></li>
-            <li><a href="#" class="hover:text-lime transition">Parachute & Cargo Pants</a></li>
-            <li><a href="#" class="hover:text-lime transition">Raw Distressed Denim</a></li>
-            <li><a href="#" class="hover:text-lime transition font-bold text-zinc-300">Steal Deals (Under ₹999)</a></li>
+            <li><a href="#vault-catalog" data-nav="drops" class="footer-nav hover:text-lime transition">Latest SS25 Drops</a></li>
+            <li><a href="#vault-catalog" data-nav="oversized" class="footer-nav hover:text-lime transition">Boxy & Heavyweight Tees</a></li>
+            <li><a href="#vault-catalog" data-nav="cargos" class="footer-nav hover:text-lime transition">Parachute & Cargo Pants</a></li>
+            <li><a href="#vault-catalog" data-nav="cargos" class="footer-nav hover:text-lime transition">Raw Distressed Denim</a></li>
+            <li><a href="#vault-catalog" data-nav="sale" class="footer-nav hover:text-lime transition font-bold text-zinc-300">Steal Deals (Under ₹999)</a></li>
           </ul>
         </div>
 
         <div>
           <h6 class="font-space font-bold text-xs uppercase tracking-wider text-white mb-4">// CUSTOMER CARE</h6>
           <ul class="space-y-2 text-xs font-inter text-zinc-400">
-            <li><a href="#" class="hover:text-lime transition">Track Order Status</a></li>
-            <li><a href="#" class="hover:text-lime transition">Easy 7-Day Hassle-Free Returns</a></li>
-            <li><a href="#" class="hover:text-lime transition">Cash On Delivery (COD) Info</a></li>
-            <li><a href="#" class="hover:text-lime transition">Shipping & Express Timeline</a></li>
-            <li><a href="#" class="hover:text-lime transition flex items-center gap-1.5 text-lime"><i data-lucide="message-circle" class="w-3.5 h-3.5"></i> WhatsApp Support Desk</a></li>
+            <li><a href="#" data-info="track" class="info-link hover:text-lime transition">Track Order Status</a></li>
+            <li><a href="#" data-info="returns" class="info-link hover:text-lime transition">Easy 7-Day Hassle-Free Returns</a></li>
+            <li><a href="#" data-info="cod" class="info-link hover:text-lime transition">Cash On Delivery (COD) Info</a></li>
+            <li><a href="#" data-info="shipping" class="info-link hover:text-lime transition">Shipping & Express Timeline</a></li>
+            <li><a href="https://wa.me/919876543210" target="_blank" rel="noopener" class="hover:text-lime transition flex items-center gap-1.5 text-lime"><i data-lucide="message-circle" class="w-3.5 h-3.5"></i> WhatsApp Support Desk</a></li>
           </ul>
         </div>
 
         <div>
           <h6 class="font-space font-bold text-xs uppercase tracking-wider text-white mb-4">// CULTURE & COMMUNITY</h6>
           <ul class="space-y-2 text-xs font-inter text-zinc-400">
-            <li><a href="#" class="hover:text-lime transition">Join Discord Server</a></li>
-            <li><a href="#" class="hover:text-lime transition">Underground Spotify Playlists</a></li>
-            <li><a href="#" class="hover:text-lime transition">Campus Ambassador Program</a></li>
-            <li><a href="#" class="hover:text-lime transition">Creator Affiliate Circle</a></li>
-            <li><a href="#" class="hover:text-lime transition">Editorial Lookbooks</a></li>
+            <li><a href="#" data-info="discord" class="info-link hover:text-lime transition">Join Discord Server</a></li>
+            <li><a href="#" data-info="spotify" class="info-link hover:text-lime transition">Underground Spotify Playlists</a></li>
+            <li><a href="#" data-info="campus" class="info-link hover:text-lime transition">Campus Ambassador Program</a></li>
+            <li><a href="#" data-info="affiliate" class="info-link hover:text-lime transition">Creator Affiliate Circle</a></li>
+            <li><a href="#vault-catalog" data-nav="drops" class="footer-nav hover:text-lime transition">Editorial Lookbooks</a></li>
           </ul>
         </div>
 
@@ -583,7 +600,7 @@
   </footer>
 
   <!-- ================= CART SLIDE-IN DRAWER ================= -->
-  <div id="cart-drawer-overlay" class="fixed inset-0 modal-backdrop z-50 transition-opacity opacity-0 pointer-events-none duration-300">
+  <div id="cart-drawer-overlay" class="overlay-closed fixed inset-0 modal-backdrop z-50 transition-opacity duration-300">
     <div id="cart-drawer" class="fixed top-0 right-0 h-full w-full max-w-md bg-canvas border-l border-wireframe z-50 flex flex-col transform translate-x-full transition-transform duration-300 ease-out shadow-2xl">
       
       <!-- Drawer Header -->
@@ -666,7 +683,7 @@
   </div>
 
   <!-- ================= WISHLIST MODAL ================= -->
-  <div id="wishlist-modal-overlay" class="fixed inset-0 modal-backdrop z-50 flex items-center justify-center p-4 transition-opacity opacity-0 pointer-events-none duration-200">
+  <div id="wishlist-modal-overlay" class="overlay-closed fixed inset-0 modal-backdrop z-50 flex items-center justify-center p-4 transition-opacity duration-200">
     <div class="bg-canvas border border-wireframe w-full max-w-2xl max-h-[85vh] flex flex-col shadow-2xl">
       <div class="p-4 border-b border-wireframe flex items-center justify-between bg-surface">
         <div class="flex items-center gap-2">
@@ -684,14 +701,26 @@
   </div>
 
   <!-- ================= PRODUCT QUICK VIEW MODAL ================= -->
-  <div id="quickview-overlay" class="fixed inset-0 modal-backdrop z-50 flex items-center justify-center p-4 transition-opacity opacity-0 pointer-events-none duration-200">
+  <div id="quickview-overlay" class="overlay-closed fixed inset-0 modal-backdrop z-50 flex items-center justify-center p-4 transition-opacity duration-200">
     <div id="quickview-content" class="bg-surface border border-wireframe w-full max-w-3xl max-h-[92vh] overflow-y-auto shadow-2xl relative">
       <!-- Injected via JavaScript -->
     </div>
   </div>
 
+  <!-- ================= INFO MODAL (footer / help links) ================= -->
+  <div id="info-modal-overlay" class="overlay-closed fixed inset-0 modal-backdrop z-[60] flex items-center justify-center p-4 transition-opacity duration-200">
+    <div class="bg-surface border border-wireframe w-full max-w-md p-6 shadow-2xl">
+      <div class="flex justify-between items-start gap-4 mb-3">
+        <h3 id="info-modal-title" class="font-syne font-bold text-lg text-white uppercase"></h3>
+        <button type="button" id="btn-close-info" class="text-zinc-400 hover:text-lime"><i data-lucide="x" class="w-5 h-5"></i></button>
+      </div>
+      <p id="info-modal-body" class="text-sm text-zinc-400 font-inter leading-relaxed"></p>
+      <button type="button" id="btn-close-info-2" class="mt-5 w-full py-2.5 bg-lime text-black font-space font-bold text-xs uppercase hover:bg-white">Got it</button>
+    </div>
+  </div>
+
   <!-- ================= LIVE TOAST NOTIFICATION ================= -->
-  <div id="toast" class="fixed bottom-5 left-5 z-50 bg-black border border-lime p-3 text-xs font-space font-bold text-white shadow-zine-lime flex items-center gap-3 transform -translate-y-12 opacity-0 pointer-events-none transition-all duration-300">
+  <div id="toast" class="fixed bottom-5 left-5 z-50 bg-black border border-lime p-3 text-xs font-space font-bold text-white shadow-zine-lime flex items-center gap-3 transform -translate-y-12 opacity-0 transition-all duration-300">
     <div class="w-2.5 h-2.5 bg-lime rounded-full animate-ping"></div>
     <span id="toast-message">Notification message</span>
   </div>
@@ -704,14 +733,39 @@
 
     let state = {
       category: 'all',
-      size: 'L',
+      audience: 'all',
+      collection: '',
+      maxPrice: '',
+      size: 'ALL',
       fit: 'ALL',
       sortBy: 'trending',
       searchQuery: '',
+      activeNav: 'drops',
       wishlist: [],
       cart: [],
       discountCode: null,
       discountAmount: 0
+    };
+
+    const NAV_PRESETS = {
+      drops: { category: 'all', audience: 'all', collection: '', maxPrice: '', fit: 'ALL', searchQuery: '', sortBy: 'trending' },
+      men: { category: 'all', audience: 'men', collection: '', maxPrice: '', fit: 'ALL', searchQuery: '', sortBy: 'trending' },
+      women: { category: 'all', audience: 'women', collection: '', maxPrice: '', fit: 'ALL', searchQuery: '', sortBy: 'trending' },
+      oversized: { category: 'tees', audience: 'all', collection: '', maxPrice: '', fit: 'Oversized', searchQuery: '', sortBy: 'trending' },
+      cargos: { category: 'bottoms', audience: 'all', collection: '', maxPrice: '', fit: 'ALL', searchQuery: 'cargo', sortBy: 'trending' },
+      collabs: { category: 'all', audience: 'all', collection: 'collab', maxPrice: '', fit: 'ALL', searchQuery: '', sortBy: 'trending' },
+      sale: { category: 'all', audience: 'all', collection: '', maxPrice: '999', fit: 'ALL', searchQuery: '', sortBy: 'price-low' },
+    };
+
+    const INFO_COPY = {
+      track: { title: 'Track order', body: 'Orders placed on this demo store receive an order ID at checkout (e.g. VC25-…). Full SMS/email tracking goes live with production logistics. For now, contact WhatsApp support with your order ID.' },
+      returns: { title: '7-day returns', body: 'Easy doorstep reverse pickup across 18,000+ pincodes. Items must be unworn with tags. Refund to UPI/bank within 5–7 business days after QC.' },
+      cod: { title: 'Cash on delivery', body: 'Choose COD at checkout. Pay the delivery partner in cash or UPI on delivery. COD fee may apply on orders under ₹999.' },
+      shipping: { title: 'Shipping timeline', body: 'Express 48h in Mumbai, Delhi-NCR, and Bangalore pincodes when ordered before 4 PM. Rest of India: 3–5 business days. Free shipping on carts ₹999+.' },
+      discord: { title: 'Discord community', body: 'Join the VELVETCLAP25 vault Discord for drop alerts, restock pings, and fit checks. Invite link shared via newsletter — subscribe on the homepage.' },
+      spotify: { title: 'Vault playlists', body: 'Curated underground playlists for Bombay/Delhi street runs. Follow @velvetclap25 on Spotify when the channel launches.' },
+      campus: { title: 'Campus ambassadors', body: 'College reps get early access codes and commission on sales. Email careers@velvetclap25.in with your campus and Instagram handle.' },
+      affiliate: { title: 'Creator affiliate', body: 'Creators with 5k+ engaged followers can apply for custom codes and sample drops. WhatsApp the support desk to start onboarding.' },
     };
 
     async function apiFetch(path, options) {
@@ -727,11 +781,14 @@
     async function loadProductsFromServer() {
       const params = new URLSearchParams({
         category: state.category,
+        audience: state.audience,
         size: state.size,
         fit: state.fit,
         sort: state.sortBy,
         q: state.searchQuery,
       });
+      if (state.maxPrice) params.set('maxPrice', state.maxPrice);
+      if (state.collection) params.set('collection', state.collection);
       const data = await apiFetch(`/api/products?${params}`);
       PRODUCTS = data.products || [];
     }
@@ -1098,12 +1155,14 @@
     }
 
     function openCartDrawer() {
-      cartDrawerOverlay.classList.remove('opacity-0', 'pointer-events-none');
+      cartDrawerOverlay.classList.remove('overlay-closed');
+      cartDrawerOverlay.classList.add('overlay-open');
       cartDrawer.classList.remove('translate-x-full');
     }
 
     function closeCartDrawer() {
-      cartDrawerOverlay.classList.add('opacity-0', 'pointer-events-none');
+      cartDrawerOverlay.classList.remove('overlay-open');
+      cartDrawerOverlay.classList.add('overlay-closed');
       cartDrawer.classList.add('translate-x-full');
     }
 
@@ -1123,7 +1182,8 @@
     }
 
     function openWishlistModal() {
-      wishlistModalOverlay.classList.remove('opacity-0', 'pointer-events-none');
+      wishlistModalOverlay.classList.remove('overlay-closed');
+      wishlistModalOverlay.classList.add('overlay-open');
       
       const savedProducts = PRODUCTS.filter(p => state.wishlist.includes(p.id));
       if (savedProducts.length === 0) {
@@ -1158,7 +1218,8 @@
     }
 
     function closeWishlistModal() {
-      wishlistModalOverlay.classList.add('opacity-0', 'pointer-events-none');
+      wishlistModalOverlay.classList.remove('overlay-open');
+      wishlistModalOverlay.classList.add('overlay-closed');
     }
 
     // --- 8. Quick View Editorial Modal ---
@@ -1252,12 +1313,67 @@
         </div>
       `;
 
-      quickviewOverlay.classList.remove('opacity-0', 'pointer-events-none');
+      quickviewOverlay.classList.remove('overlay-closed');
+      quickviewOverlay.classList.add('overlay-open');
       lucide.createIcons();
     }
 
     function closeQuickView() {
-      quickviewOverlay.classList.add('opacity-0', 'pointer-events-none');
+      quickviewOverlay.classList.remove('overlay-open');
+      quickviewOverlay.classList.add('overlay-closed');
+    }
+
+    function openInfoModal(key) {
+      const copy = INFO_COPY[key];
+      if (!copy) return;
+      document.getElementById('info-modal-title').textContent = copy.title;
+      document.getElementById('info-modal-body').textContent = copy.body;
+      const el = document.getElementById('info-modal-overlay');
+      el.classList.remove('overlay-closed');
+      el.classList.add('overlay-open');
+      lucide.createIcons();
+    }
+
+    function closeInfoModal() {
+      const el = document.getElementById('info-modal-overlay');
+      el.classList.remove('overlay-open');
+      el.classList.add('overlay-closed');
+    }
+
+    function scrollToCatalog() {
+      document.getElementById('vault-catalog')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+
+    function syncNavTabsUI() {
+      document.querySelectorAll('.nav-tab').forEach((tab) => {
+        tab.classList.toggle('nav-tab-active', tab.getAttribute('data-nav') === state.activeNav);
+      });
+    }
+
+    function syncCategoryPillsUI() {
+      document.querySelectorAll('.cat-pill').forEach((btn) => {
+        const active = btn.getAttribute('data-cat') === state.category;
+        btn.classList.toggle('bg-lime', active);
+        btn.classList.toggle('text-black', active);
+        btn.classList.toggle('border-lime', active);
+        btn.classList.toggle('bg-surface', !active);
+        btn.classList.toggle('text-zinc-300', !active);
+        btn.classList.toggle('border-wireframe', !active);
+      });
+    }
+
+    async function applyNavFilter(navKey) {
+      const preset = NAV_PRESETS[navKey];
+      if (!preset) return;
+      state.activeNav = navKey;
+      Object.assign(state, preset);
+      document.getElementById('search-input').value = state.searchQuery;
+      document.getElementById('sort-select').value = state.sortBy;
+      syncNavTabsUI();
+      syncCategoryPillsUI();
+      await refreshCatalog();
+      scrollToCatalog();
+      triggerToast(`Showing ${navKey.replace('-', ' ').toUpperCase()} vault`);
     }
 
     // --- 9. Toast Notification Handler ---
@@ -1265,11 +1381,11 @@
     function triggerToast(message) {
       clearTimeout(toastTimeout);
       toastMsg.textContent = message;
-      toastEl.classList.remove('opacity-0', 'pointer-events-none', '-translate-y-12');
+      toastEl.classList.remove('opacity-0', '-translate-y-12');
       toastEl.classList.add('translate-y-0');
 
       toastTimeout = setTimeout(() => {
-        toastEl.classList.add('opacity-0', 'pointer-events-none', '-translate-y-12');
+        toastEl.classList.add('opacity-0', '-translate-y-12');
         toastEl.classList.remove('translate-y-0');
       }, 3500);
     }
@@ -1286,6 +1402,8 @@
           btn.classList.remove('bg-surface', 'text-zinc-300', 'border-wireframe');
           btn.classList.add('bg-lime', 'text-black', 'border-lime');
           state.category = btn.getAttribute('data-cat');
+          state.activeNav = '';
+          syncNavTabsUI();
           refreshCatalog();
         });
       });
@@ -1343,25 +1461,42 @@
     }
 
     function resetFilters() {
-      state.category = 'all';
+      applyNavFilter('drops');
       state.size = 'ALL';
-      state.fit = 'ALL';
-      state.searchQuery = '';
-      document.getElementById('search-input').value = '';
-      
-      // Reset UI states
-      document.querySelectorAll('.cat-pill').forEach((b, i) => {
-        if (i === 0) {
-          b.classList.add('bg-lime', 'text-black', 'border-lime');
-          b.classList.remove('bg-surface', 'text-zinc-300', 'border-wireframe');
-        } else {
-          b.classList.remove('bg-lime', 'text-black', 'border-lime');
-          b.classList.add('bg-surface', 'text-zinc-300', 'border-wireframe');
-        }
-      });
-
-      refreshCatalog();
       triggerToast('All filter parameters cleared');
+    }
+
+    function setupNavAndFooterLinks() {
+      document.querySelectorAll('.nav-tab[data-nav]').forEach((btn) => {
+        btn.addEventListener('click', () => applyNavFilter(btn.getAttribute('data-nav')));
+      });
+      document.querySelectorAll('.footer-nav[data-nav]').forEach((link) => {
+        link.addEventListener('click', (e) => {
+          e.preventDefault();
+          applyNavFilter(link.getAttribute('data-nav'));
+        });
+      });
+      document.querySelectorAll('.info-link[data-info]').forEach((link) => {
+        link.addEventListener('click', (e) => {
+          e.preventDefault();
+          openInfoModal(link.getAttribute('data-info'));
+        });
+      });
+      document.getElementById('btn-close-info').addEventListener('click', closeInfoModal);
+      document.getElementById('btn-close-info-2').addEventListener('click', closeInfoModal);
+      document.getElementById('info-modal-overlay').addEventListener('click', (e) => {
+        if (e.target.id === 'info-modal-overlay') closeInfoModal();
+      });
+      document.getElementById('brand-home')?.addEventListener('click', (e) => {
+        e.preventDefault();
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      });
+      document.getElementById('btn-currency')?.addEventListener('click', () => {
+        triggerToast('Checkout in INR (₹) — pan-India pricing');
+      });
+      document.getElementById('btn-profile')?.addEventListener('click', () => {
+        openInfoModal('track');
+      });
     }
 
     // --- 11. Courier Pincode Checker (API) ---
@@ -1567,7 +1702,7 @@
     setInterval(() => {
       const randomMsg = socialNotifications[Math.floor(Math.random() * socialNotifications.length)];
       // Only pop if cart and quickview aren't open
-      if (cartDrawerOverlay.classList.contains('pointer-events-none') && quickviewOverlay.classList.contains('pointer-events-none')) {
+      if (cartDrawerOverlay.classList.contains('overlay-closed') && quickviewOverlay.classList.contains('overlay-closed')) {
         triggerToast(`⚡ ${randomMsg}`);
       }
     }, 18000);
@@ -1595,13 +1730,25 @@
         closeCartDrawer();
         closeWishlistModal();
         closeQuickView();
+        closeInfoModal();
       }
     });
 
+    function ensureOverlaysClosed() {
+      [cartDrawerOverlay, wishlistModalOverlay, quickviewOverlay, document.getElementById('info-modal-overlay')].forEach((el) => {
+        if (!el) return;
+        el.classList.add('overlay-closed');
+        el.classList.remove('overlay-open');
+      });
+      cartDrawer?.classList.add('translate-x-full');
+    }
+
     // --- Initialize App ---
     document.addEventListener('DOMContentLoaded', async () => {
+      ensureOverlaysClosed();
       loadPersistedSession();
       setupFilterListeners();
+      setupNavAndFooterLinks();
       try {
         await loadPaymentConfig();
         await refreshCatalog();

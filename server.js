@@ -149,9 +149,39 @@ const COUPONS = {
 
 const EXPRESS_PIN_PREFIXES = ['400', '401', '110', '122', '201', '560', '561', '562'];
 
+function normalizeAudience(value) {
+  const a = String(value || 'unisex').toLowerCase();
+  if (['men', 'women', 'unisex'].includes(a)) return a;
+  return 'unisex';
+}
+
 function filterProducts(query) {
   let list = [...products];
-  const { category, size, fit, sort, q } = query;
+  const { category, size, fit, sort, q, audience, maxPrice, collection } = query;
+
+  if (audience && audience !== 'all') {
+    const aud = String(audience).toLowerCase();
+    if (aud === 'men') {
+      list = list.filter((p) => {
+        const a = normalizeAudience(p.audience);
+        return a === 'men' || a === 'unisex';
+      });
+    } else if (aud === 'women') {
+      list = list.filter((p) => {
+        const a = normalizeAudience(p.audience);
+        return a === 'women' || a === 'unisex';
+      });
+    }
+  }
+
+  if (collection && collection !== 'all') {
+    list = list.filter((p) => p.collection === collection);
+  }
+
+  if (maxPrice && Number(maxPrice) > 0) {
+    const cap = Number(maxPrice);
+    list = list.filter((p) => p.price <= cap);
+  }
 
   if (category && category !== 'all') {
     list = list.filter((p) => p.category === category);
@@ -327,6 +357,8 @@ app.post('/api/admin/products', requireAdmin, (req, res) => {
     sizes: Array.isArray(body.sizes) && body.sizes.length ? body.sizes : ['S', 'M', 'L', 'XL'],
     stockLeft: Number(body.stockLeft) ?? 10,
     details: String(body.details || '').trim(),
+    audience: normalizeAudience(body.audience || 'unisex'),
+    collection: body.collection || null,
   };
 
   if (products.some((p) => p.id === product.id)) {

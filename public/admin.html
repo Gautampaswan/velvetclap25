@@ -56,6 +56,14 @@
             </select>
           </div>
           <div>
+            <label class="text-xs text-zinc-400">Audience (for MEN / WOMEN tabs)</label>
+            <select name="audience" class="mt-1 w-full bg-[#0B0B0D] border border-zinc-600 px-3 py-2 text-sm">
+              <option value="unisex">unisex</option>
+              <option value="men">men</option>
+              <option value="women">women</option>
+            </select>
+          </div>
+          <div>
             <label class="text-xs text-zinc-400">Fit</label>
             <select name="fit" class="mt-1 w-full bg-[#0B0B0D] border border-zinc-600 px-3 py-2 text-sm">
               <option>Oversized</option>
@@ -183,6 +191,7 @@
         title: fd.get('title'),
         subtitle: fd.get('subtitle') || '',
         category: fd.get('category'),
+        audience: fd.get('audience') || 'unisex',
         fit: fd.get('fit'),
         price,
         originalPrice,
