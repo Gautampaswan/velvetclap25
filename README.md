@@ -57,6 +57,16 @@ Orders, **customer profiles** (by mobile), and newsletter: `data/store.json`.
    - `SHOP_ORDERS_EMAIL` — same Gmail or another inbox for alerts
 4. Optional: `ORDER_SMS=false` to skip MSG91 entirely.
 
+### Customer emails in Spam (Gmail)
+
+Personal Gmail SMTP works but **customer mail often lands in Spam** until recipients tap **Not spam** once. To improve deliverability:
+
+| Level | What to do |
+|-------|------------|
+| **Quick** | Customer marks first email **Not spam** and adds your `GMAIL_USER` to Google Contacts. |
+| **Better** | Set `EMAIL_FROM_NAME=Velvetclap25 Orders` on Render (friendlier “From” name). |
+| **Best (production)** | Use a **custom domain** (`orders@yourdomain.com`) with [Brevo](https://www.brevo.com), SendGrid, or Amazon SES — set `SMTP_HOST`, `SMTP_USER`, `SMTP_PASS` instead of Gmail. |
+
 ## Shop staff: photos & products (20+ SKUs)
 
 **→ [STAFF-GUIDE.md](./STAFF-GUIDE.md)** — Cloudinary upload checklist, image sizes, export/sync workflow.

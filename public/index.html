@@ -667,7 +667,7 @@
             </summary>
             <div class="space-y-2 p-3 pt-0 border-t border-wireframe/60">
               <input id="ship-name" type="text" placeholder="Full name" class="w-full bg-surface border border-wireframe px-3 py-2 text-xs text-white focus:border-lime focus:outline-none" />
-              <input id="ship-email" type="email" placeholder="Email (optional — order &amp; shipping updates)" class="w-full bg-surface border border-wireframe px-3 py-2 text-xs text-white focus:border-lime focus:outline-none" />
+              <input id="ship-email" type="email" placeholder="Email for order updates (check Spam if missing)" class="w-full bg-surface border border-wireframe px-3 py-2 text-xs text-white focus:border-lime focus:outline-none" />
               <div class="grid grid-cols-2 gap-2">
                 <input id="ship-phone" type="tel" placeholder="Mobile" maxlength="10" class="w-full bg-surface border border-wireframe px-3 py-2 text-xs text-white focus:border-lime focus:outline-none" />
                 <input id="ship-pincode" type="text" placeholder="Pincode" maxlength="6" class="w-full bg-surface border border-wireframe px-3 py-2 text-xs text-white focus:border-lime focus:outline-none" />
@@ -1688,7 +1688,7 @@
             ? '\nSMS: disabled on server (email alerts may be enabled).'
             : '';
       const emailLine = data.email?.customer?.ok && !data.email.customer.skipped
-        ? '\nEmail confirmation sent to your inbox.'
+        ? '\nEmail confirmation sent — check inbox and Spam/Promotions if you don’t see it within a few minutes.'
         : data.email?.shop?.simulated
           ? '\nShop email: demo mode (set Gmail SMTP on server for free alerts).'
           : data.email?.shop?.ok

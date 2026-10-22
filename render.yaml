@@ -27,5 +27,7 @@ services:
         sync: false
       - key: SHOP_ORDERS_EMAIL
         sync: false
+      - key: EMAIL_FROM_NAME
+        value: Velvetclap25 Orders
       - key: ORDER_SMS
         sync: false
