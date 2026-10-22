@@ -3,8 +3,11 @@ services:
     name: velvetclap25
     runtime: node
     plan: free
+    repo: https://github.com/Gautampaswan/velvetclap25
+    branch: main
     buildCommand: npm install
     startCommand: npm start
+    healthCheckPath: /api/health
     envVars:
       - key: NODE_VERSION
         value: "20"

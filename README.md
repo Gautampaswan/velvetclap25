@@ -39,11 +39,16 @@ Without Razorpay keys, checkout runs in **demo mode** (order saved, no payment g
 
 Orders and newsletter data: `data/store.json`.
 
-## Deploy on Render (free)
+## Deploy on Render (free) — client demo
 
-1. Repo: [github.com/Gautampaswan/velvetclap25](https://github.com/Gautampaswan/velvetclap25)
-2. [Render](https://render.com) → **New Blueprint** → select repo (uses `render.yaml`).
-3. In the service **Environment**, add `RAZORPAY_KEY_ID` and `RAZORPAY_KEY_SECRET`.
-4. Deploy; use the `*.onrender.com` URL as your live store.
+[![Deploy to Render](https://render.com/images/deploy-to-render-button.svg)](https://render.com/deploy?repo=https://github.com/Gautampaswan/velvetclap25)
+
+1. Click **Deploy to Render** (or open the link above).
+2. Sign in with **GitHub** (`Gautampaswan`) and approve access if asked.
+3. Review the blueprint (`velvetclap25` web service) → **Apply** / **Deploy Blueprint**.
+4. Wait ~2–3 minutes; open the `https://velvetclap25.onrender.com` URL (name may vary slightly).
+5. *(Optional)* Add `RAZORPAY_KEY_ID` / `RAZORPAY_KEY_SECRET` under **Environment** for live UPI; demo works without them.
+
+**Note:** Free tier sleeps after ~15 min idle; first visit may take ~30s to wake up.
 
 GitHub Pages cannot run this API; use Render (or Railway/Fly.io).
