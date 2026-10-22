@@ -3,6 +3,7 @@ const cors = require('cors');
 const crypto = require('crypto');
 const path = require('path');
 const fs = require('fs');
+const { sendSms } = require('./lib/sms');
 
 const PORT = process.env.PORT || 3000;
 const app = express();
@@ -128,11 +129,42 @@ function validateProductInput(body, { partial } = {}) {
 
 const storePath = path.join(__dirname, 'data', 'store.json');
 
+function ensureStoreShape(store) {
+  if (!store.newsletter) store.newsletter = [];
+  if (!store.orders) store.orders = [];
+  if (!store.customers) store.customers = {};
+  return store;
+}
+
 function readStore() {
   if (!fs.existsSync(storePath)) {
-    return { newsletter: [], orders: [] };
+    return ensureStoreShape({ newsletter: [], orders: [], customers: {} });
   }
-  return JSON.parse(fs.readFileSync(storePath, 'utf8'));
+  return ensureStoreShape(JSON.parse(fs.readFileSync(storePath, 'utf8')));
+}
+
+function upsertCustomerProfile(store, customer, orderRef) {
+  const phone = String(customer.phone || '').trim();
+  let profile = store.customers[phone];
+  if (!profile) {
+    profile = {
+      profileId: `VCU-${Date.now().toString(36).toUpperCase()}`,
+      phone,
+      name: customer.name,
+      address: customer.address,
+      pincode: customer.pincode,
+      orderRefs: [],
+      createdAt: new Date().toISOString(),
+    };
+    store.customers[phone] = profile;
+  } else {
+    profile.name = customer.name;
+    profile.address = customer.address;
+    profile.pincode = customer.pincode;
+    profile.updatedAt = new Date().toISOString();
+  }
+  if (!profile.orderRefs.includes(orderRef)) profile.orderRefs.push(orderRef);
+  return profile;
 }
 
 function writeStore(store) {
@@ -403,7 +435,7 @@ app.get('/api/admin/orders', requireAdmin, (_req, res) => {
   res.json({ orders, needsPacking, total: orders.length });
 });
 
-app.patch('/api/admin/orders/:orderRef', requireAdmin, (req, res) => {
+app.patch('/api/admin/orders/:orderRef', requireAdmin, async (req, res) => {
   const status = String(req.body?.status || '').trim();
   if (!FULFILLMENT_STATUSES.includes(status)) {
     return res.status(400).json({ error: 'Invalid status.' });
@@ -413,8 +445,63 @@ app.patch('/api/admin/orders/:orderRef', requireAdmin, (req, res) => {
   if (!order) return res.status(404).json({ error: 'Order not found' });
   order.status = status;
   order.updatedAt = new Date().toISOString();
+
+  let smsResult = null;
+  if (status === 'shipped') {
+    order.courier = String(req.body?.courier || 'Bluedart/Delhivery').trim();
+    order.trackingNumber = String(req.body?.trackingNumber || '').trim();
+    order.trackingUrl = String(req.body?.trackingUrl || '').trim();
+    order.shippedAt = new Date().toISOString();
+
+    const phone = order.customer?.phone;
+    if (phone && req.body?.sendSms !== false) {
+      const awb = order.trackingNumber ? ` AWB: ${order.trackingNumber}.` : '';
+      const track = order.trackingUrl ? ` Track: ${order.trackingUrl}` : '';
+      const smsText = `VELVETCLAP25: Order ${order.orderRef} SHIPPED via ${order.courier}.${awb}${track} — thank you!`;
+      smsResult = await sendSms(phone, smsText);
+      order.lastSms = { type: 'shipped', at: new Date().toISOString(), result: smsResult };
+    }
+  }
+
   writeStore(store);
-  res.json({ ok: true, orderRef: order.orderRef, status: order.status });
+  res.json({
+    ok: true,
+    orderRef: order.orderRef,
+    status: order.status,
+    sms: smsResult,
+  });
+});
+
+app.get('/api/admin/customers', requireAdmin, (_req, res) => {
+  const store = readStore();
+  const list = Object.values(store.customers || {}).sort(
+    (a, b) => new Date(b.updatedAt || b.createdAt) - new Date(a.updatedAt || a.createdAt)
+  );
+  res.json({ customers: list, total: list.length });
+});
+
+app.get('/api/track', (req, res) => {
+  const orderRef = String(req.query.orderRef || '').trim();
+  const phone = String(req.query.phone || '').replace(/\D/g, '').slice(-10);
+  if (!orderRef || !/^\d{10}$/.test(phone)) {
+    return res.status(400).json({ error: 'Provide orderRef and 10-digit phone.' });
+  }
+  const store = readStore();
+  const order = findOrder(store, orderRef);
+  if (!order || order.customer?.phone !== phone) {
+    return res.status(404).json({ error: 'Order not found for this phone.' });
+  }
+  res.json({
+    orderRef: order.orderRef,
+    status: order.status,
+    total: order.total,
+    paymentMethod: order.paymentMethod,
+    courier: order.courier || null,
+    trackingNumber: order.trackingNumber || null,
+    trackingUrl: order.trackingUrl || null,
+    shippedAt: order.shippedAt || null,
+    createdAt: order.createdAt,
+  });
 });
 
 app.post('/api/delivery/check', (req, res) => {
@@ -524,25 +611,18 @@ app.post('/api/orders', async (req, res) => {
     razorpayPaymentId: null,
     createdAt: new Date().toISOString(),
   };
+  const profile = upsertCustomerProfile(store, customer, orderRef);
+  orderRecord.customerProfileId = profile.profileId;
   store.orders.push(orderRecord);
   writeStore(store);
 
   const shippingLabel = shippingFee === 0 ? 'FREE' : `₹${shippingFee}`;
 
-  if (paymentMethod === 'cod') {
-    return res.status(201).json({
-      orderRef,
-      subtotal,
-      discount,
-      shipping: shippingLabel,
-      total,
-      paymentMode: 'cod',
-      message: 'COD order placed. Pay when your vault drop arrives.',
-    });
-  }
-
-  if (!razorpayEnabled) {
-    orderRecord.status = 'demo_confirmed';
+  async function finalizeOrderResponse(paymentMode, message, extra = {}) {
+    const phone = customer.phone;
+    const smsText = `VELVETCLAP25: Order ${orderRef} confirmed. Total Rs${total}. ${paymentMethod === 'cod' ? 'COD on delivery.' : 'Thank you!'} Vault ID ${profile.profileId}`;
+    const smsOrder = await sendSms(phone, smsText);
+    orderRecord.smsOrderConfirm = smsOrder;
     writeStore(store);
     return res.status(201).json({
       orderRef,
@@ -550,10 +630,29 @@ app.post('/api/orders', async (req, res) => {
       discount,
       shipping: shippingLabel,
       total,
-      paymentMode: 'demo',
-      message:
-        'Demo checkout (add RAZORPAY_KEY_ID and RAZORPAY_KEY_SECRET for live UPI/cards).',
+      paymentMode,
+      profileId: profile.profileId,
+      profile: { name: profile.name, phone: profile.phone },
+      sms: smsOrder,
+      message,
+      ...extra,
     });
+  }
+
+  if (paymentMethod === 'cod') {
+    return finalizeOrderResponse(
+      'cod',
+      'COD order placed. Pay when your vault drop arrives. SMS sent if MSG91 is configured.'
+    );
+  }
+
+  if (!razorpayEnabled) {
+    orderRecord.status = 'demo_confirmed';
+    writeStore(store);
+    return finalizeOrderResponse(
+      'demo',
+      'Demo checkout (add RAZORPAY_KEY_ID and RAZORPAY_KEY_SECRET for live UPI/cards).'
+    );
   }
 
   try {

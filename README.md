@@ -39,7 +39,12 @@ Without Razorpay keys, checkout runs in **demo mode** (order saved, no payment g
 | GET | `/api/admin/orders` | Pack queue (admin password) |
 | PATCH | `/api/admin/orders/:orderRef` | `{ "status": "packed" \| "shipped" }` |
 
-Orders and newsletter data: `data/store.json`. **COD orders** save as `cod_confirmed` with customer address — view and mark packed in **`/admin.html` → Orders to pack**.
+Orders, **customer profiles** (by mobile), and newsletter: `data/store.json`.
+
+- **Guest checkout** — no login; name + phone + address creates/updates a **Vault profile** (`VCU-…`).
+- **Admin** — `/admin.html` → pack → enter courier + AWB → **Mark shipped + send SMS**.
+- **SMS** — set `MSG91_AUTH_KEY` on Render (demo logs SMS if unset).
+- **Track API** — `GET /api/track?orderRef=…&phone=10digits`
 
 ## Shop staff: photos & products (20+ SKUs)
 

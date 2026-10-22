@@ -791,7 +791,7 @@
     };
 
     const INFO_COPY = {
-      track: { title: 'Track order', body: 'Orders placed on this demo store receive an order ID at checkout (e.g. VC25-…). Full SMS/email tracking goes live with production logistics. For now, contact WhatsApp support with your order ID.' },
+      track: { title: 'Track order', body: 'Use your Order ID + mobile on GET /api/track?orderRef=VC25-…&phone=10digits (track page coming soon). You also get SMS when the shop marks your order shipped (if MSG91 is enabled).' },
       returns: { title: '7-day returns', body: 'Easy doorstep reverse pickup across 18,000+ pincodes. Items must be unworn with tags. Refund to UPI/bank within 5–7 business days after QC.' },
       cod: { title: 'Cash on delivery', body: 'Choose COD at checkout. Pay the delivery partner in cash or UPI on delivery. COD fee may apply on orders under ₹999.' },
       shipping: { title: 'Shipping timeline', body: 'Express 48h in Mumbai, Delhi-NCR, and Bangalore pincodes when ordered before 4 PM. Rest of India: 3–5 business days. Free shipping on carts ₹999+.' },
@@ -835,6 +835,23 @@
         if (Array.isArray(saved.cart)) state.cart = saved.cart;
         if (saved.discountCode) state.discountCode = saved.discountCode;
       } catch (_) { /* ignore corrupt storage */ }
+    }
+
+    function loadCustomerProfilePrefill() {
+      try {
+        const raw = localStorage.getItem('vc25_profile');
+        if (!raw) return;
+        const p = JSON.parse(raw);
+        if (p.name) document.getElementById('ship-name').value = p.name;
+        if (p.phone) document.getElementById('ship-phone').value = p.phone;
+        if (p.pincode) document.getElementById('ship-pincode').value = p.pincode;
+        if (p.address) document.getElementById('ship-address').value = p.address;
+      } catch (_) { /* ignore */ }
+    }
+
+    function saveCustomerProfile(profile) {
+      if (!profile?.phone) return;
+      localStorage.setItem('vc25_profile', JSON.stringify(profile));
     }
 
     function persistSession() {
@@ -1652,8 +1669,17 @@
     }
 
     function finalizeSuccessfulOrder(data) {
+      if (data.profile) saveCustomerProfile(data.profile);
+      const profileLine = data.profileId
+        ? `\nVault profile: ${data.profileId} (saved on this device — no login needed)\n`
+        : '';
+      const smsLine = data.sms?.simulated
+        ? '\nSMS: demo mode on server (shop owner can enable MSG91).'
+        : data.sms?.ok
+          ? '\nSMS confirmation sent to your mobile.'
+          : '';
       alert(
-        `⚡ VELVETCLAP25 ORDER CONFIRMED\n\nOrder ID: ${data.orderRef}\n(Save this ID for tracking)\n\nTotal: ₹${data.total}\nShipping: ${data.shipping}\n\n${data.message}`
+        `⚡ VELVETCLAP25 ORDER CONFIRMED\n\nOrder ID: ${data.orderRef}\n(Save this ID for tracking)\n${profileLine}\nTotal: ₹${data.total}\nShipping: ${data.shipping}${smsLine}\n\n${data.message}`
       );
       state.cart = [];
       state.discountCode = null;
@@ -1845,6 +1871,7 @@
     document.addEventListener('DOMContentLoaded', async () => {
       ensureOverlaysClosed();
       loadPersistedSession();
+      loadCustomerProfilePrefill();
       setupFilterListeners();
       setupNavAndFooterLinks();
       try {

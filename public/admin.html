@@ -160,18 +160,28 @@
         const items = (o.items || []).map((i) => `${i.title} ×${i.quantity} (${i.size})`).join('; ');
         const canPack = ['cod_confirmed', 'paid', 'demo_confirmed'].includes(o.status);
         const canShip = o.status === 'packed';
+        const shippedInfo = o.status === 'shipped' || o.status === 'delivered'
+          ? `<div class="text-xs text-lime-400 mt-2">${o.courier || 'Courier'} · AWB ${o.trackingNumber || '—'}${o.lastSms?.result?.simulated ? ' · SMS demo' : o.lastSms?.result?.ok ? ' · SMS sent' : ''}</div>`
+          : '';
         return `<li class="border border-zinc-800 p-3 bg-[#0B0B0D]">
           <div class="flex justify-between gap-2 flex-wrap">
             <span class="font-bold text-white">${o.orderRef}</span>
             <span class="text-xs uppercase ${o.paymentMethod === 'cod' ? 'text-[#C6FF00]' : 'text-zinc-400'}">${o.paymentMethod || 'online'} · ${o.status}</span>
           </div>
-          <div class="text-[#C6FF00] text-xs mt-1">₹${o.total} · ${new Date(o.createdAt).toLocaleString('en-IN')}</div>
+          <div class="text-[#C6FF00] text-xs mt-1">₹${o.total} · ${new Date(o.createdAt).toLocaleString('en-IN')}${o.customerProfileId ? ` · ${o.customerProfileId}` : ''}</div>
           <div class="text-xs text-zinc-400 mt-2">${items}</div>
           ${c.name ? `<div class="text-xs text-zinc-300 mt-2"><strong>${c.name}</strong> · ${c.phone || ''}<br/>${c.address || ''} · PIN ${c.pincode || ''}</div>` : '<div class="text-xs text-amber-500 mt-2">No address (old order)</div>'}
+          ${shippedInfo}
           <div class="flex gap-2 mt-3 flex-wrap">
             ${canPack ? `<button type="button" class="btn-pack text-xs bg-[#C6FF00] text-black px-2 py-1 font-bold uppercase" data-ref="${o.orderRef}">Mark packed</button>` : ''}
-            ${canShip ? `<button type="button" class="btn-ship text-xs border border-zinc-500 px-2 py-1 font-bold uppercase hover:border-[#C6FF00]" data-ref="${o.orderRef}">Mark shipped</button>` : ''}
           </div>
+          ${canShip ? `<div class="mt-3 p-2 border border-zinc-700 space-y-2" data-ship-box="${o.orderRef}">
+            <p class="text-[10px] text-zinc-400 uppercase font-bold">Ship &amp; SMS customer</p>
+            <input type="text" class="ship-courier w-full bg-[#121215] border border-zinc-600 px-2 py-1 text-xs" placeholder="Courier (e.g. Bluedart)" value="Bluedart" />
+            <input type="text" class="ship-awb w-full bg-[#121215] border border-zinc-600 px-2 py-1 text-xs" placeholder="AWB / tracking number" />
+            <input type="url" class="ship-url w-full bg-[#121215] border border-zinc-600 px-2 py-1 text-xs" placeholder="Tracking URL (optional)" />
+            <button type="button" class="btn-ship-confirm w-full text-xs bg-white text-black py-1.5 font-bold uppercase" data-ref="${o.orderRef}">Mark shipped + send SMS</button>
+          </div>` : ''}
         </li>`;
       }).join('');
       ul.querySelectorAll('.btn-pack').forEach((btn) => {
@@ -183,12 +193,32 @@
           await loadOrders();
         });
       });
-      ul.querySelectorAll('.btn-ship').forEach((btn) => {
+      ul.querySelectorAll('.btn-ship-confirm').forEach((btn) => {
         btn.addEventListener('click', async () => {
-          await api(`/api/admin/orders/${encodeURIComponent(btn.dataset.ref)}`, {
+          const box = document.querySelector(`[data-ship-box="${btn.dataset.ref}"]`);
+          const courier = box?.querySelector('.ship-courier')?.value?.trim() || 'Bluedart';
+          const trackingNumber = box?.querySelector('.ship-awb')?.value?.trim() || '';
+          const trackingUrl = box?.querySelector('.ship-url')?.value?.trim() || '';
+          if (!trackingNumber) {
+            alert('Enter AWB / tracking number before shipping.');
+            return;
+          }
+          const result = await api(`/api/admin/orders/${encodeURIComponent(btn.dataset.ref)}`, {
             method: 'PATCH',
-            body: JSON.stringify({ status: 'shipped' }),
+            body: JSON.stringify({
+              status: 'shipped',
+              courier,
+              trackingNumber,
+              trackingUrl,
+              sendSms: true,
+            }),
           });
+          const smsNote = result.sms?.simulated
+            ? ' (SMS simulated — add MSG91_AUTH_KEY on Render)'
+            : result.sms?.ok
+              ? ' SMS sent to customer.'
+              : '';
+          alert(`Order marked shipped.${smsNote}`);
           await loadOrders();
         });
       });
