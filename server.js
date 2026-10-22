@@ -192,6 +192,69 @@ function customerProfilePayload(profile) {
   };
 }
 
+async function runOrderConfirmNotifications(orderRef) {
+  const store = readStore();
+  const order = findOrder(store, orderRef);
+  if (!order) return;
+
+  const phone = order.customer?.phone;
+  if (orderSmsEnabled() && phone && !order.smsOrderConfirm) {
+    const codNote = order.paymentMethod === 'cod' ? 'COD on delivery.' : 'Thank you!';
+    const smsText = `VELVETCLAP25: Order ${orderRef} confirmed. Total Rs${order.total}. ${codNote} Vault ID ${order.customerProfileId || ''}`;
+    order.smsOrderConfirm = await sendSms(phone, smsText);
+  }
+  if (orderEmailShopEnabled() && !order.emailShopAlert) {
+    order.emailShopAlert = await emailShopNewOrder(order);
+  }
+  if (
+    order.customer?.email &&
+    customerEmailNeedsResend(order.emailCustomerConfirm)
+  ) {
+    order.emailCustomerConfirm = await emailCustomerOrderConfirm(order);
+  }
+  writeStore(store);
+}
+
+function queueOrderConfirmNotifications(orderRef) {
+  setImmediate(() => {
+    runOrderConfirmNotifications(orderRef).catch((err) => {
+      console.error('[Order notifications]', orderRef, err.message);
+    });
+  });
+}
+
+async function runShippedNotifications(orderRef, { sendSms = true, sendEmail = true } = {}) {
+  const store = readStore();
+  const order = findOrder(store, orderRef);
+  if (!order || order.status !== 'shipped') return;
+
+  let smsResult = null;
+  let emailResult = null;
+  const phone = order.customer?.phone;
+  if (sendSms && phone && orderSmsEnabled()) {
+    const awb = order.trackingNumber ? ` AWB: ${order.trackingNumber}.` : '';
+    const track = order.trackingUrl ? ` Track: ${order.trackingUrl}` : '';
+    const smsText = `VELVETCLAP25: Order ${order.orderRef} SHIPPED via ${order.courier}.${awb}${track} — thank you!`;
+    smsResult = await sendSms(phone, smsText);
+    order.lastSms = { type: 'shipped', at: new Date().toISOString(), result: smsResult };
+  }
+  if (sendEmail) {
+    const emailShop = orderEmailShopEnabled() ? await emailShopOrderShipped(order) : null;
+    const emailCustomer = await emailCustomerShipped(order);
+    emailResult = { shop: emailShop, customer: emailCustomer };
+    order.lastEmail = { type: 'shipped', at: new Date().toISOString(), result: emailResult };
+  }
+  writeStore(store);
+}
+
+function queueShippedNotifications(orderRef, opts) {
+  setImmediate(() => {
+    runShippedNotifications(orderRef, opts).catch((err) => {
+      console.error('[Shipped notifications]', orderRef, err.message);
+    });
+  });
+}
+
 function writeStore(store) {
   fs.writeFileSync(storePath, JSON.stringify(store, null, 2), 'utf8');
 }
@@ -522,39 +585,34 @@ app.patch('/api/admin/orders/:orderRef', requireAdmin, async (req, res) => {
   order.status = status;
   order.updatedAt = new Date().toISOString();
 
-  let smsResult = null;
-  let emailResult = null;
+  const shipNotify =
+    status === 'shipped'
+      ? {
+          sendSms: req.body?.sendSms !== false,
+          sendEmail: req.body?.sendEmail !== false,
+        }
+      : null;
+
   if (status === 'shipped') {
     order.courier = String(req.body?.courier || 'Bluedart/Delhivery').trim();
     order.trackingNumber = String(req.body?.trackingNumber || '').trim();
     order.trackingUrl = String(req.body?.trackingUrl || '').trim();
     order.shippedAt = new Date().toISOString();
-
-    const phone = order.customer?.phone;
-    if (phone && req.body?.sendSms !== false && orderSmsEnabled()) {
-      const awb = order.trackingNumber ? ` AWB: ${order.trackingNumber}.` : '';
-      const track = order.trackingUrl ? ` Track: ${order.trackingUrl}` : '';
-      const smsText = `VELVETCLAP25: Order ${order.orderRef} SHIPPED via ${order.courier}.${awb}${track} — thank you!`;
-      smsResult = await sendSms(phone, smsText);
-      order.lastSms = { type: 'shipped', at: new Date().toISOString(), result: smsResult };
-    }
-    if (req.body?.sendEmail !== false) {
-      const emailShop = orderEmailShopEnabled()
-        ? await emailShopOrderShipped(order)
-        : null;
-      const emailCustomer = await emailCustomerShipped(order);
-      emailResult = { shop: emailShop, customer: emailCustomer };
-      order.lastEmail = { type: 'shipped', at: new Date().toISOString(), result: emailResult };
-    }
   }
 
   writeStore(store);
+
+  if (shipNotify) {
+    queueShippedNotifications(order.orderRef, shipNotify);
+  }
+
   res.json({
     ok: true,
     orderRef: order.orderRef,
     status: order.status,
-    sms: smsResult,
-    email: emailResult,
+    notificationsQueued: Boolean(shipNotify),
+    sms: shipNotify ? null : undefined,
+    email: shipNotify ? null : undefined,
   });
 });
 
@@ -746,27 +804,8 @@ app.post('/api/orders', async (req, res) => {
   const shippingLabel = shippingFee === 0 ? 'FREE' : `₹${shippingFee}`;
 
   async function finalizeOrderResponse(paymentMode, message, extra = {}) {
-    const phone = deliveryCustomer.phone;
-    let smsOrder = null;
-    if (orderSmsEnabled()) {
-      const smsText = `VELVETCLAP25: Order ${orderRef} confirmed. Total Rs${total}. ${paymentMethod === 'cod' ? 'COD on delivery.' : 'Thank you!'} Vault ID ${profile.profileId}`;
-      smsOrder = await sendSms(phone, smsText);
-      orderRecord.smsOrderConfirm = smsOrder;
-    }
-    let emailShop = null;
-    let emailCustomer = null;
-    if (orderEmailShopEnabled()) {
-      emailShop = await emailShopNewOrder(orderRecord);
-      orderRecord.emailShopAlert = emailShop;
-    }
-    if (
-      deliveryCustomer.email &&
-      customerEmailNeedsResend(orderRecord.emailCustomerConfirm)
-    ) {
-      emailCustomer = await emailCustomerOrderConfirm(orderRecord);
-      orderRecord.emailCustomerConfirm = emailCustomer;
-    }
     writeStore(store);
+    queueOrderConfirmNotifications(orderRef);
     return res.status(201).json({
       orderRef,
       subtotal,
@@ -776,8 +815,7 @@ app.post('/api/orders', async (req, res) => {
       paymentMode,
       profileId: profile.profileId,
       profile: customerProfilePayload(profile),
-      sms: smsOrder,
-      email: { shop: emailShop, customer: emailCustomer },
+      notificationsQueued: true,
       message,
       ...extra,
     });
@@ -872,29 +910,8 @@ app.post('/api/orders/verify', async (req, res) => {
   order.razorpayOrderId = orderId;
   order.razorpayPaymentId = paymentId;
   order.paidAt = new Date().toISOString();
-
-  let smsOrder = null;
-  let emailShop = null;
-  let emailCustomer = null;
-  const phone = order.customer?.phone;
-  if (orderSmsEnabled() && phone && !order.smsOrderConfirm) {
-    const smsText = `VELVETCLAP25: Order ${orderRef} confirmed. Total Rs${order.total}. Thank you! Vault ID ${order.customerProfileId || ''}`;
-    smsOrder = await sendSms(phone, smsText);
-    order.smsOrderConfirm = smsOrder;
-  }
-  if (orderEmailShopEnabled() && !order.emailShopAlert) {
-    emailShop = await emailShopNewOrder(order);
-    order.emailShopAlert = emailShop;
-  }
-  if (
-    order.customer?.email &&
-    customerEmailNeedsResend(order.emailCustomerConfirm)
-  ) {
-    emailCustomer = await emailCustomerOrderConfirm(order);
-    order.emailCustomerConfirm = emailCustomer;
-  }
-
   writeStore(store);
+  queueOrderConfirmNotifications(orderRef);
 
   const storeProfile = order.customer?.phone
     ? store.customers[order.customer.phone]
@@ -906,8 +923,7 @@ app.post('/api/orders/verify', async (req, res) => {
     status: 'paid',
     profileId: order.customerProfileId || storeProfile?.profileId,
     profile: customerProfilePayload(storeProfile),
-    sms: smsOrder,
-    email: { shop: emailShop, customer: emailCustomer },
+    notificationsQueued: true,
     message: 'Payment verified. Your vault order is confirmed!',
   });
 });

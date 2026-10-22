@@ -347,8 +347,12 @@
               : result.sms === null
                 ? ' SMS disabled (ORDER_SMS=false).'
                 : '';
-          const emailNote = formatShippedEmailAlert(result.email);
-          alert(`Order marked shipped.${smsNote}${emailNote}`);
+          const queuedNote = result.notificationsQueued
+            ? ' SMS/email sending in background (check order row in a few seconds).'
+            : '';
+          const emailNote = result.notificationsQueued ? '' : formatShippedEmailAlert(result.email);
+          const smsNoteFinal = result.notificationsQueued ? queuedNote : smsNote;
+          alert(`Order marked shipped.${smsNoteFinal}${emailNote}`);
           await loadOrders();
         });
       });

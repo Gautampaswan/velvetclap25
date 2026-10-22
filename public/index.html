@@ -1903,20 +1903,27 @@
       const profileLine = data.profileId
         ? `\nVault profile: ${data.profileId} (saved on this device — no login needed)\n`
         : '';
-      const smsLine = data.sms?.simulated
-        ? '\nSMS: demo mode on server (shop owner can enable MSG91).'
-        : data.sms?.ok
-          ? '\nSMS confirmation sent to your mobile.'
-          : data.sms === null
-            ? '\nSMS: disabled on server (email alerts may be enabled).'
-            : '';
-      const emailLine = data.email?.customer?.ok && !data.email.customer.skipped
-        ? '\nEmail confirmation sent — check inbox and Spam/Promotions if you don’t see it within a few minutes.'
-        : data.email?.shop?.simulated
-          ? '\nShop email: demo mode (set Gmail SMTP on server for free alerts).'
-          : data.email?.shop?.ok
-            ? '\nShop notified by email.'
-            : '';
+      const notifyLine = data.notificationsQueued
+        ? '\nSMS/email (if enabled) send in the background — may take a few seconds.'
+        : '';
+      const smsLine = data.notificationsQueued
+        ? notifyLine
+        : data.sms?.simulated
+          ? '\nSMS: demo mode on server (shop owner can enable MSG91).'
+          : data.sms?.ok
+            ? '\nSMS confirmation sent to your mobile.'
+            : data.sms === null
+              ? '\nSMS: disabled on server (email alerts may be enabled).'
+              : '';
+      const emailLine = data.notificationsQueued
+        ? ''
+        : data.email?.customer?.ok && !data.email.customer.skipped
+          ? '\nEmail confirmation sent — check inbox and Spam/Promotions if you don’t see it within a few minutes.'
+          : data.email?.shop?.simulated
+            ? '\nShop email: demo mode (set Gmail SMTP on server for free alerts).'
+            : data.email?.shop?.ok
+              ? '\nShop notified by email.'
+              : '';
       alert(
         `⚡ VELVETCLAP25 ORDER CONFIRMED\n\nOrder ID: ${data.orderRef}\n(Save this ID for tracking)\n${profileLine}\nTotal: ₹${data.total}\nShipping: ${data.shipping}${smsLine}${emailLine}\n\n${data.message}`
       );
@@ -2021,7 +2028,7 @@
       try {
         triggerToast(
           paymentMethod === 'cod'
-            ? 'Placing COD order...'
+            ? 'Placing your order...'
             : 'Creating secure checkout session...'
         );
         const data = await apiFetch('/api/orders', {
