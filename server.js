@@ -12,6 +12,8 @@ const {
   isEmailConfigured,
   customerEmailNeedsResend,
 } = require('./lib/email');
+const { normalizeAudience, matchesProductSearch } = require('./lib/catalogSearch');
+const { buildSupportReply, getSupportContacts } = require('./lib/supportBot');
 
 const orderSmsEnabled = () => process.env.ORDER_SMS !== 'false';
 const orderEmailShopEnabled = () => process.env.ORDER_EMAIL_SHOP !== 'false';
@@ -332,105 +334,6 @@ function deliveryMessageForTier(tier, pin) {
   }
 }
 
-function normalizeAudience(value) {
-  const a = String(value || 'unisex').toLowerCase();
-  if (['men', 'women', 'unisex'].includes(a)) return a;
-  return 'unisex';
-}
-
-const SEARCH_CATEGORY_ALIASES = {
-  tee: 'tees',
-  tees: 'tees',
-  tshirt: 'tees',
-  tshirts: 'tees',
-  shirt: 'tees',
-  shirts: 'tees',
-  cargo: 'bottoms',
-  cargos: 'bottoms',
-  short: 'bottoms',
-  shorts: 'bottoms',
-  pant: 'bottoms',
-  pants: 'bottoms',
-  bottom: 'bottoms',
-  bottoms: 'bottoms',
-  denim: 'bottoms',
-  cap: 'headwear',
-  caps: 'headwear',
-  beanie: 'headwear',
-  beanies: 'headwear',
-  headwear: 'headwear',
-  bag: 'accessories',
-  bags: 'accessories',
-  accessory: 'accessories',
-  accessories: 'accessories',
-  hoodie: 'tees',
-  hoodies: 'tees',
-  oversize: 'oversized',
-  oversized: 'oversized',
-  boxy: 'boxy',
-  women: 'women',
-  woman: 'women',
-  men: 'men',
-  man: 'men',
-  unisex: 'unisex',
-};
-
-function productSearchHaystack(p) {
-  const colorNames = (p.colors || []).map((c) => c.name).join(' ');
-  return [
-    p.id,
-    p.title,
-    p.subtitle,
-    p.category,
-    p.tag,
-    p.fit,
-    p.details,
-    p.audience,
-    p.collection,
-    p.discount,
-    colorNames,
-    ...(p.sizes || []),
-  ]
-    .filter(Boolean)
-    .join(' ')
-    .toLowerCase();
-}
-
-function tokenMatchesProduct(token, p, haystack) {
-  if (!token) return true;
-  if (haystack.includes(token)) return true;
-
-  const aliasCategory = SEARCH_CATEGORY_ALIASES[token];
-  if (aliasCategory && p.category === aliasCategory) return true;
-  if (aliasCategory === 'oversized' && String(p.fit || '').toLowerCase().includes('oversized')) {
-    return true;
-  }
-  if (aliasCategory === 'boxy' && String(p.fit || '').toLowerCase().includes('boxy')) {
-    return true;
-  }
-  if (token === 'men' || token === 'man') {
-    const a = normalizeAudience(p.audience);
-    return a === 'men' || a === 'unisex';
-  }
-  if (token === 'women' || token === 'woman') {
-    const a = normalizeAudience(p.audience);
-    return a === 'women' || a === 'unisex';
-  }
-  if (token === 'sale' || token === 'discount') {
-    return Boolean(p.discount);
-  }
-  return false;
-}
-
-/** All whitespace-separated terms must match (AND). */
-function matchesProductSearch(p, rawQuery) {
-  const q = String(rawQuery || '').trim().toLowerCase();
-  if (!q) return true;
-  const haystack = productSearchHaystack(p);
-  const tokens = q.split(/\s+/).filter(Boolean);
-  return tokens.every((token) => tokenMatchesProduct(token, p, haystack));
-}
-
 function filterProducts(query) {
   let list = [...products];
   const { category, size, fit, sort, q, audience, maxPrice, collection } = query;
@@ -551,6 +454,25 @@ function buildOrderPayload(body) {
     couponCode: appliedCoupon,
   };
 }
+
+app.get('/api/support/config', (_req, res) => {
+  const contacts = getSupportContacts();
+  res.json({
+    brand: 'Velvetclap Help desk',
+    tagline: 'Find in-site products · FAQs · WhatsApp handoff',
+    ...contacts,
+  });
+});
+
+app.post('/api/support/chat', (req, res) => {
+  reloadProducts();
+  const message = String(req.body?.message || '').trim();
+  if (message.length > 500) {
+    return res.status(400).json({ error: 'Message too long (max 500 characters).' });
+  }
+  const payload = buildSupportReply(message, products);
+  res.json({ ok: true, ...payload });
+});
 
 app.get('/api/health', (_req, res) => {
   res.json({
