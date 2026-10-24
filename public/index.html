@@ -255,16 +255,18 @@
         </div>
       </a>
 
-      <!-- Universal Search Bar -->
-      <div class="hidden lg:flex items-center flex-1 max-w-md mx-6 relative">
+      <!-- Universal Search Bar (desktop) -->
+      <div class="hidden md:flex items-center flex-1 max-w-md mx-4 lg:mx-6 relative min-w-0">
         <input 
           id="search-input"
-          type="text" 
-          placeholder="Search baggy fits, parachute pants, boxy tees..." 
-          class="w-full bg-surface border border-wireframe px-4 py-2 pl-9 text-xs font-inter text-white placeholder-zinc-500 focus:outline-none focus:border-lime transition-colors"
+          type="search"
+          autocomplete="off"
+          enterkeyhint="search"
+          placeholder="Search tees, cargo, hoodie, men…" 
+          class="catalog-search-input w-full bg-surface border border-wireframe px-4 py-2 pl-9 pr-16 text-xs font-inter text-white placeholder-zinc-500 focus:outline-none focus:border-lime transition-colors"
         />
         <i data-lucide="search" class="w-4 h-4 text-zinc-400 absolute left-3 pointer-events-none"></i>
-        <span class="absolute right-3 text-[10px] font-space text-zinc-500 border border-wireframe px-1.5 py-0.5 pointer-events-none">⌘K</span>
+        <span class="absolute right-3 text-[10px] font-space text-zinc-500 border border-wireframe px-1.5 py-0.5 pointer-events-none hidden lg:inline">⌘K</span>
       </div>
 
       <!-- Action Cluster -->
@@ -309,6 +311,24 @@
         </button>
       </div>
     </nav>
+
+    <!-- Mobile / tablet search (always visible below nav tabs) -->
+    <div class="md:hidden px-4 py-2.5 border-t border-wireframe bg-surface/90">
+      <div class="relative">
+        <input
+          id="search-input-mobile"
+          type="search"
+          autocomplete="off"
+          enterkeyhint="search"
+          placeholder="Search clothes — tee, cargo, bag…"
+          class="catalog-search-input w-full bg-canvas border border-wireframe px-4 py-2.5 pl-9 pr-10 text-xs font-inter text-white placeholder-zinc-500 focus:outline-none focus:border-lime"
+        />
+        <i data-lucide="search" class="w-4 h-4 text-zinc-400 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none"></i>
+        <button type="button" id="btn-clear-search-mobile" class="absolute right-2 top-1/2 -translate-y-1/2 text-zinc-500 hover:text-white p-1 hidden" aria-label="Clear search">
+          <i data-lucide="x" class="w-4 h-4"></i>
+        </button>
+      </div>
+    </div>
   </header>
 
   <main class="max-w-[1440px] mx-auto px-4 md:px-8 pt-6 pb-20">
@@ -443,7 +463,7 @@
     <div id="no-products" class="hidden text-center py-20 border border-wireframe bg-surface p-8">
       <i data-lucide="package-x" class="w-12 h-12 text-zinc-500 mx-auto mb-3"></i>
       <h3 class="font-syne font-bold text-2xl text-white uppercase">No Vault Items Match That Fit</h3>
-      <p class="text-zinc-400 text-sm mt-1 max-w-sm mx-auto font-inter">Try resetting size filters or browse other categories in the archive.</p>
+      <p class="text-zinc-400 text-sm mt-1 max-w-sm mx-auto font-inter" id="no-products-hint">Try resetting size filters or browse other categories in the archive.</p>
       <button onclick="resetFilters()" class="mt-4 px-6 py-2.5 bg-lime text-black font-space font-bold uppercase text-xs hover:bg-white transition">
         Reset All Filters
       </button>
@@ -1187,6 +1207,13 @@
       if (filtered.length === 0) {
         productGridEl.innerHTML = '';
         noProductsEl.classList.remove('hidden');
+        const hint = document.getElementById('no-products-hint');
+        const q = (state.searchQuery || '').trim();
+        if (hint) {
+          hint.textContent = q
+            ? `No pieces match “${q}”. Try another word (tee, cargo, hoodie) or reset filters.`
+            : 'Try resetting size filters or browse other categories in the archive.';
+        }
         return;
       }
       noProductsEl.classList.add('hidden');
@@ -1679,6 +1706,39 @@
       document.getElementById('vault-catalog')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
     }
 
+    function syncSearchInputs(value) {
+      const desktop = document.getElementById('search-input');
+      const mobile = document.getElementById('search-input-mobile');
+      if (desktop && desktop.value !== value) desktop.value = value;
+      if (mobile && mobile.value !== value) mobile.value = value;
+      const clearMobile = document.getElementById('btn-clear-search-mobile');
+      if (clearMobile) clearMobile.classList.toggle('hidden', !String(value || '').trim());
+    }
+
+    /** Typing in search searches the whole catalog (like most shops). */
+    function applySearchQuery(rawValue, options = {}) {
+      const { scroll = true } = options;
+      const value = String(rawValue ?? '');
+      state.searchQuery = value;
+      syncSearchInputs(value);
+
+      const term = value.trim();
+      if (term.length > 0) {
+        state.category = 'all';
+        state.audience = 'all';
+        state.collection = '';
+        state.maxPrice = '';
+        state.fit = 'ALL';
+        state.activeNav = '';
+        syncNavTabsUI();
+        syncCategoryPillsUI();
+      }
+
+      return refreshCatalog().then(() => {
+        if (term.length > 0 && scroll) scrollToCatalog();
+      });
+    }
+
     function syncNavTabsUI() {
       document.querySelectorAll('.nav-tab').forEach((tab) => {
         tab.classList.toggle('nav-tab-active', tab.getAttribute('data-nav') === state.activeNav);
@@ -1702,7 +1762,7 @@
       if (!preset) return;
       state.activeNav = navKey;
       Object.assign(state, preset);
-      document.getElementById('search-input').value = state.searchQuery;
+      syncSearchInputs(state.searchQuery);
       document.getElementById('sort-select').value = state.sortBy;
       syncNavTabsUI();
       syncCategoryPillsUI();
@@ -1777,27 +1837,58 @@
         refreshCatalog();
       });
 
-      // Search Inputs
-      const searchInput = document.getElementById('search-input');
+      // Search (desktop + mobile, synced)
       let searchDebounce;
-      searchInput.addEventListener('input', (e) => {
-        state.searchQuery = e.target.value;
+      function bindSearchInput(el) {
+        if (!el) return;
+        el.addEventListener('input', (e) => {
+          const value = e.target.value;
+          syncSearchInputs(value);
+          clearTimeout(searchDebounce);
+          searchDebounce = setTimeout(() => applySearchQuery(value, { scroll: true }), 220);
+        });
+        el.addEventListener('keydown', (e) => {
+          if (e.key === 'Enter') {
+            e.preventDefault();
+            clearTimeout(searchDebounce);
+            applySearchQuery(el.value, { scroll: true });
+          }
+          if (e.key === 'Escape') {
+            clearTimeout(searchDebounce);
+            applySearchQuery('', { scroll: false });
+          }
+        });
+        el.addEventListener('search', () => {
+          if (!el.value) {
+            clearTimeout(searchDebounce);
+            applySearchQuery('', { scroll: false });
+          }
+        });
+      }
+      bindSearchInput(document.getElementById('search-input'));
+      bindSearchInput(document.getElementById('search-input-mobile'));
+
+      document.getElementById('btn-clear-search-mobile')?.addEventListener('click', () => {
         clearTimeout(searchDebounce);
-        searchDebounce = setTimeout(() => refreshCatalog(), 280);
+        applySearchQuery('', { scroll: false });
       });
 
       // Keyboard shortcut ⌘K / Ctrl+K
       window.addEventListener('keydown', (e) => {
         if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
           e.preventDefault();
-          searchInput.focus();
+          const desktop = document.getElementById('search-input');
+          const mobile = document.getElementById('search-input-mobile');
+          (desktop && desktop.offsetParent !== null ? desktop : mobile)?.focus();
         }
       });
     }
 
     function resetFilters() {
-      applyNavFilter('drops');
+      state.searchQuery = '';
+      syncSearchInputs('');
       state.size = 'ALL';
+      applyNavFilter('drops');
       triggerToast('All filter parameters cleared');
     }
 
