@@ -3,12 +3,13 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>VELVETCLAP25 — The Under ₹999 Steal Vault | Raw Indian Streetwear</title>
+  <title>VELVETCLAP — Streetwear for Dehradun | Under ₹999</title>
+  <link rel="icon" href="/assets/velvetclap-logo.png" type="image/png" />
   
-  <!-- Fonts: Syne, Space Grotesk, Inter -->
+  <!-- Fonts: display + Gen Z sans + logo serif -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&family=Syne:wght@700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Instrument+Serif:ital@0;1&family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&family=Syne:wght@700;800&display=swap" rel="stylesheet">
   
   <!-- Tailwind CSS CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
@@ -22,37 +23,50 @@
       theme: {
         extend: {
           colors: {
-            canvas: '#0B0B0D',
-            surface: '#121215',
-            'surface-high': '#18181D',
-            'surface-card': '#141417',
-            wireframe: '#26262B',
-            'wireframe-mid': '#3F3F46',
-            'wireframe-light': '#52525B',
+            canvas: '#08090F',
+            surface: '#10121A',
+            'surface-high': '#161922',
+            'surface-card': '#12151E',
+            wireframe: '#2A3144',
+            'wireframe-mid': '#3D4660',
+            'wireframe-light': '#5A6482',
+            velvet: {
+              DEFAULT: '#4F5D7A',
+              deep: '#3A4660',
+              light: '#6B7FA3'
+            },
+            clap: {
+              DEFAULT: '#D4612F',
+              hover: '#E87744',
+              dim: '#B04E24'
+            },
             lime: {
-              DEFAULT: '#C6FF00',
-              hover: '#B5E800',
-              dim: '#9AC900'
+              DEFAULT: '#D4612F',
+              hover: '#E87744',
+              dim: '#B04E24'
             },
             purple: {
-              accent: '#8B5CF6',
-              dim: '#6D28D9'
+              accent: '#4F5D7A',
+              dim: '#3A4660'
             },
             coral: {
-              urgent: '#FF5B4D',
-              deep: '#DC2626'
+              urgent: '#E87744',
+              deep: '#D4612F'
             }
           },
           fontFamily: {
             syne: ['Syne', 'sans-serif'],
+            bricolage: ['"Bricolage Grotesque"', 'sans-serif'],
+            instrument: ['"Instrument Serif"', 'serif'],
             space: ['"Space Grotesk"', 'sans-serif'],
             inter: ['Inter', 'sans-serif']
           },
           boxShadow: {
-            'zine-lime': '4px 4px 0px 0px #C6FF00',
+            'zine-lime': '4px 4px 0px 0px #D4612F',
+            'zine-velvet': '4px 4px 0px 0px #4F5D7A',
             'zine-white': '4px 4px 0px 0px #FFFFFF',
             'zine-black': '4px 4px 0px 0px #000000',
-            'zine-coral': '4px 4px 0px 0px #FF5B4D'
+            'zine-coral': '4px 4px 0px 0px #E87744'
           }
         }
       }
@@ -60,24 +74,52 @@
   </script>
 
   <style>
-    /* Neo-Street Raw CSS Overrides */
+    /* Brand UI — sharp cards + Gen Z pills */
     * {
       border-radius: 0px !important;
       -webkit-font-smoothing: antialiased;
     }
+    .genz-pill, .genz-logo-ring, .hero-logo-wrap img {
+      border-radius: 9999px !important;
+    }
+    .genz-card {
+      border-radius: 1.25rem !important;
+    }
     
     body {
-      background-color: #0B0B0D;
-      color: #E5E1E4;
+      background-color: #08090F;
+      color: #E8E4E0;
       font-family: 'Inter', sans-serif;
       overflow-x: hidden;
-      selection-background-color: #C6FF00;
-      selection-color: #0B0B0D;
+      position: relative;
+    }
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      z-index: -1;
+      pointer-events: none;
+      background:
+        radial-gradient(ellipse 80% 50% at 10% -10%, rgba(79, 93, 122, 0.35), transparent 55%),
+        radial-gradient(ellipse 70% 45% at 95% 5%, rgba(212, 97, 47, 0.22), transparent 50%),
+        radial-gradient(ellipse 60% 40% at 50% 100%, rgba(79, 93, 122, 0.15), transparent 45%);
     }
 
     ::selection {
-      background: #C6FF00;
-      color: #0B0B0D;
+      background: #D4612F;
+      color: #08090F;
+    }
+
+    .brand-wordmark-velvet { color: #6B7FA3; }
+    .brand-wordmark-clap { color: #D4612F; }
+    .text-gradient-brand {
+      background: linear-gradient(105deg, #6B7FA3 0%, #D4612F 62%, #E87744 100%);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+    }
+    .ticker-gradient {
+      background: linear-gradient(90deg, #3A4660 0%, #4F5D7A 35%, #D4612F 70%, #E87744 100%);
     }
 
     /* Custom Scrollbar */
@@ -92,7 +134,7 @@
       background: #26262B;
     }
     ::-webkit-scrollbar-thumb:hover {
-      background: #C6FF00;
+      background: #D4612F;
     }
 
     /* Marquee Animation */
@@ -122,7 +164,7 @@
       left: 0;
       width: 100%;
       height: 1.5px;
-      background: #FF5B4D;
+      background: #D4612F;
       transform: rotate(-45deg);
     }
 
@@ -165,30 +207,34 @@
       display: none;
     }
     .nav-tab-active {
-      color: #C6FF00 !important;
+      color: #E87744 !important;
+      text-shadow: 0 0 24px rgba(212, 97, 47, 0.35);
+    }
+    .product-card:hover {
+      box-shadow: 0 0 0 1px rgba(212, 97, 47, 0.35), 0 12px 40px rgba(0, 0, 0, 0.35);
     }
   </style>
 </head>
 <body class="bg-canvas text-gray-200">
 
   <!-- ================= TOP ANNOUNCEMENT TICKER ================= -->
-  <div class="bg-lime text-black py-1.5 px-3 text-[11px] font-space font-bold uppercase tracking-wider overflow-hidden border-b border-black select-none z-50 relative">
+  <div class="ticker-gradient text-white py-1.5 px-3 text-[11px] font-bricolage font-bold uppercase tracking-wider overflow-hidden border-b border-black/40 select-none z-50 relative">
     <div class="animate-marquee items-center gap-8">
-      <span>⚡ SS25 DROP LIVE • FLAT ₹300 OFF ON FIRST APP ORDER: CODE <strong class="underline decoration-2">VC25</strong></span>
+      <span>STREETWEAR FOR DEHRADUN • EVERY PIECE UNDER ₹999</span>
+      <span>•</span>
+      <span>CODE <strong class="underline decoration-2">VC25</strong>: ₹300 OFF ON ORDERS ₹799+</span>
       <span>•</span>
       <span>FREE SHIPPING OVER ₹999</span>
       <span>•</span>
-      <span>48H EXPRESS DELIVERY IN MUMBAI / DELHI-NCR / BLR</span>
+      <span>LOCAL 1–2 DAY DISPATCH IN DEHRADUN (248XXX)</span>
       <span>•</span>
-      <span>🔥 SECTION 09 HEAVYWEIGHT ARCHIVE CLEARANCE</span>
+      <span>STREETWEAR FOR DEHRADUN • EVERY PIECE UNDER ₹999</span>
       <span>•</span>
-      <span>⚡ SS25 DROP LIVE • FLAT ₹300 OFF ON FIRST APP ORDER: CODE <strong class="underline decoration-2">VC25</strong></span>
+      <span>CODE <strong class="underline decoration-2">VC25</strong>: ₹300 OFF ON ORDERS ₹799+</span>
       <span>•</span>
       <span>FREE SHIPPING OVER ₹999</span>
       <span>•</span>
-      <span>48H EXPRESS DELIVERY IN MUMBAI / DELHI-NCR / BLR</span>
-      <span>•</span>
-      <span>🔥 SECTION 09 HEAVYWEIGHT ARCHIVE CLEARANCE</span>
+      <span>LOCAL 1–2 DAY DISPATCH IN DEHRADUN (248XXX)</span>
     </div>
   </div>
 
@@ -197,13 +243,16 @@
     <div class="max-w-[1440px] mx-auto px-4 md:px-8 py-3.5 flex items-center justify-between gap-4">
       
       <!-- Brand Logo -->
-      <a href="/" id="brand-home" class="flex items-center gap-2 group">
-        <div class="w-7 h-7 bg-lime text-black flex items-center justify-center font-black text-base shadow-zine-white group-hover:scale-105 transition-transform">
-          ⚡
+      <a href="/" id="brand-home" class="flex items-center gap-2.5 group min-w-0">
+        <div class="hero-logo-wrap genz-logo-ring shrink-0 w-10 h-10 md:w-11 md:h-11 ring-2 ring-clap/40 ring-offset-2 ring-offset-canvas overflow-hidden group-hover:ring-clap transition-all group-hover:scale-105">
+          <img src="/assets/velvetclap-logo.png" alt="Velvetclap logo" class="w-full h-full object-cover" width="44" height="44" />
         </div>
-        <span class="font-syne font-black text-xl md:text-2xl tracking-tighter text-white uppercase">
-          VELVETCLAP<span class="text-lime">25</span>
-        </span>
+        <div class="leading-none min-w-0">
+          <span class="font-instrument text-xl md:text-2xl tracking-wide text-white uppercase block truncate">
+            <span class="brand-wordmark-velvet">Velvet</span><span class="brand-wordmark-clap">Clap</span><span class="text-zinc-500 font-space text-sm align-top">25</span>
+          </span>
+          <span class="font-instrument italic text-[10px] md:text-[11px] text-zinc-500 tracking-wide block mt-0.5 truncate">Equal style. Equal comfort.</span>
+        </div>
       </a>
 
       <!-- Universal Search Bar -->
@@ -265,36 +314,37 @@
   <main class="max-w-[1440px] mx-auto px-4 md:px-8 pt-6 pb-20">
 
     <!-- ================= HERO LOOKBOOK BANNER ================= -->
-    <section class="border border-wireframe bg-surface p-6 md:p-10 relative overflow-hidden mb-8">
-      <!-- Background Graphic Elements -->
-      <div class="absolute -right-12 -bottom-12 opacity-5 pointer-events-none select-none font-syne font-black text-[180px] leading-none text-white">
-        VAULT
+    <section class="genz-card border border-wireframe/80 bg-surface/90 backdrop-blur-sm p-6 md:p-10 relative overflow-hidden mb-8">
+      <div class="absolute -right-6 -top-6 w-40 h-40 md:w-56 md:h-56 opacity-[0.12] pointer-events-none select-none hero-logo-wrap">
+        <img src="/assets/velvetclap-logo.png" alt="" class="w-full h-full object-cover" aria-hidden="true" />
       </div>
+      <div class="absolute inset-0 bg-gradient-to-br from-velvet/10 via-transparent to-clap/10 pointer-events-none"></div>
 
       <div class="flex flex-col lg:flex-row items-start lg:items-end justify-between gap-8 relative z-10">
         <div class="max-w-3xl">
-          <!-- Live Tariff Status Badge -->
-          <div class="inline-flex items-center gap-2 border border-wireframe bg-canvas px-3 py-1 text-[11px] font-space font-bold tracking-wider text-zinc-300 uppercase mb-4">
-            <span class="w-2 h-2 rounded-full bg-coral-urgent animate-pulse"></span>
-            <span class="text-coral-urgent">LIVE TARIFF CLEARANCE</span>
-            <span class="text-zinc-600">//</span>
-            <span>SECTION 09 // HIGH-DENSITY RUN</span>
+          <div class="inline-flex genz-pill items-center gap-2 border border-clap/30 bg-canvas/80 px-3 py-1.5 text-[11px] font-bricolage font-bold tracking-wider text-zinc-200 uppercase mb-4">
+            <span class="w-2 h-2 rounded-full bg-clap animate-pulse"></span>
+            <span class="text-clap">Dehradun-first</span>
+            <span class="text-zinc-600">·</span>
+            <span class="text-velvet-light">Gen Z fits</span>
           </div>
 
-          <!-- Brutalist Big Display Typography -->
-          <h1 class="font-syne font-extrabold text-4xl sm:text-6xl md:text-7xl lg:text-[76px] leading-[0.92] tracking-tighter text-white uppercase">
-            THE UNDER<br/>
-            <span class="text-lime drop-shadow-[0_2px_15px_rgba(198,255,0,0.25)]">₹999 STEAL</span><br/>
-            VAULT
+          <h1 class="font-bricolage font-extrabold text-4xl sm:text-6xl md:text-7xl lg:text-[72px] leading-[0.95] tracking-tight text-white uppercase">
+            <span class="brand-wordmark-velvet">Streetwear</span><br/>
+            <span class="text-gradient-brand">For Dehradun</span><br/>
+            <span class="text-white/90">Under ₹999</span>
           </h1>
 
-          <p class="font-inter text-sm md:text-base text-zinc-400 mt-5 max-w-xl leading-relaxed">
-            No compromise on GSM. High-density prints, heavyweight cotton, and relaxed streetwear cuts at unbeatable Indian price points. Straight from factory floor to Delhi-NCR & Bombay streets.
+          <p class="font-instrument italic text-base md:text-lg text-zinc-400 mt-4">Equal style. Equal comfort.</p>
+          <p class="font-inter text-sm md:text-base text-zinc-500 mt-3 max-w-xl leading-relaxed">
+            Boxy tees, oversized cuts, and cargos with real GSM notes — built for your city, shipped honest nationwide.
           </p>
         </div>
 
-        <!-- Curated Metric Spec Box -->
-        <div class="w-full lg:w-80 bg-canvas border border-wireframe p-5 space-y-4">
+        <div class="w-full lg:w-80 genz-card bg-canvas/90 border border-wireframe p-5 space-y-4 shadow-zine-velvet">
+          <div class="flex justify-center pb-2">
+            <img src="/assets/velvetclap-logo.png" alt="Velvetclap" class="w-24 h-24 object-cover genz-logo-ring ring-2 ring-velvet/50" width="96" height="96" />
+          </div>
           <div class="flex justify-between items-baseline border-b border-wireframe pb-3">
             <span class="text-zinc-400 font-space text-[11px] font-bold tracking-wider uppercase">CURATED ITEMS</span>
             <span class="text-white font-syne font-bold text-2xl tracking-tight" id="hero-curated-count">64 STYLES</span>
@@ -305,17 +355,9 @@
             <span class="text-lime font-space font-bold text-2xl tracking-tight">₹999 FLAT</span>
           </div>
 
-          <!-- Scarcity Progress Bar -->
-          <div class="space-y-2">
-            <div class="w-full bg-surface h-1.5 overflow-hidden">
-              <div class="bg-lime h-full w-[84%] transition-all duration-700"></div>
-            </div>
-            <div class="flex items-center justify-between text-[11px] font-space font-bold">
-              <span class="text-coral-urgent flex items-center gap-1">
-                <i data-lucide="zap" class="w-3.5 h-3.5 fill-coral-urgent"></i>
-                84% OF VAULT RESERVED TODAY
-              </span>
-            </div>
+          <div class="space-y-1 text-[11px] font-space font-bold text-zinc-400 uppercase tracking-wide">
+            <p>Free shipping on carts ₹999+</p>
+            <p class="text-lime">VC25: ₹300 off when subtotal ≥ ₹799</p>
           </div>
         </div>
       </div>
@@ -330,7 +372,7 @@
         <!-- Category Filter Buttons -->
         <div class="flex items-center gap-1.5 flex-wrap font-space text-xs font-bold uppercase" id="category-filters">
           <button data-cat="all" class="cat-pill px-3.5 py-2 bg-lime text-black border border-lime hover:bg-white transition">
-            ALL (64)
+            ALL (<span id="cat-all-count">—</span>)
           </button>
           <button data-cat="tees" class="cat-pill px-3.5 py-2 bg-surface text-zinc-300 border border-wireframe hover:border-white transition">
             BOXY TEES (&lt;₹699)
@@ -414,8 +456,8 @@
           ⚡
         </div>
         <div>
-          <h4 class="font-space font-bold text-sm tracking-wide uppercase text-white">₹700 AVG. SAVINGS</h4>
-          <p class="text-xs text-zinc-400 mt-1 leading-relaxed">Real wholesale direct margins transferred to Indian streetwear retail without bloated middlemen.</p>
+          <h4 class="font-space font-bold text-sm tracking-wide uppercase text-white">UNDER ₹999 CAP</h4>
+          <p class="text-xs text-zinc-400 mt-1 leading-relaxed">Every vault piece is priced at or below ₹999 MRP on site — check each product for fabric weight and fit before you buy.</p>
         </div>
       </div>
 
@@ -434,8 +476,8 @@
           <i data-lucide="refresh-cw" class="w-5 h-5"></i>
         </div>
         <div>
-          <h4 class="font-space font-bold text-sm tracking-wide uppercase text-white">NO-QUESTIONS RETURN</h4>
-          <p class="text-xs text-zinc-400 mt-1 leading-relaxed">Easy 7-day doorstep reverse pickup across 18,000+ Indian pincodes without interrogation.</p>
+          <h4 class="font-space font-bold text-sm tracking-wide uppercase text-white">7-DAY RETURNS</h4>
+          <p class="text-xs text-zinc-400 mt-1 leading-relaxed">Unworn with tags — contact us within 7 days of delivery. Reverse pickup where our courier partner serves your pincode.</p>
         </div>
       </div>
     </section>
@@ -443,9 +485,9 @@
     <!-- ================= PINCODE DELIVERY CHECKER ================= -->
     <section class="border border-wireframe bg-canvas p-6 md:p-8 mb-14 flex flex-col md:flex-row items-center justify-between gap-6">
       <div class="space-y-1">
-        <span class="text-lime font-space text-[11px] font-bold uppercase tracking-widest">// EXPRESS ESTIMATOR</span>
-        <h3 class="font-syne font-bold text-xl md:text-2xl text-white uppercase">Check 48-Hour Drop Dispatch To Your Pin</h3>
-        <p class="text-xs text-zinc-400 font-inter">Live tie-up with Bluedart Air & Delhivery Priority for instant shipping.</p>
+        <span class="text-lime font-space text-[11px] font-bold uppercase tracking-widest">// DELIVERY CHECK</span>
+        <h3 class="font-syne font-bold text-xl md:text-2xl text-white uppercase">See Realistic Timelines For Your Pincode</h3>
+        <p class="text-xs text-zinc-400 font-inter">Dehradun (248xxx) first — then Uttarakhand regional and pan-India. Estimates only; exact dates confirmed when we ship.</p>
       </div>
 
       <div class="w-full md:w-auto flex flex-col sm:flex-row items-stretch gap-2">
@@ -454,7 +496,7 @@
             id="pincode-input"
             type="text" 
             maxlength="6" 
-            placeholder="e.g. 400050 or 110016" 
+            placeholder="e.g. 248001 (Dehradun)" 
             class="bg-surface border border-wireframe text-white px-4 py-2.5 text-xs font-space font-bold uppercase tracking-wider focus:outline-none focus:border-lime w-full sm:w-64"
           />
         </div>
@@ -566,23 +608,19 @@
         </div>
 
         <div>
-          <h6 class="font-space font-bold text-xs uppercase tracking-wider text-white mb-4">// FLAGSHIP HUBS</h6>
+          <h6 class="font-space font-bold text-xs uppercase tracking-wider text-white mb-4">// HOME BASE</h6>
+          <div class="flex items-center gap-2 mb-3">
+            <img src="/assets/velvetclap-logo.png" alt="" class="w-10 h-10 object-cover genz-logo-ring ring-1 ring-velvet/40" width="40" height="40" />
+            <p class="font-instrument italic text-zinc-400 text-sm leading-tight">Equal style.<br/>Equal comfort.</p>
+          </div>
           <ul class="space-y-2.5 text-xs font-inter text-zinc-400">
             <li class="flex items-start gap-1.5">
-              <span class="text-lime font-bold">📍</span>
-              <span>Bandra West, Mumbai</span>
+              <span class="text-clap font-bold">📍</span>
+              <span>Dehradun, Uttarakhand — local dispatch 248xxx</span>
             </li>
             <li class="flex items-start gap-1.5">
-              <span class="text-lime font-bold">📍</span>
-              <span>Hauz Khas Village, Delhi</span>
-            </li>
-            <li class="flex items-start gap-1.5">
-              <span class="text-lime font-bold">📍</span>
-              <span>12th Main Indiranagar, BLR</span>
-            </li>
-            <li class="flex items-start gap-1.5">
-              <span class="text-lime font-bold">📍</span>
-              <span>Koregaon Park, Pune</span>
+              <span class="text-velvet-light font-bold">📦</span>
+              <span>Pan-India shipping when you order online</span>
             </li>
           </ul>
         </div>
@@ -599,14 +637,14 @@
         </div>
 
         <div class="text-zinc-500 text-[11px]">
-          © 2025 VELVETCLAP25 INDIA PRIVATE LIMITED. ALL RIGHTS RESERVED.
+          © 2025 <span class="brand-wordmark-velvet">VELVET</span><span class="brand-wordmark-clap">CLAP</span> — ALL RIGHTS RESERVED.
         </div>
       </div>
 
       <!-- Giant Editorial Subculture Watermark -->
       <div class="select-none pointer-events-none mt-10 -mb-6 text-center overflow-hidden">
         <span class="font-syne font-black text-4xl sm:text-7xl md:text-9xl text-white/[0.03] tracking-tighter uppercase whitespace-nowrap block">
-          VELVETCLAP25 STREETWEAR
+          VELVET CLAP · DEHRADUN
         </span>
       </div>
 
@@ -818,7 +856,9 @@
       wishlist: [],
       cart: [],
       discountCode: null,
-      discountAmount: 0
+      discountAmount: 0,
+      couponMinSubtotal: 0,
+      catalogTotal: 0,
     };
 
     const NAV_PRESETS = {
@@ -833,9 +873,9 @@
 
     const INFO_COPY = {
       track: { title: 'Track order', body: 'Use Vault profile (header avatar) or Track Order in the footer — enter your mobile to see your VCU profile and orders.' },
-      returns: { title: '7-day returns', body: 'Easy doorstep reverse pickup across 18,000+ pincodes. Items must be unworn with tags. Refund to UPI/bank within 5–7 business days after QC.' },
+      returns: { title: '7-day returns', body: 'Contact us within 7 days of delivery. Items must be unworn with tags. Reverse pickup where our courier serves your pincode. Refund to UPI/bank within 5–7 business days after QC.' },
       cod: { title: 'Cash on delivery', body: 'Choose COD at checkout. Pay the delivery partner in cash or UPI on delivery. COD fee may apply on orders under ₹999.' },
-      shipping: { title: 'Shipping timeline', body: 'Express 48h in Mumbai, Delhi-NCR, and Bangalore pincodes when ordered before 4 PM. Rest of India: 3–5 business days. Free shipping on carts ₹999+.' },
+      shipping: { title: 'Shipping timeline', body: 'Dehradun (248xxx): typically 1–2 business days after dispatch. Nearby Uttarakhand: 2–4 days. Metro express lanes: 1–3 days where available. Rest of India: 3–6 business days. Free shipping on carts ₹999+.' },
       discord: { title: 'Discord community', body: 'Join the VELVETCLAP25 vault Discord for drop alerts, restock pings, and fit checks. Invite link shared via newsletter — subscribe on the homepage.' },
       spotify: { title: 'Vault playlists', body: 'Curated underground playlists for Bombay/Delhi street runs. Follow @velvetclap25 on Spotify when the channel launches.' },
       campus: { title: 'Campus ambassadors', body: 'College reps get early access codes and commission on sales. Email careers@velvetclap25.in with your campus and Instagram handle.' },
@@ -865,6 +905,9 @@
       if (state.collection) params.set('collection', state.collection);
       const data = await apiFetch(`/api/products?${params}`);
       PRODUCTS = data.products || [];
+      if (typeof data.total === 'number') state.catalogTotal = data.total;
+      const catAll = document.getElementById('cat-all-count');
+      if (catAll) catAll.textContent = String(state.catalogTotal || PRODUCTS.length);
     }
 
     function loadPersistedSession() {
@@ -1320,6 +1363,23 @@
       const freeShippingGoal = 999;
       const progressPercent = Math.min(100, Math.round((subtotal / freeShippingGoal) * 100));
       const remainingForShipping = Math.max(0, freeShippingGoal - subtotal);
+
+      // Drop promo if cart no longer meets minimum
+      if (
+        state.discountCode &&
+        state.couponMinSubtotal > 0 &&
+        subtotal < state.couponMinSubtotal
+      ) {
+        state.discountCode = null;
+        state.discountAmount = 0;
+        state.couponMinSubtotal = 0;
+        const alertEl = document.getElementById('coupon-alert');
+        if (alertEl) {
+          alertEl.classList.remove('hidden');
+          alertEl.className = 'text-[11px] font-space font-bold text-coral-urgent';
+          alertEl.textContent = '✕ Promo removed — cart below minimum for VC25.';
+        }
+      }
 
       // Coupon logic (amount set when user applies a valid code)
       const finalDiscount = state.discountCode ? (state.discountAmount || 0) : 0;
@@ -1830,9 +1890,22 @@
           method: 'POST',
           body: JSON.stringify({ pincode: pin }),
         });
-        resEl.classList.remove('hidden', 'border-coral-urgent', 'text-coral-urgent', 'bg-coral-urgent/10');
-        resEl.classList.add('border-lime', 'text-lime', 'bg-lime/10');
-        resEl.innerHTML = data.expressAvailable ? `⚡ ${data.message}` : `📦 ${data.message}`;
+        resEl.classList.remove('hidden', 'border-coral-urgent', 'text-coral-urgent', 'bg-coral-urgent/10', 'border-lime', 'text-lime', 'bg-lime/10', 'border-purple-accent', 'text-purple-accent', 'bg-purple-accent/10');
+        const tier = data.tier || (data.expressAvailable ? 'express-metro' : 'standard');
+        const icon =
+          tier === 'dehradun-local' ? '📍' :
+          tier === 'uttarakhand-regional' ? '🏔️' :
+          tier === 'express-metro' ? '⚡' : '📦';
+        if (tier === 'dehradun-local') {
+          resEl.classList.add('border-lime', 'text-lime', 'bg-lime/10');
+        } else if (tier === 'express-metro') {
+          resEl.classList.add('border-lime', 'text-lime', 'bg-lime/10');
+        } else if (tier === 'uttarakhand-regional') {
+          resEl.classList.add('border-purple-accent', 'text-purple-accent', 'bg-purple-accent/10');
+        } else {
+          resEl.classList.add('border-wireframe', 'text-zinc-300', 'bg-surface');
+        }
+        resEl.innerHTML = `${icon} ${data.message}`;
       } catch (err) {
         resEl.classList.remove('hidden', 'border-lime', 'text-lime', 'bg-lime/10');
         resEl.classList.add('border-coral-urgent', 'text-coral-urgent', 'bg-coral-urgent/10');
@@ -1857,13 +1930,16 @@
         return;
       }
 
+      const subtotal = state.cart.reduce((sum, item) => sum + (item.product.price * item.quantity), 0);
+
       try {
         const data = await apiFetch('/api/coupons/validate', {
           method: 'POST',
-          body: JSON.stringify({ code }),
+          body: JSON.stringify({ code, subtotal }),
         });
         state.discountCode = data.code;
         state.discountAmount = data.discount;
+        state.couponMinSubtotal = data.minSubtotal || 0;
         alertEl.className = 'text-[11px] font-space font-bold text-lime';
         alertEl.textContent = `✓ ${data.message}`;
         updateCartState();
@@ -1871,6 +1947,7 @@
       } catch (err) {
         state.discountCode = null;
         state.discountAmount = 0;
+        state.couponMinSubtotal = 0;
         alertEl.className = 'text-[11px] font-space font-bold text-coral-urgent';
         alertEl.textContent = `✕ ${err.message}`;
         updateCartState();
@@ -2138,24 +2215,7 @@
       }
     });
 
-    // --- 15. Real-Time Social Proof Simulator ---
-    const socialNotifications = [
-      'Dev from Pune just copped Cyberpunk Glitch Boxy Tee!',
-      'Kabir from Bandra West grabbed Heavy 280 GSM Mesh Shorts.',
-      'Siddharth from Delhi-NCR applied code VC25 for ₹300 OFF!',
-      'Tanvi from Indiranagar added Minimalist Foam-Print Tee to Bag.',
-      'Only 3 pieces remaining in Section 09 Steal Vault!'
-    ];
-
-    setInterval(() => {
-      const randomMsg = socialNotifications[Math.floor(Math.random() * socialNotifications.length)];
-      // Only pop if cart and quickview aren't open
-      if (cartDrawerOverlay.classList.contains('overlay-closed') && quickviewOverlay.classList.contains('overlay-closed')) {
-        triggerToast(`⚡ ${randomMsg}`);
-      }
-    }, 18000);
-
-    // --- 16. Event Bindings ---
+    // --- 15. Event Bindings ---
     document.getElementById('btn-open-cart').addEventListener('click', openCartDrawer);
     document.getElementById('btn-close-cart').addEventListener('click', closeCartDrawer);
     cartDrawerOverlay.addEventListener('click', (e) => {

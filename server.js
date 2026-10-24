@@ -264,10 +264,73 @@ function findOrder(store, orderRef) {
 }
 
 const COUPONS = {
-  VC25: { discount: 300, label: 'APP PROMO (VC25)' },
+  VC25: {
+    discount: 300,
+    label: 'APP PROMO (VC25)',
+    minSubtotal: 799,
+    description: 'Flat ₹300 off when cart subtotal is ₹799 or more (before shipping).',
+  },
 };
 
+/** Dehradun & nearby Uttarakhand (first 3 digits of Indian pincode). Adjust as ops expand. */
+const DEHRADUN_PIN_PREFIXES = ['248'];
+const UTTARAKHAND_REGIONAL_PREFIXES = ['249', '262', '263'];
+
 const EXPRESS_PIN_PREFIXES = ['400', '401', '110', '122', '201', '560', '561', '562'];
+
+function normalizeCouponCode(raw) {
+  return String(raw || '')
+    .trim()
+    .toUpperCase()
+    .replace(/[^A-Z0-9]/g, '');
+}
+
+function evaluateCoupon(codeRaw, subtotal) {
+  const code = normalizeCouponCode(codeRaw);
+  if (!code) return { ok: false, status: 400, message: 'Enter a promo code.' };
+  const coupon = COUPONS[code];
+  if (!coupon) {
+    return { ok: false, status: 400, message: 'INVALID VOUCHER CODE. USE "VC25"' };
+  }
+  const sub = Math.max(0, Number(subtotal) || 0);
+  const minSubtotal = Number(coupon.minSubtotal) || 0;
+  if (sub < minSubtotal) {
+    return {
+      ok: false,
+      status: 400,
+      message: `CODE ${code} REQUIRES CART SUBTOTAL ₹${minSubtotal}+ (YOURS: ₹${sub}).`,
+    };
+  }
+  return {
+    ok: true,
+    code,
+    discount: coupon.discount,
+    label: coupon.label,
+    minSubtotal,
+    message: `CODE ${code} APPLIED: FLAT ₹${coupon.discount} OFF ACTIVATED!`,
+  };
+}
+
+function getDeliveryTier(pin) {
+  const prefix = pin.slice(0, 3);
+  if (DEHRADUN_PIN_PREFIXES.includes(prefix)) return 'dehradun-local';
+  if (UTTARAKHAND_REGIONAL_PREFIXES.includes(prefix)) return 'uttarakhand-regional';
+  if (EXPRESS_PIN_PREFIXES.includes(prefix)) return 'express-metro';
+  return 'standard';
+}
+
+function deliveryMessageForTier(tier, pin) {
+  switch (tier) {
+    case 'dehradun-local':
+      return `PINCODE ${pin} — DEHRADUN LOCAL. TYPICAL 1–2 BUSINESS DAYS AFTER DISPATCH. LOCAL PICKUP BY APPOINTMENT — CONTACT US ON CHECKOUT WHATSAPP.`;
+    case 'uttarakhand-regional':
+      return `PINCODE ${pin} — UTTARAKHAND REGIONAL. TYPICAL 2–4 BUSINESS DAYS AFTER DISPATCH.`;
+    case 'express-metro':
+      return `PINCODE ${pin} — METRO EXPRESS LANE. TYPICAL 1–3 BUSINESS DAYS (CARRIER & PIN DEPENDENT). ORDER BEFORE 4 PM FOR SAME-DAY DISPATCH WHEN POSSIBLE.`;
+    default:
+      return `PINCODE ${pin} — PAN-INDIA STANDARD. TYPICAL 3–6 BUSINESS DAYS. FREE SHIPPING ON ORDERS OVER ₹999.`;
+  }
+}
 
 function normalizeAudience(value) {
   const a = String(value || 'unisex').toLowerCase();
@@ -373,10 +436,16 @@ function buildOrderPayload(body) {
   }
 
   let discount = 0;
-  const code = String(couponCode || '')
-    .trim()
-    .toUpperCase();
-  if (code && COUPONS[code]) discount = COUPONS[code].discount;
+  let appliedCoupon = null;
+  const code = normalizeCouponCode(couponCode);
+  if (code) {
+    const couponResult = evaluateCoupon(code, subtotal);
+    if (!couponResult.ok) {
+      return { error: couponResult.message, status: couponResult.status };
+    }
+    discount = couponResult.discount;
+    appliedCoupon = couponResult.code;
+  }
 
   const shippingFee = subtotal >= 999 ? 0 : 99;
   const total = Math.max(0, subtotal - discount + shippingFee);
@@ -392,7 +461,7 @@ function buildOrderPayload(body) {
     shippingFee,
     total,
     paymentMethod: method,
-    couponCode: code || null,
+    couponCode: appliedCoupon,
   };
 }
 
@@ -689,40 +758,33 @@ app.post('/api/delivery/check', (req, res) => {
       message: 'PLEASE ENTER A VALID 6-DIGIT INDIAN PINCODE.',
     });
   }
-  const prefix = pin.slice(0, 3);
-  const expressAvailable = EXPRESS_PIN_PREFIXES.includes(prefix);
+  const tier = getDeliveryTier(pin);
+  const expressAvailable = tier === 'express-metro' || tier === 'dehradun-local';
   res.json({
     valid: true,
     pincode: pin,
+    tier,
     expressAvailable,
-    message: expressAvailable
-      ? `PINCODE ${pin} VERIFIED! EXPRESS 48H AIR COURIER AVAILABLE. ORDER BEFORE 4:00 PM FOR SAME-DAY DISPATCH.`
-      : `PINCODE ${pin} VERIFIED! STANDARD 3–5 DAY PAN-INDIA DELIVERY. FREE SHIPPING ON ORDERS OVER ₹999.`,
+    message: deliveryMessageForTier(tier, pin),
   });
 });
 
-function normalizeCouponCode(raw) {
-  return String(raw || '')
-    .trim()
-    .toUpperCase()
-    .replace(/[^A-Z0-9]/g, '');
-}
-
 app.post('/api/coupons/validate', (req, res) => {
-  const code = normalizeCouponCode(req.body.code);
-  const coupon = COUPONS[code];
-  if (!coupon) {
-    return res.status(400).json({
+  const subtotal = Number(req.body.subtotal) || 0;
+  const result = evaluateCoupon(req.body.code, subtotal);
+  if (!result.ok) {
+    return res.status(result.status).json({
       valid: false,
-      message: 'INVALID VOUCHER CODE. USE "VC25"',
+      message: result.message,
     });
   }
   res.json({
     valid: true,
-    code,
-    discount: coupon.discount,
-    label: coupon.label,
-    message: `CODE ${code} APPLIED: FLAT ₹${coupon.discount} OFF ACTIVATED!`,
+    code: result.code,
+    discount: result.discount,
+    label: result.label,
+    minSubtotal: result.minSubtotal,
+    message: result.message,
   });
 });
 
