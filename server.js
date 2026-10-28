@@ -280,6 +280,22 @@ const UTTARAKHAND_REGIONAL_PREFIXES = ['249', '262', '263'];
 
 const EXPRESS_PIN_PREFIXES = ['400', '401', '110', '122', '201', '560', '561', '562'];
 
+const PAN_INDIA_FREE_SHIPPING_MIN = 999;
+const DEHRADUN_SAME_DAY_MIN = 1599;
+
+function isDehradunPin(pin) {
+  const p = String(pin || '').trim();
+  return p.length >= 3 && DEHRADUN_PIN_PREFIXES.includes(p.slice(0, 3));
+}
+
+function computeShippingFee(subtotal, pincode) {
+  const sub = Math.max(0, Number(subtotal) || 0);
+  if (sub === 0) return 0;
+  if (isDehradunPin(pincode)) return 0;
+  if (sub >= PAN_INDIA_FREE_SHIPPING_MIN) return 0;
+  return 99;
+}
+
 function normalizeCouponCode(raw) {
   return String(raw || '')
     .trim()
@@ -321,10 +337,16 @@ function getDeliveryTier(pin) {
   return 'standard';
 }
 
-function deliveryMessageForTier(tier, pin) {
+function deliveryMessageForTier(tier, pin, subtotal) {
+  const sub = Math.max(0, Number(subtotal) || 0);
   switch (tier) {
-    case 'dehradun-local':
-      return `PINCODE ${pin} — DEHRADUN LOCAL. TYPICAL 1–2 BUSINESS DAYS AFTER DISPATCH. LOCAL PICKUP BY APPOINTMENT — CONTACT US ON CHECKOUT WHATSAPP.`;
+    case 'dehradun-local': {
+      const sameDay =
+        sub >= DEHRADUN_SAME_DAY_MIN
+          ? ' SAME-DAY DELIVERY ELIGIBLE ON THIS CART (SUBJECT TO ORDER TIME & OPS).'
+          : ` SAME-DAY DELIVERY WHEN ORDER TOTAL IS ₹${DEHRADUN_SAME_DAY_MIN}+.`;
+      return `PINCODE ${pin} — DEHRADUN LOCAL. FREE DELIVERY WITHIN DEHRADUN.${sameDay} ORDERS UNDER ₹${DEHRADUN_SAME_DAY_MIN}: TYPICAL 1–2 BUSINESS DAYS AFTER DISPATCH. LOCAL PICKUP BY APPOINTMENT — CONTACT US ON CHECKOUT WHATSAPP.`;
+    }
     case 'uttarakhand-regional':
       return `PINCODE ${pin} — UTTARAKHAND REGIONAL. TYPICAL 2–4 BUSINESS DAYS AFTER DISPATCH.`;
     case 'express-metro':
@@ -490,7 +512,8 @@ function buildOrderPayload(body) {
     appliedCoupon = couponResult.code;
   }
 
-  const shippingFee = subtotal >= 999 ? 0 : 99;
+  const pincode = customer?.pincode;
+  const shippingFee = computeShippingFee(subtotal, pincode);
   const total = Math.max(0, subtotal - discount + shippingFee);
   const orderRef = `VC25-${Date.now().toString(36).toUpperCase()}`;
   const method = paymentMethod === 'cod' ? 'cod' : 'online';
@@ -830,13 +853,16 @@ app.post('/api/delivery/check', (req, res) => {
     });
   }
   const tier = getDeliveryTier(pin);
+  const subtotal = Number(req.body.subtotal) || 0;
   const expressAvailable = tier === 'express-metro' || tier === 'dehradun-local';
   res.json({
     valid: true,
     pincode: pin,
     tier,
     expressAvailable,
-    message: deliveryMessageForTier(tier, pin),
+    freeLocalDehradun: tier === 'dehradun-local',
+    sameDayEligible: tier === 'dehradun-local' && subtotal >= DEHRADUN_SAME_DAY_MIN,
+    message: deliveryMessageForTier(tier, pin, subtotal),
   });
 });
 

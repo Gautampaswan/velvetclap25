@@ -326,17 +326,21 @@
       <span>•</span>
       <span>CODE <strong class="underline decoration-2">VC25</strong>: ₹300 OFF ON ORDERS ₹799+</span>
       <span>•</span>
-      <span>FREE SHIPPING OVER ₹999</span>
+      <span>FREE DELIVERY IN LOCAL DEHRADUN (248XXX)</span>
       <span>•</span>
-      <span>LOCAL 1–2 DAY DISPATCH IN DEHRADUN (248XXX)</span>
+      <span>SAME-DAY DELIVERY ON ORDERS ₹1599+ (DEHRADUN)</span>
+      <span>•</span>
+      <span>FREE PAN-INDIA SHIPPING OVER ₹999</span>
       <span>•</span>
       <span>STREETWEAR FOR DEHRADUN • EVERY PIECE UNDER ₹999</span>
       <span>•</span>
       <span>CODE <strong class="underline decoration-2">VC25</strong>: ₹300 OFF ON ORDERS ₹799+</span>
       <span>•</span>
-      <span>FREE SHIPPING OVER ₹999</span>
+      <span>FREE DELIVERY IN LOCAL DEHRADUN (248XXX)</span>
       <span>•</span>
-      <span>LOCAL 1–2 DAY DISPATCH IN DEHRADUN (248XXX)</span>
+      <span>SAME-DAY DELIVERY ON ORDERS ₹1599+ (DEHRADUN)</span>
+      <span>•</span>
+      <span>FREE PAN-INDIA SHIPPING OVER ₹999</span>
     </div>
   </div>
 
@@ -483,7 +487,8 @@
           </div>
 
           <div class="space-y-1 text-[11px] font-space font-bold text-zinc-400 uppercase tracking-wide">
-            <p>Free shipping on carts ₹999+</p>
+            <p>Free delivery in Dehradun (248xxx) · same-day on ₹1599+</p>
+            <p>Free pan-India shipping on carts ₹999+</p>
             <p class="text-lime">VC25: ₹300 off when subtotal ≥ ₹799</p>
           </div>
         </div>
@@ -624,7 +629,7 @@
       <div class="space-y-1 min-w-0">
         <span class="text-lime font-space text-[11px] font-bold uppercase tracking-widest">// DELIVERY CHECK</span>
         <h3 class="font-syne font-bold text-lg sm:text-xl md:text-2xl text-white uppercase leading-snug">See Realistic Timelines For Your Pincode</h3>
-        <p class="text-xs text-zinc-400 font-inter">Dehradun (248xxx) first — then Uttarakhand regional and pan-India. Estimates only; exact dates confirmed when we ship.</p>
+        <p class="text-xs text-zinc-400 font-inter">Dehradun (248xxx): free local delivery · same-day on orders ₹1599+. Pan-India free shipping ₹999+. Estimates only; exact dates confirmed when we ship.</p>
       </div>
 
       <div class="w-full md:w-auto flex flex-col sm:flex-row items-stretch gap-2">
@@ -1058,7 +1063,7 @@
       track: { title: 'Track order', body: 'Use Vault profile (header avatar) or Track Order in the footer — enter your mobile to see your VCU profile and orders.' },
       returns: { title: '7-day returns', body: 'Contact us within 7 days of delivery. Items must be unworn with tags. Reverse pickup where our courier serves your pincode. Refund to UPI/bank within 5–7 business days after QC.' },
       cod: { title: 'Cash on delivery', body: 'Choose COD at checkout. Pay the delivery partner in cash or UPI on delivery. COD fee may apply on orders under ₹999.' },
-      shipping: { title: 'Shipping timeline', body: 'Dehradun (248xxx): typically 1–2 business days after dispatch. Nearby Uttarakhand: 2–4 days. Metro express lanes: 1–3 days where available. Rest of India: 3–6 business days. Free shipping on carts ₹999+.' },
+      shipping: { title: 'Shipping timeline', body: 'Dehradun (248xxx): free local delivery. Same-day delivery on orders ₹1599+ (subject to order time). Under ₹1599: typically 1–2 business days after dispatch. Nearby Uttarakhand: 2–4 days. Metro express lanes: 1–3 days where available. Rest of India: 3–6 business days. Free pan-India shipping on carts ₹999+.' },
       discord: { title: 'Discord community', body: 'Join the VELVETCLAP25 vault Discord for drop alerts, restock pings, and fit checks. Invite link shared via newsletter — subscribe on the homepage.' },
       spotify: { title: 'Vault playlists', body: 'Curated underground playlists for Bombay/Delhi street runs. Follow @velvetclap25 on Spotify when the channel launches.' },
       campus: { title: 'Campus ambassadors', body: 'College reps get early access codes and commission on sales. Email careers@velvetclap25.in with your campus and Instagram handle.' },
@@ -1563,15 +1568,25 @@
       triggerToast(`Added ${product.title} (${size}) to bag!`);
     }
 
+    function isDehradunPincode(pin) {
+      const p = String(pin || '').trim();
+      return /^\d{6}$/.test(p) && p.startsWith('248');
+    }
+
     function updateCartState() {
       // Subtotal calculation
       const subtotal = state.cart.reduce((sum, item) => sum + (item.product.price * item.quantity), 0);
       const totalItems = state.cart.reduce((sum, item) => sum + item.quantity, 0);
 
-      // Free shipping threshold (₹999)
+      const shipPin = document.getElementById('ship-pincode')?.value?.trim() || '';
+      const dehradunLocal = isDehradunPincode(shipPin);
+
+      // Free shipping threshold (₹999 pan-India; Dehradun 248xxx is always free)
       const freeShippingGoal = 999;
-      const progressPercent = Math.min(100, Math.round((subtotal / freeShippingGoal) * 100));
-      const remainingForShipping = Math.max(0, freeShippingGoal - subtotal);
+      const progressPercent = dehradunLocal
+        ? 100
+        : Math.min(100, Math.round((subtotal / freeShippingGoal) * 100));
+      const remainingForShipping = dehradunLocal ? 0 : Math.max(0, freeShippingGoal - subtotal);
 
       // Drop promo if cart no longer meets minimum
       if (
@@ -1593,7 +1608,8 @@
       // Coupon logic (amount set when user applies a valid code)
       const finalDiscount = state.discountCode ? (state.discountAmount || 0) : 0;
 
-      const shippingFee = subtotal >= freeShippingGoal ? 0 : (subtotal > 0 ? 99 : 0);
+      const shippingFee =
+        subtotal === 0 ? 0 : dehradunLocal || subtotal >= freeShippingGoal ? 0 : 99;
       const grandTotal = Math.max(0, subtotal - finalDiscount + shippingFee);
 
       // Update Header Elements
@@ -1607,7 +1623,18 @@
       const shippingRemaining = document.getElementById('shipping-remaining');
 
       shippingProgressBar.style.width = `${progressPercent}%`;
-      if (subtotal >= freeShippingGoal) {
+      if (dehradunLocal) {
+        const sameDayMin = 1599;
+        if (subtotal >= sameDayMin) {
+          shippingProgressText.innerHTML = `⚡ DEHRADUN: FREE DELIVERY + SAME-DAY ELIGIBLE`;
+        } else if (subtotal > 0) {
+          const needSameDay = Math.max(0, sameDayMin - subtotal);
+          shippingProgressText.innerHTML = `📍 DEHRADUN FREE DELIVERY · ADD <strong class="text-white">₹${needSameDay}</strong> FOR SAME-DAY`;
+        } else {
+          shippingProgressText.innerHTML = `📍 FREE DELIVERY IN DEHRADUN (248XXX)`;
+        }
+        shippingRemaining.textContent = `₹0 TO GO`;
+      } else if (subtotal >= freeShippingGoal) {
         shippingProgressText.innerHTML = `⚡ YOU'VE UNLOCKED FREE PAN-INDIA SHIPPING!`;
         shippingRemaining.textContent = `₹0 TO GO`;
       } else {
@@ -2156,14 +2183,20 @@
     }
 
     // --- 11. Courier Pincode Checker (API) ---
+    document.getElementById('ship-pincode')?.addEventListener('input', () => updateCartState());
+
     document.getElementById('btn-check-pincode').addEventListener('click', async () => {
       const pin = document.getElementById('pincode-input').value.trim();
       const resEl = document.getElementById('pincode-result');
 
       try {
+        const cartSubtotal = state.cart.reduce(
+          (sum, item) => sum + item.product.price * item.quantity,
+          0
+        );
         const data = await apiFetch('/api/delivery/check', {
           method: 'POST',
-          body: JSON.stringify({ pincode: pin }),
+          body: JSON.stringify({ pincode: pin, subtotal: cartSubtotal }),
         });
         resEl.classList.remove('hidden', 'border-coral-urgent', 'text-coral-urgent', 'bg-coral-urgent/10', 'border-lime', 'text-lime', 'bg-lime/10', 'border-purple-accent', 'text-purple-accent', 'bg-purple-accent/10');
         const tier = data.tier || (data.expressAvailable ? 'express-metro' : 'standard');
@@ -2613,7 +2646,7 @@
       }
       if (/\b(deliver|shipping|pincode|dehradun|248)\b/i.test(m)) {
         return {
-          reply: '**Dehradun (248xxx)**: about 1–2 business days after dispatch. Pan-India: about 3–6 days. Free shipping on orders **₹999+**. Use the pincode checker on the homepage.',
+          reply: '**Dehradun (248xxx)**: **free local delivery**. **Same-day** on orders **₹1599+**. Under ₹1599: about 1–2 business days after dispatch. Pan-India: 3–6 days. Free shipping **₹999+** outside Dehradun. Use the pincode checker on the homepage.',
           products: [],
           actions: [{ label: 'Find tees', type: 'query', value: 'tees' }],
         };
