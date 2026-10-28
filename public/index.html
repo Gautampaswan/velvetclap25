@@ -230,12 +230,82 @@
     .support-chip {
       border-radius: 9999px !important;
     }
+
+    .no-scrollbar {
+      -ms-overflow-style: none;
+      scrollbar-width: none;
+    }
+    .no-scrollbar::-webkit-scrollbar {
+      display: none;
+    }
+
+    .mobile-h-scroll {
+      display: flex;
+      flex-wrap: nowrap;
+      align-items: center;
+      overflow-x: auto;
+      overflow-y: hidden;
+      -webkit-overflow-scrolling: touch;
+      max-width: 100%;
+      padding-bottom: 2px;
+    }
+
+    @media (max-width: 767px) {
+      body {
+        padding-bottom: calc(5.5rem + env(safe-area-inset-bottom, 0px));
+      }
+      main {
+        padding-left: max(1rem, env(safe-area-inset-left));
+        padding-right: max(1rem, env(safe-area-inset-right));
+      }
+      #support-chat-root {
+        right: max(0.75rem, env(safe-area-inset-right));
+        bottom: max(0.75rem, env(safe-area-inset-bottom));
+        left: max(0.75rem, env(safe-area-inset-left));
+        align-items: stretch;
+      }
+      #support-chat-panel {
+        width: 100% !important;
+        max-width: none !important;
+        max-height: min(78vh, 560px);
+      }
+      #support-chat-fab {
+        align-self: flex-end;
+        max-width: 100%;
+      }
+      #toast {
+        left: 0.75rem;
+        right: 0.75rem;
+        bottom: calc(4.75rem + env(safe-area-inset-bottom, 0px));
+        width: auto;
+        max-width: none;
+      }
+      .product-card .quick-add-desktop {
+        display: none !important;
+      }
+      .support-msg-user {
+        margin-left: 0.75rem !important;
+      }
+      .support-msg-bot {
+        margin-right: 0 !important;
+      }
+      #vault-modal-panel,
+      #quickview-content {
+        max-height: 85vh;
+      }
+    }
+
+    @media (min-width: 768px) {
+      .product-card .quick-add-touch {
+        display: none !important;
+      }
+    }
   </style>
 </head>
 <body class="bg-canvas text-gray-200">
 
   <!-- ================= TOP ANNOUNCEMENT TICKER ================= -->
-  <div class="ticker-gradient text-white py-1.5 px-3 text-[11px] font-bricolage font-bold uppercase tracking-wider overflow-hidden border-b border-black/40 select-none z-50 relative">
+  <div class="ticker-gradient text-white py-1 px-3 sm:py-1.5 text-[10px] sm:text-[11px] font-bricolage font-bold uppercase tracking-wide sm:tracking-wider overflow-hidden border-b border-black/40 select-none z-50 relative">
     <div class="animate-marquee items-center gap-8">
       <span>STREETWEAR FOR DEHRADUN • EVERY PIECE UNDER ₹999</span>
       <span>•</span>
@@ -257,18 +327,18 @@
 
   <!-- ================= PRIMARY HEADER NAVIGATION ================= -->
   <header class="sticky top-0 z-40 bg-canvas/95 backdrop-blur-md border-b border-wireframe">
-    <div class="max-w-[1440px] mx-auto px-4 md:px-8 py-3.5 flex items-center justify-between gap-4">
+    <div class="max-w-[1440px] mx-auto px-3 sm:px-4 md:px-8 py-2.5 sm:py-3.5 flex items-center justify-between gap-2 sm:gap-4 min-w-0">
       
       <!-- Brand Logo -->
-      <a href="/" id="brand-home" class="flex items-center gap-2.5 group min-w-0">
-        <div class="hero-logo-wrap genz-logo-ring shrink-0 w-10 h-10 md:w-11 md:h-11 ring-2 ring-clap/40 ring-offset-2 ring-offset-canvas overflow-hidden group-hover:ring-clap transition-all group-hover:scale-105">
+      <a href="/" id="brand-home" class="flex items-center gap-2 sm:gap-2.5 group min-w-0 flex-1 max-w-[58%] sm:max-w-none">
+        <div class="hero-logo-wrap genz-logo-ring shrink-0 w-9 h-9 sm:w-10 sm:h-10 md:w-11 md:h-11 ring-2 ring-clap/40 ring-offset-1 sm:ring-offset-2 ring-offset-canvas overflow-hidden group-hover:ring-clap transition-all">
           <img src="/assets/velvetclap-logo.png" alt="Velvetclap logo" class="w-full h-full object-cover" width="44" height="44" />
         </div>
-        <div class="leading-none min-w-0">
-          <span class="font-instrument text-xl md:text-2xl tracking-wide text-white uppercase block truncate">
-            <span class="brand-wordmark-velvet">Velvet</span><span class="brand-wordmark-clap">Clap</span><span class="text-zinc-500 font-space text-sm align-top">25</span>
+        <div class="leading-none min-w-0 overflow-hidden">
+          <span class="font-instrument text-lg sm:text-xl md:text-2xl tracking-wide text-white uppercase block truncate">
+            <span class="brand-wordmark-velvet">Velvet</span><span class="brand-wordmark-clap">Clap</span><span class="text-zinc-500 font-space text-xs sm:text-sm align-top">25</span>
           </span>
-          <span class="font-instrument italic text-[10px] md:text-[11px] text-zinc-500 tracking-wide block mt-0.5 truncate">Equal style. Equal comfort.</span>
+          <span class="hidden sm:block font-instrument italic text-[10px] md:text-[11px] text-zinc-500 tracking-wide mt-0.5 truncate">Equal style. Equal comfort.</span>
         </div>
       </a>
 
@@ -287,44 +357,44 @@
       </div>
 
       <!-- Action Cluster -->
-      <div class="flex items-center gap-2.5 sm:gap-4 font-space text-xs">
+      <div class="flex items-center gap-1.5 sm:gap-2.5 shrink-0 font-space text-xs">
         <!-- Currency -->
-        <div id="btn-currency" role="button" tabindex="0" class="hidden sm:flex items-center gap-1.5 px-2.5 py-1.5 border border-wireframe bg-surface hover:border-zinc-400 transition cursor-pointer">
+        <div id="btn-currency" role="button" tabindex="0" class="hidden md:flex items-center gap-1.5 px-2.5 py-1.5 border border-wireframe bg-surface hover:border-zinc-400 transition cursor-pointer">
           <span class="text-lime font-bold">₹</span>
           <span class="text-white font-semibold">INR (₹)</span>
         </div>
 
         <!-- Wishlist -->
-        <button id="btn-open-wishlist" class="flex items-center gap-1.5 px-2.5 py-1.5 border border-wireframe bg-surface hover:border-lime transition relative group">
+        <button id="btn-open-wishlist" aria-label="Wishlist" class="flex items-center justify-center gap-1 p-2 sm:px-2.5 sm:py-1.5 border border-wireframe bg-surface hover:border-lime transition relative group">
           <i data-lucide="heart" class="w-4 h-4 text-zinc-300 group-hover:text-lime"></i>
-          <span id="header-wishlist-count" class="bg-lime text-black font-bold text-[10px] px-1.5 py-0.2 leading-none">0</span>
+          <span id="header-wishlist-count" class="bg-lime text-black font-bold text-[10px] min-w-[1.1rem] text-center px-1 leading-none">0</span>
         </button>
 
         <!-- Cart Quick Access -->
-        <button id="btn-open-cart" class="flex items-center gap-2 px-3 py-1.5 bg-surface border border-wireframe hover:border-lime group transition relative">
-          <i data-lucide="shopping-bag" class="w-4 h-4 text-zinc-300 group-hover:text-lime"></i>
-          <span id="header-cart-total" class="font-bold text-white group-hover:text-lime transition">₹0</span>
-          <span id="header-cart-count" class="bg-lime text-black font-extrabold text-[11px] px-1.5 py-0.2 leading-none">0</span>
+        <button id="btn-open-cart" aria-label="Open bag" class="flex items-center gap-1 sm:gap-2 px-2 sm:px-3 py-1.5 bg-surface border border-wireframe hover:border-lime group transition relative">
+          <i data-lucide="shopping-bag" class="w-4 h-4 text-zinc-300 group-hover:text-lime shrink-0"></i>
+          <span id="header-cart-total" class="hidden sm:inline font-bold text-white group-hover:text-lime transition">₹0</span>
+          <span id="header-cart-count" class="bg-lime text-black font-extrabold text-[10px] sm:text-[11px] px-1.5 py-0.5 leading-none">0</span>
         </button>
 
         <!-- User Profile Avatar -->
-        <div id="btn-profile" role="button" tabindex="0" class="w-8 h-8 border border-wireframe overflow-hidden cursor-pointer hover:border-lime transition">
+        <div id="btn-profile" role="button" tabindex="0" class="w-8 h-8 shrink-0 border border-wireframe overflow-hidden cursor-pointer hover:border-lime transition">
           <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=120&q=80" alt="Avatar" class="w-full h-full object-cover grayscale contrast-125" />
         </div>
       </div>
     </div>
 
     <!-- Category Sub-Navigation -->
-    <nav class="border-t border-wireframe bg-surface/80 overflow-x-auto no-scrollbar">
-      <div class="max-w-[1440px] mx-auto px-4 md:px-8 flex items-center gap-1 sm:gap-2 text-[11px] md:text-xs font-space font-bold tracking-wider uppercase py-1">
-        <button type="button" data-nav="drops" class="nav-tab px-3 py-2 text-zinc-400 hover:text-white transition nav-tab-active">DROPS</button>
-        <button type="button" data-nav="men" class="nav-tab px-3 py-2 text-zinc-400 hover:text-white transition">MEN</button>
-        <button type="button" data-nav="women" class="nav-tab px-3 py-2 text-zinc-400 hover:text-white transition">WOMEN</button>
-        <button type="button" data-nav="oversized" class="nav-tab px-3 py-2 text-zinc-400 hover:text-white transition">OVERSIZED TEES</button>
-        <button type="button" data-nav="cargos" class="nav-tab px-3 py-2 text-zinc-400 hover:text-white transition">CARGOS & DENIM</button>
-        <button type="button" data-nav="collabs" class="nav-tab px-3 py-2 text-zinc-400 hover:text-white transition">COLLABS</button>
-        <button type="button" data-nav="sale" class="nav-tab ml-auto px-3.5 py-1.5 bg-lime text-black font-extrabold flex items-center gap-1.5 hover:bg-white transition">
-          UNDER ₹999 (SALE 🔥)
+    <nav class="border-t border-wireframe bg-surface/80 overflow-x-auto no-scrollbar touch-pan-x">
+      <div class="max-w-[1440px] mx-auto px-3 sm:px-4 md:px-8 mobile-h-scroll gap-1 sm:gap-2 text-[10px] sm:text-[11px] md:text-xs font-space font-bold tracking-wide sm:tracking-wider uppercase py-1.5">
+        <button type="button" data-nav="drops" class="nav-tab shrink-0 whitespace-nowrap px-2.5 sm:px-3 py-2 text-zinc-400 hover:text-white transition nav-tab-active">DROPS</button>
+        <button type="button" data-nav="men" class="nav-tab shrink-0 whitespace-nowrap px-2.5 sm:px-3 py-2 text-zinc-400 hover:text-white transition">MEN</button>
+        <button type="button" data-nav="women" class="nav-tab shrink-0 whitespace-nowrap px-2.5 sm:px-3 py-2 text-zinc-400 hover:text-white transition">WOMEN</button>
+        <button type="button" data-nav="oversized" class="nav-tab shrink-0 whitespace-nowrap px-2.5 sm:px-3 py-2 text-zinc-400 hover:text-white transition"><span class="sm:hidden">OVERSIZED</span><span class="hidden sm:inline">OVERSIZED TEES</span></button>
+        <button type="button" data-nav="cargos" class="nav-tab shrink-0 whitespace-nowrap px-2.5 sm:px-3 py-2 text-zinc-400 hover:text-white transition"><span class="sm:hidden">CARGOS</span><span class="hidden sm:inline">CARGOS & DENIM</span></button>
+        <button type="button" data-nav="collabs" class="nav-tab shrink-0 whitespace-nowrap px-2.5 sm:px-3 py-2 text-zinc-400 hover:text-white transition">COLLABS</button>
+        <button type="button" data-nav="sale" class="nav-tab shrink-0 whitespace-nowrap px-2.5 sm:px-3.5 py-1.5 bg-lime text-black font-extrabold hover:bg-white transition">
+          <span class="sm:hidden">SALE 🔥</span><span class="hidden sm:inline">UNDER ₹999 (SALE 🔥)</span>
         </button>
       </div>
     </nav>
@@ -348,10 +418,10 @@
     </div>
   </header>
 
-  <main class="max-w-[1440px] mx-auto px-4 md:px-8 pt-6 pb-20">
+  <main class="max-w-[1440px] mx-auto px-3 sm:px-4 md:px-8 pt-4 sm:pt-6 pb-24 md:pb-20">
 
     <!-- ================= HERO LOOKBOOK BANNER ================= -->
-    <section class="genz-card border border-wireframe/80 bg-surface/90 backdrop-blur-sm p-6 md:p-10 relative overflow-hidden mb-8">
+    <section class="genz-card border border-wireframe/80 bg-surface/90 backdrop-blur-sm p-4 sm:p-6 md:p-10 relative overflow-hidden mb-6 sm:mb-8">
       <div class="absolute -right-6 -top-6 w-40 h-40 md:w-56 md:h-56 opacity-[0.12] pointer-events-none select-none hero-logo-wrap">
         <img src="/assets/velvetclap-logo.png" alt="" class="w-full h-full object-cover" aria-hidden="true" />
       </div>
@@ -366,7 +436,7 @@
             <span class="text-velvet-light">Gen Z fits</span>
           </div>
 
-          <h1 class="font-bricolage font-extrabold text-4xl sm:text-6xl md:text-7xl lg:text-[72px] leading-[0.95] tracking-tight text-white uppercase">
+          <h1 class="font-bricolage font-extrabold text-[1.75rem] leading-[1.05] sm:text-5xl md:text-7xl lg:text-[72px] sm:leading-[0.95] tracking-tight text-white uppercase break-words">
             <span class="brand-wordmark-velvet">Streetwear</span><br/>
             <span class="text-gradient-brand">For Dehradun</span><br/>
             <span class="text-white/90">Under ₹999</span>
@@ -378,7 +448,7 @@
           </p>
         </div>
 
-        <div class="w-full lg:w-80 genz-card bg-canvas/90 border border-wireframe p-5 space-y-4 shadow-zine-velvet">
+        <div class="w-full lg:w-80 genz-card bg-canvas/90 border border-wireframe p-4 sm:p-5 space-y-3 sm:space-y-4 shadow-zine-velvet">
           <div class="flex justify-center pb-2">
             <img src="/assets/velvetclap-logo.png" alt="Velvetclap" class="w-24 h-24 object-cover genz-logo-ring ring-2 ring-velvet/50" width="96" height="96" />
           </div>
@@ -407,29 +477,29 @@
       <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4 border-b border-wireframe pb-4">
         
         <!-- Category Filter Buttons -->
-        <div class="flex items-center gap-1.5 flex-wrap font-space text-xs font-bold uppercase" id="category-filters">
-          <button data-cat="all" class="cat-pill px-3.5 py-2 bg-lime text-black border border-lime hover:bg-white transition">
+        <div class="mobile-h-scroll gap-1.5 font-space text-[10px] sm:text-xs font-bold uppercase pb-1 -mx-1 px-1" id="category-filters">
+          <button data-cat="all" class="cat-pill shrink-0 whitespace-nowrap px-3 sm:px-3.5 py-2 bg-lime text-black border border-lime hover:bg-white transition">
             ALL (<span id="cat-all-count">—</span>)
           </button>
-          <button data-cat="tees" class="cat-pill px-3.5 py-2 bg-surface text-zinc-300 border border-wireframe hover:border-white transition">
-            BOXY TEES (&lt;₹699)
+          <button data-cat="tees" class="cat-pill shrink-0 whitespace-nowrap px-3 sm:px-3.5 py-2 bg-surface text-zinc-300 border border-wireframe hover:border-white transition">
+            <span class="md:hidden">TEES</span><span class="hidden md:inline">BOXY TEES (&lt;₹699)</span>
           </button>
-          <button data-cat="bottoms" class="cat-pill px-3.5 py-2 bg-surface text-zinc-300 border border-wireframe hover:border-white transition">
-            BOTTOMS (&lt;₹899)
+          <button data-cat="bottoms" class="cat-pill shrink-0 whitespace-nowrap px-3 sm:px-3.5 py-2 bg-surface text-zinc-300 border border-wireframe hover:border-white transition">
+            <span class="md:hidden">BOTTOMS</span><span class="hidden md:inline">BOTTOMS (&lt;₹899)</span>
           </button>
-          <button data-cat="accessories" class="cat-pill px-3.5 py-2 bg-surface text-zinc-300 border border-wireframe hover:border-white transition">
-            ACCESSORIES (&lt;₹499)
+          <button data-cat="accessories" class="cat-pill shrink-0 whitespace-nowrap px-3 sm:px-3.5 py-2 bg-surface text-zinc-300 border border-wireframe hover:border-white transition">
+            <span class="md:hidden">ACCESS</span><span class="hidden md:inline">ACCESSORIES (&lt;₹499)</span>
           </button>
-          <button data-cat="headwear" class="cat-pill px-3.5 py-2 bg-surface text-zinc-300 border border-wireframe hover:border-white transition">
-            CAPS & BEANIES (&lt;₹399)
+          <button data-cat="headwear" class="cat-pill shrink-0 whitespace-nowrap px-3 sm:px-3.5 py-2 bg-surface text-zinc-300 border border-wireframe hover:border-white transition">
+            <span class="md:hidden">CAPS</span><span class="hidden md:inline">CAPS & BEANIES (&lt;₹399)</span>
           </button>
         </div>
 
         <!-- Sort Select -->
-        <div class="flex items-center gap-2 self-start lg:self-auto">
-          <label for="sort-select" class="text-[11px] font-space text-zinc-400 font-bold uppercase tracking-wider">SORT BY:</label>
-          <div class="relative">
-            <select id="sort-select" class="bg-surface border border-wireframe text-white text-xs font-space font-bold uppercase px-3 py-2 pr-8 appearance-none focus:outline-none focus:border-lime cursor-pointer">
+        <div class="flex items-center gap-2 self-stretch sm:self-start lg:self-auto w-full sm:w-auto">
+          <label for="sort-select" class="text-[10px] sm:text-[11px] font-space text-zinc-400 font-bold uppercase tracking-wider shrink-0">SORT:</label>
+          <div class="relative flex-1 sm:flex-none min-w-0">
+            <select id="sort-select" class="w-full sm:w-auto bg-surface border border-wireframe text-white text-[10px] sm:text-xs font-space font-bold uppercase px-2 sm:px-3 py-2 pr-8 appearance-none focus:outline-none focus:border-lime cursor-pointer">
               <option value="trending">TRENDING FIRST</option>
               <option value="price-low">PRICE: LOW TO HIGH</option>
               <option value="price-high">PRICE: HIGH TO LOW</option>
@@ -442,30 +512,30 @@
       </div>
 
       <!-- Secondary Sub-Filter Row: Sizing & Cut / Fit Selectors -->
-      <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 py-2 border-b border-wireframe/60">
+      <div class="flex flex-col gap-3 md:flex-row md:items-center md:justify-between py-2 border-b border-wireframe/60 min-w-0">
         <!-- Sizes -->
-        <div class="flex items-center gap-2">
-          <span class="text-[11px] font-space text-zinc-500 font-bold uppercase mr-1">SIZE:</span>
-          <div class="flex items-center gap-1 font-space text-xs font-bold" id="size-filters">
-            <button data-size="ALL" class="size-btn px-2.5 py-1.5 border border-lime bg-lime text-black font-extrabold">ALL</button>
-            <button data-size="XS" class="size-btn px-2.5 py-1.5 border border-wireframe bg-surface text-zinc-300 hover:border-zinc-400">XS</button>
-            <button data-size="S" class="size-btn px-2.5 py-1.5 border border-wireframe bg-surface text-zinc-300 hover:border-zinc-400">S</button>
-            <button data-size="M" class="size-btn px-2.5 py-1.5 border border-wireframe bg-surface text-zinc-300 hover:border-zinc-400">M</button>
-            <button data-size="L" class="size-btn px-2.5 py-1.5 border border-wireframe bg-surface text-zinc-300 hover:border-zinc-400">L</button>
-            <button data-size="XL" class="size-btn px-2.5 py-1.5 border border-wireframe bg-surface text-zinc-300 hover:border-zinc-400">XL</button>
-            <button data-size="XXL" class="size-btn px-2.5 py-1.5 border border-wireframe bg-surface text-zinc-300 hover:border-zinc-400">XXL</button>
+        <div class="flex items-center gap-2 min-w-0">
+          <span class="text-[10px] sm:text-[11px] font-space text-zinc-500 font-bold uppercase shrink-0">SIZE:</span>
+          <div class="mobile-h-scroll gap-1 font-space text-xs font-bold flex-1 min-w-0" id="size-filters">
+            <button data-size="ALL" class="size-btn shrink-0 px-2.5 py-1.5 border border-lime bg-lime text-black font-extrabold">ALL</button>
+            <button data-size="XS" class="size-btn shrink-0 px-2.5 py-1.5 border border-wireframe bg-surface text-zinc-300 hover:border-zinc-400">XS</button>
+            <button data-size="S" class="size-btn shrink-0 px-2.5 py-1.5 border border-wireframe bg-surface text-zinc-300 hover:border-zinc-400">S</button>
+            <button data-size="M" class="size-btn shrink-0 px-2.5 py-1.5 border border-wireframe bg-surface text-zinc-300 hover:border-zinc-400">M</button>
+            <button data-size="L" class="size-btn shrink-0 px-2.5 py-1.5 border border-wireframe bg-surface text-zinc-300 hover:border-zinc-400">L</button>
+            <button data-size="XL" class="size-btn shrink-0 px-2.5 py-1.5 border border-wireframe bg-surface text-zinc-300 hover:border-zinc-400">XL</button>
+            <button data-size="XXL" class="size-btn shrink-0 px-2.5 py-1.5 border border-wireframe bg-surface text-zinc-300 hover:border-zinc-400">XXL</button>
           </div>
         </div>
 
         <!-- Fit Selectors -->
-        <div class="flex items-center gap-2 overflow-x-auto no-scrollbar">
-          <span class="text-[11px] font-space text-zinc-500 font-bold uppercase mr-1">FIT:</span>
-          <div class="flex items-center gap-1 font-space text-xs font-semibold" id="fit-filters">
-            <button data-fit="ALL" class="fit-btn px-3 py-1 border border-lime bg-lime text-black font-bold">All Fits</button>
-            <button data-fit="Oversized" class="fit-btn px-3 py-1 border border-wireframe bg-surface text-zinc-300 hover:border-zinc-400">Oversized</button>
-            <button data-fit="Boxy Fit" class="fit-btn px-3 py-1 border border-wireframe bg-surface text-zinc-300 hover:border-zinc-400">Boxy Fit</button>
-            <button data-fit="Relaxed Fit" class="fit-btn px-3 py-1 border border-wireframe bg-surface text-zinc-300 hover:border-zinc-400">Relaxed Fit</button>
-            <button data-fit="Straight Cut" class="fit-btn px-3 py-1 border border-wireframe bg-surface text-zinc-300 hover:border-zinc-400">Straight Cut</button>
+        <div class="flex items-center gap-2 min-w-0">
+          <span class="text-[10px] sm:text-[11px] font-space text-zinc-500 font-bold uppercase shrink-0">FIT:</span>
+          <div class="mobile-h-scroll gap-1 font-space text-xs font-semibold flex-1 min-w-0" id="fit-filters">
+            <button data-fit="ALL" class="fit-btn shrink-0 whitespace-nowrap px-3 py-1 border border-lime bg-lime text-black font-bold">All</button>
+            <button data-fit="Oversized" class="fit-btn shrink-0 whitespace-nowrap px-3 py-1 border border-wireframe bg-surface text-zinc-300 hover:border-zinc-400">Oversized</button>
+            <button data-fit="Boxy Fit" class="fit-btn shrink-0 whitespace-nowrap px-3 py-1 border border-wireframe bg-surface text-zinc-300 hover:border-zinc-400">Boxy</button>
+            <button data-fit="Relaxed Fit" class="fit-btn shrink-0 whitespace-nowrap px-3 py-1 border border-wireframe bg-surface text-zinc-300 hover:border-zinc-400">Relaxed</button>
+            <button data-fit="Straight Cut" class="fit-btn shrink-0 whitespace-nowrap px-3 py-1 border border-wireframe bg-surface text-zinc-300 hover:border-zinc-400">Straight</button>
           </div>
         </div>
       </div>
@@ -520,10 +590,10 @@
     </section>
 
     <!-- ================= PINCODE DELIVERY CHECKER ================= -->
-    <section class="border border-wireframe bg-canvas p-6 md:p-8 mb-14 flex flex-col md:flex-row items-center justify-between gap-6">
-      <div class="space-y-1">
+    <section class="border border-wireframe bg-canvas p-4 sm:p-6 md:p-8 mb-10 sm:mb-14 flex flex-col md:flex-row items-stretch md:items-center justify-between gap-4 sm:gap-6">
+      <div class="space-y-1 min-w-0">
         <span class="text-lime font-space text-[11px] font-bold uppercase tracking-widest">// DELIVERY CHECK</span>
-        <h3 class="font-syne font-bold text-xl md:text-2xl text-white uppercase">See Realistic Timelines For Your Pincode</h3>
+        <h3 class="font-syne font-bold text-lg sm:text-xl md:text-2xl text-white uppercase leading-snug">See Realistic Timelines For Your Pincode</h3>
         <p class="text-xs text-zinc-400 font-inter">Dehradun (248xxx) first — then Uttarakhand regional and pan-India. Estimates only; exact dates confirmed when we ship.</p>
       </div>
 
@@ -1305,7 +1375,7 @@
               />
               
               <!-- Quick Size Overlay (Hover on Desktop) -->
-              <div class="absolute inset-x-0 bottom-0 bg-canvas/95 border-t border-wireframe p-3 translate-y-full group-hover:translate-y-0 transition-transform duration-200 flex flex-col gap-2 z-10">
+              <div class="quick-add-desktop absolute inset-x-0 bottom-0 bg-canvas/95 border-t border-wireframe p-3 translate-y-full group-hover:translate-y-0 transition-transform duration-200 flex flex-col gap-2 z-10">
                 <div class="flex items-center justify-between text-[10px] font-space text-zinc-400 font-bold uppercase">
                   <span>QUICK ADD SIZE:</span>
                   <span class="text-coral-urgent">⚡ ${product.stockLeft} LEFT</span>
@@ -1355,29 +1425,27 @@
               <div>
                 <h3 
                   onclick="openQuickView('${product.id}')"
-                  class="font-space font-bold text-sm md:text-base text-white tracking-tight uppercase group-hover:text-lime transition cursor-pointer"
+                  class="font-space font-bold text-sm md:text-base text-white tracking-tight uppercase group-hover:text-lime transition cursor-pointer line-clamp-2 sm:line-clamp-none"
                 >
                   ${product.title}
                 </h3>
-                <p class="font-inter text-xs text-zinc-400 mt-0.5 line-clamp-1">
+                <p class="font-inter text-xs text-zinc-400 mt-0.5 line-clamp-2 sm:line-clamp-1">
                   ${product.subtitle}
                 </p>
               </div>
 
-              <!-- Price & "COP NOW" CTA Button -->
-              <div class="flex items-center justify-between pt-2 border-t border-wireframe/70">
-                <div class="flex items-baseline gap-2">
+              <!-- Price & add to bag -->
+              <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 pt-2 border-t border-wireframe/70">
+                <div class="flex items-baseline gap-2 flex-wrap min-w-0">
                   <span class="font-space font-bold text-lg md:text-xl text-white">₹${product.price}</span>
                   <span class="font-space text-xs text-zinc-500 line-through">₹${product.originalPrice}</span>
                 </div>
-
-                <!-- Instant Action Button (Sharp 0px, Electric Lime) -->
                 <button 
                   onclick="quickAddToCart('${product.id}', '${product.sizes[0]}')" 
-                  class="px-4 py-2 bg-lime text-black font-space font-bold text-xs uppercase tracking-wider hover:bg-white hover:shadow-zine-white transition flex items-center gap-1.5"
+                  class="w-full sm:w-auto justify-center px-4 py-2.5 bg-lime text-black font-space font-bold text-xs uppercase tracking-wider hover:bg-white hover:shadow-zine-white transition flex items-center gap-1.5 shrink-0"
                 >
                   <i data-lucide="shopping-bag" class="w-3.5 h-3.5"></i>
-                  <span>COP NOW</span>
+                  <span>ADD TO BAG</span>
                 </button>
               </div>
 
