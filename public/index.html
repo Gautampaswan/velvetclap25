@@ -210,6 +210,21 @@
       color: #E87744 !important;
       text-shadow: 0 0 24px rgba(212, 97, 47, 0.35);
     }
+    .nav-tab-promo {
+      border: 1px solid transparent;
+    }
+    .nav-tab-promo.nav-tab-active {
+      color: inherit !important;
+      text-shadow: none;
+      box-shadow: 0 0 0 2px #fff;
+    }
+    .nav-tab-thumb {
+      border-radius: 9999px !important;
+      width: 1.65rem;
+      height: 1.65rem;
+      object-fit: cover;
+      flex-shrink: 0;
+    }
     .product-card:hover {
       box-shadow: 0 0 0 1px rgba(212, 97, 47, 0.35), 0 12px 40px rgba(0, 0, 0, 0.35);
     }
@@ -393,8 +408,13 @@
         <button type="button" data-nav="oversized" class="nav-tab shrink-0 whitespace-nowrap px-2.5 sm:px-3 py-2 text-zinc-400 hover:text-white transition"><span class="sm:hidden">OVERSIZED</span><span class="hidden sm:inline">OVERSIZED TEES</span></button>
         <button type="button" data-nav="cargos" class="nav-tab shrink-0 whitespace-nowrap px-2.5 sm:px-3 py-2 text-zinc-400 hover:text-white transition"><span class="sm:hidden">CARGOS</span><span class="hidden sm:inline">CARGOS & DENIM</span></button>
         <button type="button" data-nav="collabs" class="nav-tab shrink-0 whitespace-nowrap px-2.5 sm:px-3 py-2 text-zinc-400 hover:text-white transition">COLLABS</button>
-        <button type="button" data-nav="sale" class="nav-tab shrink-0 whitespace-nowrap px-2.5 sm:px-3.5 py-1.5 bg-lime text-black font-extrabold hover:bg-white transition">
-          <span class="sm:hidden">SALE 🔥</span><span class="hidden sm:inline">UNDER ₹999 (SALE 🔥)</span>
+        <button type="button" data-nav="genz" class="nav-tab nav-tab-promo shrink-0 whitespace-nowrap pl-1 pr-2.5 sm:pr-3 py-1 bg-lime text-black font-extrabold hover:bg-white transition flex items-center gap-1.5">
+          <img src="https://images.unsplash.com/photo-1529139574466-a303027c1d8b?auto=format&fit=crop&w=80&q=80" alt="" class="nav-tab-thumb" width="28" height="28" />
+          <span class="hidden sm:inline">GENZ STYLE</span><span class="sm:hidden">GENZ</span>
+        </button>
+        <button type="button" data-nav="weekend" class="nav-tab nav-tab-promo shrink-0 whitespace-nowrap pl-1 pr-2.5 sm:pr-3 py-1 bg-velvet text-white font-extrabold hover:bg-velvet-light transition flex items-center gap-1.5">
+          <img src="https://images.unsplash.com/photo-1441986300917-64674bd600d8?auto=format&fit=crop&w=80&q=80" alt="" class="nav-tab-thumb ring-1 ring-white/30" width="28" height="28" />
+          <span class="hidden sm:inline">WEEKEND SALE</span><span class="sm:hidden">WEEKEND</span>
         </button>
       </div>
     </nav>
@@ -472,6 +492,16 @@
 
     <!-- ================= CONTROLS: FILTERS, SIZES, FITS, SORT ================= -->
     <section id="vault-catalog" class="space-y-4 mb-8">
+
+      <div id="catalog-spotlight" class="hidden relative overflow-hidden genz-card border border-wireframe min-h-[140px] sm:min-h-[168px]">
+        <img id="catalog-spotlight-img" src="" alt="" class="absolute inset-0 w-full h-full object-cover opacity-35 pointer-events-none" />
+        <div class="absolute inset-0 bg-gradient-to-r from-canvas via-canvas/85 to-transparent pointer-events-none"></div>
+        <div class="relative z-10 p-4 sm:p-6 max-w-xl">
+          <p id="catalog-spotlight-kicker" class="text-[10px] font-space font-bold uppercase tracking-widest text-clap mb-1">Collection</p>
+          <h2 id="catalog-spotlight-title" class="font-bricolage font-extrabold text-xl sm:text-2xl text-white uppercase">Title</h2>
+          <p id="catalog-spotlight-desc" class="text-xs sm:text-sm text-zinc-400 mt-2 font-inter leading-relaxed">Description</p>
+        </div>
+      </div>
       
       <!-- Top Category Tabs & Sort Dropdown -->
       <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4 border-b border-wireframe pb-4">
@@ -688,7 +718,8 @@
             <li><a href="#vault-catalog" data-nav="oversized" class="footer-nav hover:text-lime transition">Boxy & Heavyweight Tees</a></li>
             <li><a href="#vault-catalog" data-nav="cargos" class="footer-nav hover:text-lime transition">Parachute & Cargo Pants</a></li>
             <li><a href="#vault-catalog" data-nav="cargos" class="footer-nav hover:text-lime transition">Raw Distressed Denim</a></li>
-            <li><a href="#vault-catalog" data-nav="sale" class="footer-nav hover:text-lime transition font-bold text-zinc-300">Steal Deals (Under ₹999)</a></li>
+            <li><a href="#vault-catalog" data-nav="genz" class="footer-nav hover:text-lime transition">GenZ Style Edit</a></li>
+            <li><a href="#vault-catalog" data-nav="weekend" class="footer-nav hover:text-lime transition font-bold text-zinc-300">Weekend Sale</a></li>
           </ul>
         </div>
 
@@ -994,16 +1025,33 @@
       discountAmount: 0,
       couponMinSubtotal: 0,
       catalogTotal: 0,
+      promo: '',
+    };
+
+    const NAV_SPOTLIGHT = {
+      genz: {
+        kicker: 'GenZ style edit',
+        title: 'Oversized · Boxy · Street',
+        desc: 'Baggy fits, heavy tees, and campus-ready drops curated for Dehradun — all under ₹999.',
+        image: 'https://images.unsplash.com/photo-1529139574466-a303027c1d8b?auto=format&fit=crop&w=1200&q=80',
+      },
+      weekend: {
+        kicker: 'Weekend sale',
+        title: 'Steals before Sunday',
+        desc: 'Highest discounts in the vault this weekend. Extra value with VC25 on orders ₹799+.',
+        image: 'https://images.unsplash.com/photo-1441986300917-64674bd600d8?auto=format&fit=crop&w=1200&q=80',
+      },
     };
 
     const NAV_PRESETS = {
-      drops: { category: 'all', audience: 'all', collection: '', maxPrice: '', fit: 'ALL', searchQuery: '', sortBy: 'trending' },
-      men: { category: 'all', audience: 'men', collection: '', maxPrice: '', fit: 'ALL', searchQuery: '', sortBy: 'trending' },
-      women: { category: 'all', audience: 'women', collection: '', maxPrice: '', fit: 'ALL', searchQuery: '', sortBy: 'trending' },
-      oversized: { category: 'tees', audience: 'all', collection: '', maxPrice: '', fit: 'Oversized', searchQuery: '', sortBy: 'trending' },
-      cargos: { category: 'bottoms', audience: 'all', collection: '', maxPrice: '', fit: 'ALL', searchQuery: 'cargo', sortBy: 'trending' },
-      collabs: { category: 'all', audience: 'all', collection: 'collab', maxPrice: '', fit: 'ALL', searchQuery: '', sortBy: 'trending' },
-      sale: { category: 'all', audience: 'all', collection: '', maxPrice: '999', fit: 'ALL', searchQuery: '', sortBy: 'price-low' },
+      drops: { category: 'all', audience: 'all', collection: '', maxPrice: '', fit: 'ALL', searchQuery: '', sortBy: 'trending', promo: '' },
+      men: { category: 'all', audience: 'men', collection: '', maxPrice: '', fit: 'ALL', searchQuery: '', sortBy: 'trending', promo: '' },
+      women: { category: 'all', audience: 'women', collection: '', maxPrice: '', fit: 'ALL', searchQuery: '', sortBy: 'trending', promo: '' },
+      oversized: { category: 'tees', audience: 'all', collection: '', maxPrice: '', fit: 'Oversized', searchQuery: '', sortBy: 'trending', promo: '' },
+      cargos: { category: 'bottoms', audience: 'all', collection: '', maxPrice: '', fit: 'ALL', searchQuery: 'cargo', sortBy: 'trending', promo: '' },
+      collabs: { category: 'all', audience: 'all', collection: 'collab', maxPrice: '', fit: 'ALL', searchQuery: '', sortBy: 'trending', promo: '' },
+      genz: { category: 'all', audience: 'all', collection: '', maxPrice: '999', fit: 'ALL', searchQuery: '', sortBy: 'trending', promo: 'genz' },
+      weekend: { category: 'all', audience: 'all', collection: '', maxPrice: '999', fit: 'ALL', searchQuery: '', sortBy: 'discount', promo: 'weekend' },
     };
 
     const INFO_COPY = {
@@ -1038,6 +1086,7 @@
       });
       if (state.maxPrice) params.set('maxPrice', state.maxPrice);
       if (state.collection) params.set('collection', state.collection);
+      if (state.promo) params.set('promo', state.promo);
       const data = await apiFetch(`/api/products?${params}`);
       PRODUCTS = data.products || [];
       if (typeof data.total === 'number') state.catalogTotal = data.total;
@@ -1308,10 +1357,30 @@
       return PRODUCTS;
     }
 
+    function updateCatalogSpotlight() {
+      const wrap = document.getElementById('catalog-spotlight');
+      if (!wrap) return;
+      const meta = NAV_SPOTLIGHT[state.activeNav];
+      if (!meta) {
+        wrap.classList.add('hidden');
+        return;
+      }
+      wrap.classList.remove('hidden');
+      document.getElementById('catalog-spotlight-kicker').textContent = meta.kicker;
+      document.getElementById('catalog-spotlight-title').textContent = meta.title;
+      document.getElementById('catalog-spotlight-desc').textContent = meta.desc;
+      const img = document.getElementById('catalog-spotlight-img');
+      if (img) {
+        img.src = meta.image;
+        img.alt = meta.title;
+      }
+    }
+
     async function refreshCatalog() {
       await loadProductsFromServer();
       hydrateCartProducts();
       renderProducts();
+      updateCatalogSpotlight();
       updateCartState();
     }
 
@@ -1842,6 +1911,7 @@
         state.collection = '';
         state.maxPrice = '';
         state.fit = 'ALL';
+        state.promo = '';
         state.activeNav = '';
         syncNavTabsUI();
         syncCategoryPillsUI();
@@ -1881,7 +1951,8 @@
       syncCategoryPillsUI();
       await refreshCatalog();
       scrollToCatalog();
-      triggerToast(`Showing ${navKey.replace('-', ' ').toUpperCase()} vault`);
+      const toastLabels = { genz: 'GenZ style edit', weekend: 'Weekend sale picks' };
+      triggerToast(toastLabels[navKey] || `Showing ${navKey.replace(/-/g, ' ').toUpperCase()} vault`);
     }
 
     // --- 9. Toast Notification Handler ---

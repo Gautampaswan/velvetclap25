@@ -336,7 +336,7 @@ function deliveryMessageForTier(tier, pin) {
 
 function filterProducts(query) {
   let list = [...products];
-  const { category, size, fit, sort, q, audience, maxPrice, collection } = query;
+  const { category, size, fit, sort, q, audience, maxPrice, collection, promo } = query;
 
   if (audience && audience !== 'all') {
     const aud = String(audience).toLowerCase();
@@ -375,6 +375,23 @@ function filterProducts(query) {
   }
   if (q && String(q).trim()) {
     list = list.filter((p) => matchesProductSearch(p, q));
+  }
+
+  if (promo === 'genz') {
+    list = list.filter((p) => {
+      const fit = String(p.fit || '').toLowerCase();
+      return (
+        fit.includes('oversized') ||
+        fit.includes('boxy') ||
+        p.tagType === 'purple' ||
+        p.tagType === 'lime'
+      );
+    });
+  } else if (promo === 'weekend') {
+    list = list.filter((p) => {
+      const off = parseInt(String(p.discount || '0'), 10) || 0;
+      return p.price <= 999 && off >= 40;
+    });
   }
 
   const sortBy = sort || 'trending';
