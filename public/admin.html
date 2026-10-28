@@ -70,13 +70,21 @@
               <option value="headwear">headwear</option>
             </select>
           </div>
-          <div>
-            <label class="text-xs text-zinc-400">Audience (for MEN / WOMEN tabs)</label>
+          <div class="sm:col-span-2">
+            <label class="text-xs text-zinc-400">Audience &amp; promo nav</label>
             <select name="audience" class="mt-1 w-full bg-[#0B0B0D] border border-zinc-600 px-3 py-2 text-sm">
-              <option value="unisex">unisex</option>
-              <option value="men">men</option>
-              <option value="women">women</option>
+              <optgroup label="Who it’s for (MEN / WOMEN tabs)">
+                <option value="unisex">unisex</option>
+                <option value="men">men</option>
+                <option value="women">women</option>
+              </optgroup>
+              <optgroup label="Featured on storefront nav">
+                <option value="genz">GenZ Style tab</option>
+                <option value="weekend">Weekend Sale tab</option>
+                <option value="genz-weekend">GenZ Style + Weekend Sale</option>
+              </optgroup>
             </select>
+            <p class="text-[11px] text-zinc-500 mt-1">Pick <strong class="text-zinc-400">unisex / men / women</strong> for normal catalog, or a <strong class="text-zinc-400">GenZ / Weekend</strong> option to pin this SKU to those nav buttons (still shows under MEN/WOMEN if unisex).</p>
           </div>
           <div>
             <label class="text-xs text-zinc-400">Fit</label>
@@ -369,16 +377,25 @@
       const data = await api('/api/admin/products');
       document.getElementById('product-count').textContent = `${data.products.length} products in catalog`;
       const ul = document.getElementById('product-list');
-      ul.innerHTML = data.products.map((p) => `
+      ul.innerHTML = data.products.map((p) => {
+        const shelves = Array.isArray(p.promoShelves) ? p.promoShelves : [];
+        const shelfBadges = shelves.map((s) => {
+          if (s === 'genz') return '<span class="text-[10px] px-1 py-0.5 bg-lime text-black font-bold uppercase">GenZ</span>';
+          if (s === 'weekend') return '<span class="text-[10px] px-1 py-0.5 bg-[#D4612F] text-white font-bold uppercase">Weekend</span>';
+          return '';
+        }).join(' ');
+        const aud = p.audience || 'unisex';
+        return `
         <li class="flex gap-3 border border-zinc-800 p-2 bg-[#121215]">
           <img src="${p.colors[0]?.image || ''}" alt="" class="w-12 h-14 object-cover bg-black" />
           <div class="flex-1 min-w-0">
             <div class="font-bold text-white truncate">${p.title}</div>
-            <div class="text-[#D4612F] text-xs">₹${p.price} · ${p.id}</div>
+            <div class="text-[#D4612F] text-xs">₹${p.price} · ${p.id} · ${aud}</div>
+            ${shelfBadges ? `<div class="mt-1 flex flex-wrap gap-1">${shelfBadges}</div>` : ''}
           </div>
           <button type="button" data-id="${p.id}" class="btn-del text-xs text-red-400 hover:text-red-300 uppercase font-bold shrink-0">Delete</button>
-        </li>
-      `).join('');
+        </li>`;
+      }).join('');
       ul.querySelectorAll('.btn-del').forEach((btn) => {
         btn.addEventListener('click', async () => {
           if (!confirm('Remove this product from the live catalog?')) return;

@@ -334,6 +334,55 @@ function deliveryMessageForTier(tier, pin) {
   }
 }
 
+function parseAudienceField(rawAudience) {
+  const raw = String(rawAudience || 'unisex')
+    .trim()
+    .toLowerCase();
+  if (raw === 'genz') {
+    return { audience: 'unisex', promoShelves: ['genz'] };
+  }
+  if (raw === 'weekend') {
+    return { audience: 'unisex', promoShelves: ['weekend'] };
+  }
+  if (raw === 'genz-weekend' || raw === 'both') {
+    return { audience: 'unisex', promoShelves: ['genz', 'weekend'] };
+  }
+  return { audience: normalizeAudience(raw), promoShelves: [] };
+}
+
+function normalizePromoShelves(raw) {
+  if (!raw) return [];
+  if (Array.isArray(raw)) {
+    return [
+      ...new Set(
+        raw.map((s) => String(s).toLowerCase()).filter((s) => s === 'genz' || s === 'weekend')
+      ),
+    ];
+  }
+  return [];
+}
+
+function productMatchesPromoShelf(p, promo) {
+  const shelves = normalizePromoShelves(p.promoShelves);
+  if (promo === 'genz' && shelves.includes('genz')) return true;
+  if (promo === 'weekend' && shelves.includes('weekend')) return true;
+
+  if (promo === 'genz') {
+    const fit = String(p.fit || '').toLowerCase();
+    return (
+      fit.includes('oversized') ||
+      fit.includes('boxy') ||
+      p.tagType === 'purple' ||
+      p.tagType === 'lime'
+    );
+  }
+  if (promo === 'weekend') {
+    const off = parseInt(String(p.discount || '0'), 10) || 0;
+    return p.price <= 999 && off >= 40;
+  }
+  return false;
+}
+
 function filterProducts(query) {
   let list = [...products];
   const { category, size, fit, sort, q, audience, maxPrice, collection, promo } = query;
@@ -377,21 +426,8 @@ function filterProducts(query) {
     list = list.filter((p) => matchesProductSearch(p, q));
   }
 
-  if (promo === 'genz') {
-    list = list.filter((p) => {
-      const fit = String(p.fit || '').toLowerCase();
-      return (
-        fit.includes('oversized') ||
-        fit.includes('boxy') ||
-        p.tagType === 'purple' ||
-        p.tagType === 'lime'
-      );
-    });
-  } else if (promo === 'weekend') {
-    list = list.filter((p) => {
-      const off = parseInt(String(p.discount || '0'), 10) || 0;
-      return p.price <= 999 && off >= 40;
-    });
+  if (promo === 'genz' || promo === 'weekend') {
+    list = list.filter((p) => productMatchesPromoShelf(p, promo));
   }
 
   const sortBy = sort || 'trending';
@@ -572,9 +608,18 @@ app.post('/api/admin/products', requireAdmin, (req, res) => {
     sizes: Array.isArray(body.sizes) && body.sizes.length ? body.sizes : ['S', 'M', 'L', 'XL'],
     stockLeft: Number(body.stockLeft) ?? 10,
     details: String(body.details || '').trim(),
-    audience: normalizeAudience(body.audience || 'unisex'),
+    ...(() => {
+      const parsed = parseAudienceField(body.audience);
+      const extra = normalizePromoShelves(body.promoShelves);
+      const promoShelves = [...new Set([...parsed.promoShelves, ...extra])];
+      return {
+        audience: parsed.audience,
+        promoShelves: promoShelves.length ? promoShelves : undefined,
+      };
+    })(),
     collection: body.collection || null,
   };
+  if (product.promoShelves === undefined) delete product.promoShelves;
 
   if (products.some((p) => p.id === product.id)) {
     return res.status(409).json({ error: `Product id ${product.id} already exists` });
