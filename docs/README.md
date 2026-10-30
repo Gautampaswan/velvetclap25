@@ -7,6 +7,7 @@ Professional documentation for the **VELVETCLAP25** e-commerce demo/store, deriv
 | [PROJECT_DOCUMENTATION.md](./PROJECT_DOCUMENTATION.md) | Business, dev, QA, maintainers | Full overview, requirements, features, UI/UX, architecture, journeys |
 | [REQUIREMENTS_TRACEABILITY.md](./REQUIREMENTS_TRACEABILITY.md) | PM, QA, developers | Requirement IDs, status, evidence, gaps |
 | [SETUP_AND_DEPLOYMENT.md](./SETUP_AND_DEPLOYMENT.md) | Developers, DevOps | Local setup, env vars, Render deploy, troubleshooting |
+| [CUSTOM_DOMAIN_AND_SEO.md](./CUSTOM_DOMAIN_AND_SEO.md) | Owner, DevOps | velvetclap.com on Render, DNS, Google Search Console |
 | [KNOWN_ISSUES_AND_ROADMAP.md](./KNOWN_ISSUES_AND_ROADMAP.md) | Product, engineering | Bugs, debt, priorities, future features |
 | [CATALOG_QA_CHECKLIST.md](./CATALOG_QA_CHECKLIST.md) | QA, shop staff | Pre-deploy catalog, filters, promo, pincode tests |
 

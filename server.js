@@ -37,6 +37,45 @@ if (razorpayEnabled) {
 
 app.use(cors());
 app.use(express.json());
+
+/** Canonical public URL (set SITE_URL on Render after custom domain). */
+function getPublicSiteBase(req) {
+  const fromEnv = String(process.env.SITE_URL || '').trim().replace(/\/$/, '');
+  if (fromEnv) return fromEnv;
+  const proto = String(req.get('x-forwarded-proto') || req.protocol || 'https').split(',')[0].trim();
+  const host = String(req.get('x-forwarded-host') || req.get('host') || 'localhost').split(',')[0].trim();
+  return `${proto}://${host}`;
+}
+
+app.get('/robots.txt', (req, res) => {
+  const base = getPublicSiteBase(req);
+  res.type('text/plain');
+  res.send(
+    `User-agent: *\nAllow: /\nDisallow: /admin.html\nDisallow: /api/\n\nSitemap: ${base}/sitemap.xml\n`
+  );
+});
+
+app.get('/sitemap.xml', (req, res) => {
+  const base = getPublicSiteBase(req);
+  const lastmod = new Date().toISOString().slice(0, 10);
+  const urls = [{ loc: `${base}/`, changefreq: 'weekly', priority: '1.0' }];
+  const body = `<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+${urls
+  .map(
+    (u) => `  <url>
+    <loc>${u.loc}</loc>
+    <lastmod>${lastmod}</lastmod>
+    <changefreq>${u.changefreq}</changefreq>
+    <priority>${u.priority}</priority>
+  </url>`
+  )
+  .join('\n')}
+</urlset>`;
+  res.type('application/xml');
+  res.send(body);
+});
+
 app.use(express.static(path.join(__dirname, 'public')));
 
 const productsPath = path.join(__dirname, 'data', 'products.json');
