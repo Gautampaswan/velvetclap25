@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>VELVETCLAP — Streetwear for Dehradun | Under ₹999</title>
+  <title>VELVETCLAP — Streetwear for Dehradun</title>
   <link rel="icon" href="/assets/velvetclap-logo.png" type="image/png" />
   
   <!-- Fonts: display + Gen Z sans + logo serif -->
@@ -454,35 +454,13 @@
 
           <h1 class="font-bricolage font-extrabold text-[1.75rem] leading-[1.05] sm:text-5xl md:text-7xl lg:text-[72px] sm:leading-[0.95] tracking-tight text-white uppercase break-words">
             <span class="brand-wordmark-velvet">Streetwear</span><br/>
-            <span class="text-gradient-brand">For Dehradun</span><br/>
-            <span class="text-white/90">Under ₹999</span>
+            <span class="text-gradient-brand">For Dehradun</span>
           </h1>
 
           <p class="font-instrument italic text-base md:text-lg text-zinc-400 mt-4">Equal style. Equal comfort.</p>
           <p class="font-inter text-sm md:text-base text-zinc-500 mt-3 max-w-xl leading-relaxed">
             Boxy tees, oversized cuts, and cargos with real GSM notes — built for your city, shipped honest nationwide.
           </p>
-        </div>
-
-        <div class="w-full lg:w-80 genz-card bg-canvas/90 border border-wireframe p-4 sm:p-5 space-y-3 sm:space-y-4 shadow-zine-velvet">
-          <div class="flex justify-center pb-2">
-            <img src="/assets/velvetclap-logo.png" alt="Velvetclap" class="w-24 h-24 object-cover genz-logo-ring ring-2 ring-velvet/50" width="96" height="96" />
-          </div>
-          <div class="flex justify-between items-baseline border-b border-wireframe pb-3">
-            <span class="text-zinc-400 font-space text-[11px] font-bold tracking-wider uppercase">CURATED ITEMS</span>
-            <span class="text-white font-syne font-bold text-2xl tracking-tight" id="hero-curated-count">64 STYLES</span>
-          </div>
-
-          <div class="flex justify-between items-baseline border-b border-wireframe pb-3">
-            <span class="text-zinc-400 font-space text-[11px] font-bold tracking-wider uppercase">MAX PRICE CAP</span>
-            <span class="text-lime font-space font-bold text-2xl tracking-tight">₹999 FLAT</span>
-          </div>
-
-          <div class="space-y-1 text-[11px] font-space font-bold text-zinc-400 uppercase tracking-wide">
-            <p>Free delivery in Dehradun (248xxx) · same-day on ₹1599+</p>
-            <p>Free pan-India shipping on carts ₹999+</p>
-            <p class="text-lime">VC25: ₹300 off when subtotal ≥ ₹799</p>
-          </div>
         </div>
       </div>
     </section>
@@ -1347,8 +1325,6 @@
     const headerCartTotal = document.getElementById('header-cart-total');
     const headerCartCount = document.getElementById('header-cart-count');
     const headerWishlistCount = document.getElementById('header-wishlist-count');
-    const heroCuratedCount = document.getElementById('hero-curated-count');
-
     // --- 4. Render Products Engine ---
     function getFilteredProducts() {
       return PRODUCTS;
@@ -1383,7 +1359,6 @@
 
     function renderProducts() {
       const filtered = getFilteredProducts();
-      heroCuratedCount.textContent = `${filtered.length} STYLES`;
 
       if (filtered.length === 0) {
         productGridEl.innerHTML = '';
