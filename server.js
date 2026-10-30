@@ -102,8 +102,18 @@ function nextProductId(list) {
   return `vc-${next}`;
 }
 
+function normalizeImageUrlInput(raw) {
+  let img = String(raw || '').trim();
+  const srcMatch = img.match(/src=["'](https?:\/\/i\.ibb\.co\/[^"']+)["']/i);
+  if (srcMatch) return srcMatch[1];
+  const directMatch = img.match(/https?:\/\/i\.ibb\.co\/[^\s"'<>]+/i);
+  if (directMatch && !/^https?:\/\//i.test(img)) return directMatch[0];
+  if (directMatch && img.includes('<')) return directMatch[0];
+  return img;
+}
+
 function validateImageUrl(url) {
-  const img = String(url || '').trim();
+  const img = normalizeImageUrlInput(url);
   if (!img) return 'image URL is required';
   if (!img.startsWith('/') && !/^https?:\/\//i.test(img)) {
     return 'image must be https URL or /products/... path';
@@ -626,7 +636,7 @@ app.post('/api/admin/products', requireAdmin, (req, res) => {
     colors: body.colors.map((c) => ({
       name: c.name || 'Default',
       hex: c.hex || '#262626',
-      image: String(c.image).trim(),
+      image: normalizeImageUrlInput(c.image),
     })),
     sizes: Array.isArray(body.sizes) && body.sizes.length ? body.sizes : ['S', 'M', 'L', 'XL'],
     stockLeft: Number(body.stockLeft) ?? 10,

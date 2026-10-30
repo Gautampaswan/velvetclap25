@@ -117,7 +117,7 @@
             <textarea name="details" rows="3" class="mt-1 w-full bg-[#0B0B0D] border border-zinc-600 px-3 py-2 text-sm"></textarea>
           </div>
         </div>
-        <button type="submit" class="bg-[#D4612F] text-white font-bold text-sm py-2.5 px-6 uppercase hover:bg-[#E87744]">Add product</button>
+        <button type="submit" id="btn-add-product" class="bg-[#D4612F] text-white font-bold text-sm py-2.5 px-6 uppercase hover:bg-[#E87744] disabled:opacity-50 disabled:pointer-events-none disabled:cursor-not-allowed">Add product</button>
         <p id="form-msg" class="text-xs"></p>
       </form>
 
@@ -425,10 +425,57 @@
       a.click();
     });
 
+    function normalizeImageUrlInput(raw) {
+      let img = String(raw || '').trim();
+      const srcMatch = img.match(/src=["'](https?:\/\/i\.ibb\.co\/[^"']+)["']/i);
+      if (srcMatch) return srcMatch[1];
+      const directMatch = img.match(/https?:\/\/i\.ibb\.co\/[^\s"'<>]+/i);
+      if (directMatch && (img.includes('<') || !/^https?:\/\//i.test(img))) return directMatch[0];
+      return img;
+    }
+
+    function validateImageField(raw) {
+      const img = normalizeImageUrlInput(raw);
+      if (!img) return { ok: false, message: 'Image URL is required.' };
+      if (!img.startsWith('/') && !/^https?:\/\//i.test(img)) {
+        return {
+          ok: false,
+          message:
+            'Paste only the direct photo URL (https://i.ibb.co/…/file.jpg), not HTML from “HTML full linked”.',
+        };
+      }
+      if (/^https?:\/\/(www\.)?ibb\.co\//i.test(img)) {
+        return {
+          ok: false,
+          message:
+            'Use Direct link (https://i.ibb.co/…), not Viewer link (https://ibb.co/…).',
+        };
+      }
+      return { ok: true, url: img };
+    }
+
     document.getElementById('add-form').addEventListener('submit', async (e) => {
       e.preventDefault();
-      const fd = new FormData(e.target);
+      const form = e.target;
+      const submitBtn = document.getElementById('btn-add-product');
+      const msg = document.getElementById('form-msg');
+      const fd = new FormData(form);
       const price = Number(fd.get('price'));
+      if (!Number.isFinite(price) || price < 1) {
+        msg.className = 'text-xs text-red-400';
+        msg.textContent = 'Enter a valid price (₹).';
+        return;
+      }
+      const imageCheck = validateImageField(fd.get('image'));
+      if (!imageCheck.ok) {
+        msg.className = 'text-xs text-red-400';
+        msg.textContent = imageCheck.message;
+        return;
+      }
+      const imageInput = form.querySelector('[name="image"]');
+      if (imageInput && imageCheck.url !== String(imageInput.value || '').trim()) {
+        imageInput.value = imageCheck.url;
+      }
       const originalPrice = Number(fd.get('originalPrice')) || Math.round(price * 2);
       const discountPct = Math.round((1 - price / originalPrice) * 100);
       const body = {
@@ -444,21 +491,31 @@
         tagType: 'lime',
         sizes: String(fd.get('sizes')).split(',').map((s) => s.trim()).filter(Boolean),
         stockLeft: Number(fd.get('stockLeft')) || 0,
-        colors: [{ name: fd.get('colorName') || 'Default', hex: '#262626', image: fd.get('image') }],
+        colors: [{ name: fd.get('colorName') || 'Default', hex: '#262626', image: imageCheck.url }],
         details: fd.get('details') || '',
         rating: 4.8,
         reviewsCount: 0,
       };
-      const msg = document.getElementById('form-msg');
+      const prevLabel = submitBtn.textContent;
+      submitBtn.disabled = true;
+      submitBtn.textContent = 'Adding…';
+      msg.textContent = '';
       try {
         await api('/api/admin/products', { method: 'POST', body: JSON.stringify(body) });
         msg.className = 'text-xs text-[#D4612F]';
         msg.textContent = 'Product added — visible on the store now.';
-        e.target.reset();
+        form.reset();
+        form.querySelector('[name="sizes"]').value = 'S, M, L, XL';
+        form.querySelector('[name="colorName"]').value = 'Default';
+        form.querySelector('[name="stockLeft"]').value = '10';
         await loadProducts();
       } catch (err) {
         msg.className = 'text-xs text-red-400';
         msg.textContent = err.message;
+        msg.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      } finally {
+        submitBtn.disabled = false;
+        submitBtn.textContent = prevLabel;
       }
     });
 
