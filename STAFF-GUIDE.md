@@ -55,7 +55,11 @@ Staff should prefer **Cloudinary**, not Git.
 - **Fits:** `Oversized`, `Boxy Fit`, `Relaxed Fit`, `Straight Cut`
 - **Tag types:** `lime`, `purple`, `urgent` (badge colors)
 
-## 4. After staff edits on Render (important)
+## 4. Demo products removed from Git
+
+The repo ships with an **empty** `data/products.json` (`[]`). The live shop only shows SKUs you **add in admin**. There are no built-in demo tees/cargos after you deploy the latest code.
+
+## 5. After staff edits on Render (important)
 
 Render saves `data/products.json` on the server, but **a new deploy from GitHub can overwrite** catalog changes unless someone:
 
@@ -65,7 +69,7 @@ Render saves `data/products.json` on the server, but **a new deploy from GitHub 
 
 Until you move to a database, do an **export + push** weekly or after big drops.
 
-## 5. JSON reference (if editing by hand)
+## 6. JSON reference (if editing by hand)
 
 ```json
 {
@@ -94,7 +98,7 @@ Until you move to a database, do an **export + push** weekly or after big drops.
 }
 ```
 
-## 6. Order alerts (email vs SMS)
+## 7. Order alerts (email vs SMS)
 
 | Channel | Cost | Setup |
 |---------|------|--------|
@@ -103,7 +107,7 @@ Until you move to a database, do an **export + push** weekly or after big drops.
 
 Every new checkout emails the shop inbox with order ID, items, and delivery address. If the customer entered email at checkout, they also get confirm + shipped emails when you mark shipped in admin.
 
-## 7. Who to contact
+## 8. Who to contact
 
 - **New password / Render env:** tech lead  
 - **Razorpay live payments:** tech lead + Razorpay KYC  
